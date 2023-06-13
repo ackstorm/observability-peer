@@ -30082,6 +30082,18 @@ spec:
               }
             }
           }
+          otelcol.receiver.prometheus "default" {
+            output {
+              metrics = [otelcol.exporter.otlp.default.input]
+              logs    = [otelcol.exporter.otlp.default.input]
+              traces  = [otelcol.exporter.otlp.default.input]
+            }
+          }
+          otelcol.exporter.otlp "default" {
+            client {
+              endpoint = ${OBSERVER_URL}
+            }
+          }
         create: true
       enableReporting: false
       mode: flow
