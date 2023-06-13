@@ -30065,11 +30065,21 @@ spec:
   values:
     agent:
       configMap:
-        content: "logging {\n  level  = \"info\"\n  format = \"logfmt\"\n}\nmimir.rules.kubernetes
-          \"default\" {\n  address = \"${OBSERVER_URL}\"\n  tenant_id = \"${ENVIRONMENT}-${CLUSTER}\"\n
-          \ mimir_namespace_prefix = \"peer\"\n  #rule_selector {\n  #  match_labels
-          = { \n  #    role = \"migrate\",\n  #  }\n  #}\n  match_expression {\n    key
-          = \"role\"\n    operator = \"NotIn\"\n    values = [\"peer\"]\n  }\n}\n"
+        content: |
+          logging {
+            level  = "info"
+            format = "logfmt"
+          }
+          mimir.rules.kubernetes "default" {
+            address = "${OBSERVER_URL}"
+            tenant_id = "${ENVIRONMENT}-${CLUSTER}"
+            mimir_namespace_prefix = "peer"
+            match_expression {
+              key = "role"
+              operator = "NotIn"
+              values = ["peer"]
+            }
+          }
         create: true
       enableReporting: false
       mode: flow
