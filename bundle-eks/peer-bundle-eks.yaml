@@ -29641,7 +29641,7 @@ apiVersion: v1
 data:
   config.river: "logging {\n  level  = \"info\"\n  format = \"logfmt\"\n}\nmimir.rules.kubernetes
     \"default\" {\n  address = \"${OBSERVER_URL}\"\n  tenant_id = \"${ENVIRONMENT}-${CLUSTER}\"\n
-    \ rule_selector {\n    match_labels = { \n      agent = \"yes\",\n    }\n  }\n}"
+    \ rule_selector {\n    match_labels = { \n      role = \"peer\",\n    }\n  }\n}"
 kind: ConfigMap
 metadata:
   labels:
