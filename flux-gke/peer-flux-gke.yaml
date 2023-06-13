@@ -30067,8 +30067,9 @@ spec:
       configMap:
         content: "logging {\n  level  = \"info\"\n  format = \"logfmt\"\n}\nmimir.rules.kubernetes
           \"default\" {\n  address = \"${OBSERVER_URL}\"\n  tenant_id = \"${ENVIRONMENT}-${CLUSTER}\"\n
-          \ rule_selector {\n    match_labels = { \n      role = \"peer\",\n    }\n
-          \ }\n}\n"
+          \ mimir_namespace_prefix = \"peer\"\n  #rule_selector {\n  #  match_labels
+          = { \n  #    role = \"migrate\",\n  #  }\n  #}\n  match_expression {\n    key
+          = \"role\"\n    operator = \"NotIn\"\n    values = [\"peer\"]\n  }\n}\n"
         create: true
       enableReporting: false
       mode: flow
