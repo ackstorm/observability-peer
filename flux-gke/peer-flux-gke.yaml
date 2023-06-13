@@ -30073,11 +30073,13 @@ spec:
           mimir.rules.kubernetes "default" {
             address = "${OBSERVER_URL}"
             tenant_id = "${ENVIRONMENT}-${CLUSTER}"
-            mimir_namespace_prefix = "peer"
-            match_expression {
-              key = "role"
-              operator = "NotIn"
-              values = ["peer"]
+            mimir_namespace_prefix = "${ENVIRONMENT}-${CLUSTER}"
+            rule_selector {
+              match_expression {
+                key = "role"
+                operator = "NotIn"
+                values = ["peer", "alert-rules"]
+              }
             }
           }
         create: true
