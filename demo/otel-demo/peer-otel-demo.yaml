@@ -175,24 +175,6 @@ spec:
       securityContext: {}
       serviceAccountName: otel-demo-frontend
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    release: kps
-  name: otel-demo-backend
-  namespace: prometheus
-spec:
-  endpoints:
-  - path: /metrics
-    port: http
-  namespaceSelector:
-    matchNames:
-    - default
-  selector:
-    matchLabels:
-      app: otel-demo-backend
----
 apiVersion: v1
 kind: Pod
 metadata:
