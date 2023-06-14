@@ -6226,7 +6226,7 @@ spec:
   config: "receivers:\n  otlp:\n    protocols:\n      grpc:\n      http:\n\nprocessors:\n
     \ memory_limiter:\n    check_interval: 1s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n\nexporters:\n  logging:\n
-    \   loglevel: warn\n\n  otlp/tempo: \n    endpoint: \"${OBSERVER_URL}:80/tempo\"\n
+    \   loglevel: warn\n\n  otlphttp/tempo: \n    endpoint: \"${OBSERVER_URL}\"\n
     \   tls:\n      insecure: true\n      \n  prometheusremotewrite:\n    endpoint:
     \"${OBSERVER_URL}/api/v1/write\"\n    headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n
     \   target_info:\n      enabled: true\n\n  loki:\n    endpoint: \"${OBSERVER_URL}/loki/api/v1/push\"\n
