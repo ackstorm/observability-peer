@@ -84,7 +84,7 @@ spec:
         - http://db
         env:
         - name: JAEGER_AGENT_HOST
-          value: opentelemetry-collector.observability-peer.svc:16687
+          value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
           value: cluster=tns,namespace=tns
         - name: JAEGER_SAMPLER_TYPE
