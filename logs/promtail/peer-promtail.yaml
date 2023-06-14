@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
   name: grafana-promtail
-  namespace: observability-peer
+  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -51,7 +51,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: grafana-promtail
-  namespace: observability-peer
+  namespace: default
 ---
 apiVersion: v1
 kind: Secret
@@ -63,7 +63,7 @@ metadata:
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
   name: grafana-promtail
-  namespace: observability-peer
+  namespace: default
 stringData:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
     \ - tenant_id: ${ENVIRONMENT}-${CLUSTER}\n    url: ${OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
   name: grafana-promtail
-  namespace: observability-peer
+  namespace: default
 spec:
   selector:
     matchLabels:
