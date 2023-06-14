@@ -84,7 +84,7 @@ spec:
         - http://db
         env:
         - name: JAEGER_AGENT_HOST
-          value: opentelemetry.observability-peer.svc
+          value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
           value: cluster=tns,namespace=tns
         - name: JAEGER_SAMPLER_TYPE
@@ -119,7 +119,7 @@ spec:
         - -log.level=debug
         env:
         - name: JAEGER_AGENT_HOST
-          value: opentelemetry.observability-peer.svc
+          value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
           value: cluster=tns,namespace=tns
         - name: JAEGER_SAMPLER_TYPE
@@ -155,7 +155,7 @@ spec:
         - http://app
         env:
         - name: JAEGER_AGENT_HOST
-          value: opentelemetry.observability-peer.svc
+          value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
           value: cluster=tns,namespace=tns
         - name: JAEGER_SAMPLER_TYPE
