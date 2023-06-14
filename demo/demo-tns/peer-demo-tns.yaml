@@ -1,0 +1,216 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tns
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tns-app
+  namespace: tns
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tns-db
+  namespace: tns
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tns-loadgen
+  namespace: tns
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: app
+  name: app
+  namespace: tns
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    name: app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: db
+  name: db
+  namespace: tns
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    name: db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: loadgen
+  name: loadgen
+  namespace: tns
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    name: loadgen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: tns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: app
+  template:
+    metadata:
+      labels:
+        name: app
+    spec:
+      containers:
+      - args:
+        - -log.level=debug
+        - http://db
+        env:
+        - name: JAEGER_AGENT_HOST
+          value: opentelemetry.observability-peer.svc
+        - name: JAEGER_TAGS
+          value: cluster=tns,namespace=tns
+        - name: JAEGER_SAMPLER_TYPE
+          value: const
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"
+        image: grafana/tns-app:latest
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 80
+          name: http
+      serviceAccountName: tns-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: tns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: db
+  template:
+    metadata:
+      labels:
+        name: db
+    spec:
+      containers:
+      - args:
+        - -log.level=debug
+        env:
+        - name: JAEGER_AGENT_HOST
+          value: opentelemetry.observability-peer.svc
+        - name: JAEGER_TAGS
+          value: cluster=tns,namespace=tns
+        - name: JAEGER_SAMPLER_TYPE
+          value: const
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"
+        image: grafana/tns-db:latest
+        imagePullPolicy: IfNotPresent
+        name: db
+        ports:
+        - containerPort: 80
+          name: http
+      serviceAccountName: tns-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: tns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: loadgen
+  template:
+    metadata:
+      labels:
+        name: loadgen
+    spec:
+      containers:
+      - args:
+        - -log.level=debug
+        - http://app
+        env:
+        - name: JAEGER_AGENT_HOST
+          value: opentelemetry.observability-peer.svc
+        - name: JAEGER_TAGS
+          value: cluster=tns,namespace=tns
+        - name: JAEGER_SAMPLER_TYPE
+          value: const
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"
+        image: grafana/tns-loadgen:latest
+        imagePullPolicy: IfNotPresent
+        name: loadgen
+        ports:
+        - containerPort: 80
+          name: http
+      serviceAccountName: tns-loadgen
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: monitor
+  name: app
+  namespace: tns
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  selector:
+    matchLabels:
+      name: app
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: monitor
+  name: db
+  namespace: tns
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  selector:
+    matchLabels:
+      name: db
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: monitor
+  name: loadgen
+  namespace: tns
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  selector:
+    matchLabels:
+      name: loadgen
