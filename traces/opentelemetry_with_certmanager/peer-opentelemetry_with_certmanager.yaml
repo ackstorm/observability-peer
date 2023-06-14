@@ -14131,7 +14131,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: v1
@@ -14146,7 +14146,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
   namespace: cert-manager
 ---
 apiVersion: v1
@@ -14165,7 +14165,7 @@ metadata:
     app.kubernetes.io/name: startupapicheck
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-startupapicheck
+  name: loki-startupapicheck
   namespace: cert-manager
 ---
 apiVersion: v1
@@ -14180,7 +14180,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 ---
 apiVersion: v1
@@ -14202,7 +14202,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector:leaderelection
+  name: loki-cainjector:leaderelection
   namespace: cert-manager
 rules:
 - apiGroups:
@@ -14238,7 +14238,7 @@ metadata:
     app.kubernetes.io/name: startupapicheck
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-startupapicheck:create-cert
+  name: loki-startupapicheck:create-cert
   namespace: cert-manager
 rules:
 - apiGroups:
@@ -14259,13 +14259,13 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook:dynamic-serving
+  name: loki-webhook:dynamic-serving
   namespace: cert-manager
 rules:
 - apiGroups:
   - ""
   resourceNames:
-  - ackstorm-cert-manager-webhook-ca
+  - loki-webhook-ca
   resources:
   - secrets
   verbs:
@@ -14291,7 +14291,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager:leaderelection
+  name: loki:leaderelection
   namespace: cert-manager
 rules:
 - apiGroups:
@@ -14358,7 +14358,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14425,7 +14425,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-approve:cert-manager-io
+  name: loki-controller-approve:cert-manager-io
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14448,7 +14448,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-certificates
+  name: loki-controller-certificates
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14519,7 +14519,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-certificatesigningrequests
+  name: loki-controller-certificatesigningrequests
 rules:
 - apiGroups:
   - certificates.k8s.io
@@ -14564,7 +14564,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-challenges
+  name: loki-controller-challenges
 rules:
 - apiGroups:
   - acme.cert-manager.io
@@ -14671,7 +14671,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-clusterissuers
+  name: loki-controller-clusterissuers
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14719,7 +14719,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-ingress-shim
+  name: loki-controller-ingress-shim
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14790,7 +14790,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-issuers
+  name: loki-controller-issuers
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14838,7 +14838,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-orders
+  name: loki-controller-orders
 rules:
 - apiGroups:
   - acme.cert-manager.io
@@ -14908,7 +14908,7 @@ metadata:
     helm.sh/chart: cert-manager-v1.11.3
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
-  name: ackstorm-cert-manager-edit
+  name: loki-edit
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14954,7 +14954,7 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-view: "true"
-  name: ackstorm-cert-manager-view
+  name: loki-view
 rules:
 - apiGroups:
   - cert-manager.io
@@ -14987,7 +14987,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook:subjectaccessreviews
+  name: loki-webhook:subjectaccessreviews
 rules:
 - apiGroups:
   - authorization.k8s.io
@@ -15223,15 +15223,15 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector:leaderelection
+  name: loki-cainjector:leaderelection
   namespace: cert-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ackstorm-cert-manager-cainjector:leaderelection
+  name: loki-cainjector:leaderelection
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15249,15 +15249,15 @@ metadata:
     app.kubernetes.io/name: startupapicheck
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-startupapicheck:create-cert
+  name: loki-startupapicheck:create-cert
   namespace: cert-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ackstorm-cert-manager-startupapicheck:create-cert
+  name: loki-startupapicheck:create-cert
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager-startupapicheck
+  name: loki-startupapicheck
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15271,16 +15271,16 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook:dynamic-serving
+  name: loki-webhook:dynamic-serving
   namespace: cert-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ackstorm-cert-manager-webhook:dynamic-serving
+  name: loki-webhook:dynamic-serving
 subjects:
 - apiGroup: ""
   kind: ServiceAccount
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15294,16 +15294,16 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager:leaderelection
+  name: loki:leaderelection
   namespace: cert-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ackstorm-cert-manager:leaderelection
+  name: loki:leaderelection
 subjects:
 - apiGroup: ""
   kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15333,14 +15333,14 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15354,14 +15354,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-approve:cert-manager-io
+  name: loki-controller-approve:cert-manager-io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-approve:cert-manager-io
+  name: loki-controller-approve:cert-manager-io
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15375,14 +15375,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-certificates
+  name: loki-controller-certificates
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-certificates
+  name: loki-controller-certificates
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15396,14 +15396,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-certificatesigningrequests
+  name: loki-controller-certificatesigningrequests
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-certificatesigningrequests
+  name: loki-controller-certificatesigningrequests
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15417,14 +15417,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-challenges
+  name: loki-controller-challenges
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-challenges
+  name: loki-controller-challenges
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15438,14 +15438,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-clusterissuers
+  name: loki-controller-clusterissuers
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-clusterissuers
+  name: loki-controller-clusterissuers
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15459,14 +15459,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-ingress-shim
+  name: loki-controller-ingress-shim
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-ingress-shim
+  name: loki-controller-ingress-shim
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15480,14 +15480,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-issuers
+  name: loki-controller-issuers
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-issuers
+  name: loki-controller-issuers
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15501,14 +15501,14 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-controller-orders
+  name: loki-controller-orders
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-controller-orders
+  name: loki-controller-orders
 subjects:
 - kind: ServiceAccount
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15522,15 +15522,15 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook:subjectaccessreviews
+  name: loki-webhook:subjectaccessreviews
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ackstorm-cert-manager-webhook:subjectaccessreviews
+  name: loki-webhook:subjectaccessreviews
 subjects:
 - apiGroup: ""
   kind: ServiceAccount
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -15575,7 +15575,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 ---
 apiVersion: v1
@@ -15589,7 +15589,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 spec:
   ports:
@@ -15614,7 +15614,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 spec:
   ports:
@@ -15673,7 +15673,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager
+  name: loki
   namespace: cert-manager
 spec:
   replicas: 1
@@ -15727,7 +15727,7 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: ackstorm-cert-manager
+      serviceAccountName: loki
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15740,7 +15740,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-cainjector
+  name: loki-cainjector
   namespace: cert-manager
 spec:
   replicas: 1
@@ -15783,7 +15783,7 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: ackstorm-cert-manager-cainjector
+      serviceAccountName: loki-cainjector
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15796,7 +15796,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
   namespace: cert-manager
 spec:
   replicas: 1
@@ -15821,10 +15821,10 @@ spec:
         - --v=2
         - --secure-port=10250
         - --dynamic-serving-ca-secret-namespace=$(POD_NAMESPACE)
-        - --dynamic-serving-ca-secret-name=ackstorm-cert-manager-webhook-ca
-        - --dynamic-serving-dns-names=ackstorm-cert-manager-webhook
-        - --dynamic-serving-dns-names=ackstorm-cert-manager-webhook.$(POD_NAMESPACE)
-        - --dynamic-serving-dns-names=ackstorm-cert-manager-webhook.$(POD_NAMESPACE).svc
+        - --dynamic-serving-ca-secret-name=loki-webhook-ca
+        - --dynamic-serving-dns-names=loki-webhook
+        - --dynamic-serving-dns-names=loki-webhook.$(POD_NAMESPACE)
+        - --dynamic-serving-dns-names=loki-webhook.$(POD_NAMESPACE).svc
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -15871,7 +15871,7 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: ackstorm-cert-manager-webhook
+      serviceAccountName: loki-webhook
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15967,7 +15967,7 @@ metadata:
     app.kubernetes.io/name: startupapicheck
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-startupapicheck
+  name: loki-startupapicheck
   namespace: cert-manager
 spec:
   backoffLimit: 4
@@ -16002,7 +16002,7 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: ackstorm-cert-manager-startupapicheck
+      serviceAccountName: loki-startupapicheck
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -16083,7 +16083,7 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from-secret: default/ackstorm-cert-manager-webhook-ca
+    cert-manager.io/inject-ca-from-secret: default/loki-webhook-ca
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -16092,13 +16092,13 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
 webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
     service:
-      name: ackstorm-cert-manager-webhook
+      name: loki-webhook
       namespace: cert-manager
       path: /mutate
   failurePolicy: Fail
@@ -16192,7 +16192,7 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from-secret: default/ackstorm-cert-manager-webhook-ca
+    cert-manager.io/inject-ca-from-secret: default/loki-webhook-ca
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -16201,13 +16201,13 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/version: v1.11.3
     helm.sh/chart: cert-manager-v1.11.3
-  name: ackstorm-cert-manager-webhook
+  name: loki-webhook
 webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
     service:
-      name: ackstorm-cert-manager-webhook
+      name: loki-webhook
       namespace: cert-manager
       path: /validate
   failurePolicy: Fail
