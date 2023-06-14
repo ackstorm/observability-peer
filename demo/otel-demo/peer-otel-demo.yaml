@@ -193,43 +193,6 @@ spec:
     matchLabels:
       app: otel-demo-backend
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    release: kps
-  name: otel-demo-frontend
-  namespace: prometheus
-spec:
-  endpoints:
-  - path: /metrics
-    port: http
-  namespaceSelector:
-    matchNames:
-    - default
-  selector:
-    matchLabels:
-      app: otel-demo-frontend
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-frontend
-    app.kubernetes.io/version: 0.1.14
-    helm.sh/chart: otel-demo-frontend-0.1.14
-  name: otel-demo-frontend
-spec:
-  rules:
-  - host: otel-demo-frontend.localhost
-    http:
-      paths:
-      - backend:
-          serviceName: otel-demo-frontend
-          servicePort: 80
----
 apiVersion: v1
 kind: Pod
 metadata:
