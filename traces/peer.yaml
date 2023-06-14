@@ -6236,7 +6236,7 @@ spec:
     \   namespace: span.metrics\n\nservice:\n  telemetry:\n    logs:\n      level:
     ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp]\n
     \     processors: [memory_limiter, batch]\n      exporters: [logging, spanmetrics,
-    otlp/tempo]\n    metrics:\n      receivers: [otlp, spanmetrics]\n      processors:
+    otlphttp/tempo]\n    metrics:\n      receivers: [otlp, spanmetrics]\n      processors:
     [memory_limiter, batch]\n      exporters: [logging, prometheusremotewrite]\n    logs:
     \n      receivers: [otlp]\n      processors: [memory_limiter, batch]\n      exporters:
     [logging, loki]\n"
