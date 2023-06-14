@@ -16189,18 +16189,19 @@ spec:
     \     thrift_http:\n        endpoint: 0.0.0.0:14268\nprocessors:\n  memory_limiter:\n
     \   check_interval: 1s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\nexporters:\n  logging:\n
-    \   loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n    tls:\n
-    \     insecure: true\n  prometheusremotewrite:\n    endpoint: ${OBSERVER_URL}/api/v1/push\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    target_info:\n
-    \     enabled: true\n  loki:\n    endpoint: ${OBSERVER_URL}/loki/api/v1/push\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    format:
-    json\n    labels:\n      attributes:\n        container_name: \"\"\n        source:
-    \"\"\n      resource:\n        host.name: \"hostname\"\nconnectors:\n  spanmetrics:\n
-    \   namespace: span.metrics\nservice:\n  telemetry:\n    logs:\n      level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n
-    \ pipelines:\n    traces:\n      receivers: [otlp, jaeger]\n      processors:
-    [memory_limiter, batch]\n      exporters: [logging, spanmetrics, otlphttp/tempo]\n
-    \   metrics:\n      receivers: [otlp, spanmetrics]\n      processors: [memory_limiter,
-    batch]\n      exporters: [logging, prometheusremotewrite]\n    logs: \n      receivers:
+    \   loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n    headers:\n
+    \     \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n      insecure:
+    true\n  prometheusremotewrite:\n    endpoint: ${OBSERVER_URL}/api/v1/push\n    headers:\n
+    \     \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    target_info:\n      enabled:
+    true\n  loki:\n    endpoint: ${OBSERVER_URL}/loki/api/v1/push\n    headers:\n
+    \     \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    format: json\n    labels:\n
+    \     attributes:\n        container_name: \"\"\n        source: \"\"\n      resource:\n
+    \       host.name: \"hostname\"\nconnectors:\n  spanmetrics:\n    namespace: span.metrics\nservice:\n
+    \ telemetry:\n    logs:\n      level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n
+    \   traces:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,
+    batch]\n      exporters: [logging, spanmetrics, otlphttp/tempo]\n    metrics:\n
+    \     receivers: [otlp, spanmetrics]\n      processors: [memory_limiter, batch]\n
+    \     exporters: [logging, prometheusremotewrite]\n    logs: \n      receivers:
     [otlp]\n      processors: [memory_limiter, batch]\n      exporters: [logging,
     loki]\n"
   image: otel/opentelemetry-collector-contrib:0.75.0
