@@ -16184,8 +16184,10 @@ metadata:
   namespace: observability-peer
 spec:
   config: "receivers:\n  otlp:\n    protocols:\n      grpc:\n      http:\n  jaeger:\n
-    \   protocols:\n      thrift_http:\n        endpoint: \"0.0.0.0:14268\"\nprocessors:\n
-    \ memory_limiter:\n    check_interval: 1s\n    limit_percentage: 75\n    spike_limit_percentage:
+    \   protocols:\n      grpc:\n        endpoint: 0.0.0.0:14250\n      thrift_compact:\n
+    \       endpoint: 0.0.0.0:6832\n      thrift_binary:\n        endpoint: 0.0.0.0:6831\n
+    \     thrift_http:\n        endpoint: 0.0.0.0:14268\nprocessors:\n  memory_limiter:\n
+    \   check_interval: 1s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\nexporters:\n  logging:\n
     \   loglevel: warn\n  otlphttp/tempo: \n    endpoint: \"${OBSERVER_URL}\"\n    tls:\n
     \     insecure: true\n  prometheusremotewrite:\n    endpoint: \"${OBSERVER_URL}/api/v1/write\"\n
