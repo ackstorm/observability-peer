@@ -19,8 +19,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: certificaterequests.cert-manager.io
 spec:
   group: cert-manager.io
@@ -275,8 +275,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: certificates.cert-manager.io
 spec:
   group: cert-manager.io
@@ -434,10 +434,11 @@ spec:
                           Certificate. If true, a file named `keystore.jks` will be
                           created in the target Secret resource, encrypted using the
                           password stored in `passwordSecretRef`. The keystore file
-                          will be updated immediately. A file named `truststore.jks`
-                          will also be created in the target Secret resource, encrypted
-                          using the password stored in `passwordSecretRef` containing
-                          the issuing Certificate Authority
+                          will be updated immediately. If the issuer provided a CA
+                          certificate, a file named `truststore.jks` will also be
+                          created in the target Secret resource, encrypted using the
+                          password stored in `passwordSecretRef` containing the issuing
+                          Certificate Authority
                         type: boolean
                       passwordSecretRef:
                         description: PasswordSecretRef is a reference to a key in
@@ -469,10 +470,11 @@ spec:
                           Certificate. If true, a file named `keystore.p12` will be
                           created in the target Secret resource, encrypted using the
                           password stored in `passwordSecretRef`. The keystore file
-                          will be updated immediately. A file named `truststore.p12`
-                          will also be created in the target Secret resource, encrypted
-                          using the password stored in `passwordSecretRef` containing
-                          the issuing Certificate Authority
+                          will be updated immediately. If the issuer provided a CA
+                          certificate, a file named `truststore.p12` will also be
+                          created in the target Secret resource, encrypted using the
+                          password stored in `passwordSecretRef` containing the issuing
+                          Certificate Authority
                         type: boolean
                       passwordSecretRef:
                         description: PasswordSecretRef is a reference to a key in
@@ -751,10 +753,11 @@ spec:
                   using formula time.Hour * 2 ^ (failedIssuanceAttempts - 1).
                 type: integer
               lastFailureTime:
-                description: LastFailureTime is the time as recorded by the Certificate
-                  controller of the most recent failure to complete a CertificateRequest
-                  for this Certificate resource. If set, cert-manager will not re-request
-                  another Certificate until 1 hour has elapsed from this time.
+                description: LastFailureTime is set only if the lastest issuance for
+                  this Certificate failed and contains the time of the failure. If
+                  an issuance has failed, the delay till the next issuance will be
+                  calculated using formula time.Hour * 2 ^ (failedIssuanceAttempts
+                  - 1). If the latest issuance has succeeded this field will be unset.
                 format: date-time
                 type: string
               nextPrivateKeySecretName:
@@ -808,8 +811,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: challenges.acme.cert-manager.io
 spec:
   group: acme.cert-manager.io
@@ -1458,9 +1461,18 @@ spec:
                           for each Challenge to be completed.
                         properties:
                           class:
-                            description: The ingress class to use when creating Ingress
-                              resources to solve ACME challenges that use this challenge
-                              solver. Only one of 'class' or 'name' may be specified.
+                            description: This field configures the annotation `kubernetes.io/ingress.class`
+                              when creating Ingress resources to solve ACME challenges
+                              that use this challenge solver. Only one of `class`,
+                              `name` or `ingressClassName` may be specified.
+                            type: string
+                          ingressClassName:
+                            description: This field configures the field `ingressClassName`
+                              on the created Ingress resources used to solve ACME
+                              challenges that use this challenge solver. This is the
+                              recommended way of configuring the ingress class. Only
+                              one of `class`, `name` or `ingressClassName` may be
+                              specified.
                             type: string
                           ingressTemplate:
                             description: Optional ingress template used to configure
@@ -1493,7 +1505,8 @@ spec:
                               in order to solve HTTP01 challenges. This is typically
                               used in conjunction with ingress controllers like ingress-gce,
                               which maintains a 1:1 mapping between external IPs and
-                              ingress resources.
+                              ingress resources. Only one of `class`, `name` or `ingressClassName`
+                              may be specified.
                             type: string
                           podTemplate:
                             description: Optional pod template used to configure the
@@ -1521,10 +1534,9 @@ spec:
                                 type: object
                               spec:
                                 description: PodSpec defines overrides for the HTTP01
-                                  challenge solver pod. Only the 'priorityClassName',
-                                  'nodeSelector', 'affinity', 'serviceAccountName'
-                                  and 'tolerations' fields are supported currently.
-                                  All other fields will be ignored.
+                                  challenge solver pod. Check ACMEChallengeSolverHTTP01IngressPodSpec
+                                  to find out currently supported fields. All other
+                                  fields will be ignored.
                                 properties:
                                   affinity:
                                     description: If specified, the pod's scheduling
@@ -2652,6 +2664,22 @@ spec:
                                             type: array
                                         type: object
                                     type: object
+                                  imagePullSecrets:
+                                    description: If specified, the pod's imagePullSecrets
+                                    items:
+                                      description: LocalObjectReference contains enough
+                                        information to let you locate the referenced
+                                        object inside the same namespace.
+                                      properties:
+                                        name:
+                                          description: 'Name of the referent. More
+                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                            TODO: Add other useful fields. apiVersion,
+                                            kind, uid?'
+                                          type: string
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    type: array
                                   nodeSelector:
                                     additionalProperties:
                                       type: string
@@ -2843,8 +2871,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: clusterissuers.cert-manager.io
 spec:
   group: cert-manager.io
@@ -3622,10 +3650,19 @@ spec:
                                 cert-manager for each Challenge to be completed.
                               properties:
                                 class:
-                                  description: The ingress class to use when creating
-                                    Ingress resources to solve ACME challenges that
-                                    use this challenge solver. Only one of 'class'
-                                    or 'name' may be specified.
+                                  description: This field configures the annotation
+                                    `kubernetes.io/ingress.class` when creating Ingress
+                                    resources to solve ACME challenges that use this
+                                    challenge solver. Only one of `class`, `name`
+                                    or `ingressClassName` may be specified.
+                                  type: string
+                                ingressClassName:
+                                  description: This field configures the field `ingressClassName`
+                                    on the created Ingress resources used to solve
+                                    ACME challenges that use this challenge solver.
+                                    This is the recommended way of configuring the
+                                    ingress class. Only one of `class`, `name` or
+                                    `ingressClassName` may be specified.
                                   type: string
                                 ingressTemplate:
                                   description: Optional ingress template used to configure
@@ -3662,7 +3699,8 @@ spec:
                                     is typically used in conjunction with ingress
                                     controllers like ingress-gce, which maintains
                                     a 1:1 mapping between external IPs and ingress
-                                    resources.
+                                    resources. Only one of `class`, `name` or `ingressClassName`
+                                    may be specified.
                                   type: string
                                 podTemplate:
                                   description: Optional pod template used to configure
@@ -3693,10 +3731,9 @@ spec:
                                       type: object
                                     spec:
                                       description: PodSpec defines overrides for the
-                                        HTTP01 challenge solver pod. Only the 'priorityClassName',
-                                        'nodeSelector', 'affinity', 'serviceAccountName'
-                                        and 'tolerations' fields are supported currently.
-                                        All other fields will be ignored.
+                                        HTTP01 challenge solver pod. Check ACMEChallengeSolverHTTP01IngressPodSpec
+                                        to find out currently supported fields. All
+                                        other fields will be ignored.
                                       properties:
                                         affinity:
                                           description: If specified, the pod's scheduling
@@ -5018,6 +5055,23 @@ spec:
                                                   type: array
                                               type: object
                                           type: object
+                                        imagePullSecrets:
+                                          description: If specified, the pod's imagePullSecrets
+                                          items:
+                                            description: LocalObjectReference contains
+                                              enough information to let you locate
+                                              the referenced object inside the same
+                                              namespace.
+                                            properties:
+                                              name:
+                                                description: 'Name of the referent.
+                                                  More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                                  TODO: Add other useful fields. apiVersion,
+                                                  kind, uid?'
+                                                type: string
+                                            type: object
+                                            x-kubernetes-map-type: atomic
+                                          type: array
                                         nodeSelector:
                                           additionalProperties:
                                             type: string
@@ -5267,9 +5321,23 @@ spec:
                             required:
                             - name
                             type: object
+                          serviceAccountRef:
+                            description: A reference to a service account that will
+                              be used to request a bound token (also known as "projected
+                              token"). Compared to using "secretRef", using this field
+                              means that you don't rely on statically bound tokens.
+                              To use this field, you must configure an RBAC rule to
+                              let cert-manager request a token.
+                            properties:
+                              name:
+                                description: Name of the ServiceAccount used to request
+                                  a token.
+                                type: string
+                            required:
+                            - name
+                            type: object
                         required:
                         - role
-                        - secretRef
                         type: object
                       tokenSecretRef:
                         description: TokenSecretRef authenticates with Vault by presenting
@@ -5418,6 +5486,11 @@ spec:
                   be set if the Issuer is configured to use an ACME server to issue
                   certificates.
                 properties:
+                  lastPrivateKeyHash:
+                    description: LastPrivateKeyHash is a hash of the private key associated
+                      with the latest registered ACME account, in order to track changes
+                      made to registered account associated with the Issuer
+                    type: string
                   lastRegisteredEmail:
                     description: LastRegisteredEmail is the email associated with
                       the latest registered ACME account, in order to track changes
@@ -6907,8 +6980,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: issuers.cert-manager.io
 spec:
   group: cert-manager.io
@@ -7685,10 +7758,19 @@ spec:
                                 cert-manager for each Challenge to be completed.
                               properties:
                                 class:
-                                  description: The ingress class to use when creating
-                                    Ingress resources to solve ACME challenges that
-                                    use this challenge solver. Only one of 'class'
-                                    or 'name' may be specified.
+                                  description: This field configures the annotation
+                                    `kubernetes.io/ingress.class` when creating Ingress
+                                    resources to solve ACME challenges that use this
+                                    challenge solver. Only one of `class`, `name`
+                                    or `ingressClassName` may be specified.
+                                  type: string
+                                ingressClassName:
+                                  description: This field configures the field `ingressClassName`
+                                    on the created Ingress resources used to solve
+                                    ACME challenges that use this challenge solver.
+                                    This is the recommended way of configuring the
+                                    ingress class. Only one of `class`, `name` or
+                                    `ingressClassName` may be specified.
                                   type: string
                                 ingressTemplate:
                                   description: Optional ingress template used to configure
@@ -7725,7 +7807,8 @@ spec:
                                     is typically used in conjunction with ingress
                                     controllers like ingress-gce, which maintains
                                     a 1:1 mapping between external IPs and ingress
-                                    resources.
+                                    resources. Only one of `class`, `name` or `ingressClassName`
+                                    may be specified.
                                   type: string
                                 podTemplate:
                                   description: Optional pod template used to configure
@@ -7756,10 +7839,9 @@ spec:
                                       type: object
                                     spec:
                                       description: PodSpec defines overrides for the
-                                        HTTP01 challenge solver pod. Only the 'priorityClassName',
-                                        'nodeSelector', 'affinity', 'serviceAccountName'
-                                        and 'tolerations' fields are supported currently.
-                                        All other fields will be ignored.
+                                        HTTP01 challenge solver pod. Check ACMEChallengeSolverHTTP01IngressPodSpec
+                                        to find out currently supported fields. All
+                                        other fields will be ignored.
                                       properties:
                                         affinity:
                                           description: If specified, the pod's scheduling
@@ -9081,6 +9163,23 @@ spec:
                                                   type: array
                                               type: object
                                           type: object
+                                        imagePullSecrets:
+                                          description: If specified, the pod's imagePullSecrets
+                                          items:
+                                            description: LocalObjectReference contains
+                                              enough information to let you locate
+                                              the referenced object inside the same
+                                              namespace.
+                                            properties:
+                                              name:
+                                                description: 'Name of the referent.
+                                                  More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                                  TODO: Add other useful fields. apiVersion,
+                                                  kind, uid?'
+                                                type: string
+                                            type: object
+                                            x-kubernetes-map-type: atomic
+                                          type: array
                                         nodeSelector:
                                           additionalProperties:
                                             type: string
@@ -9330,9 +9429,23 @@ spec:
                             required:
                             - name
                             type: object
+                          serviceAccountRef:
+                            description: A reference to a service account that will
+                              be used to request a bound token (also known as "projected
+                              token"). Compared to using "secretRef", using this field
+                              means that you don't rely on statically bound tokens.
+                              To use this field, you must configure an RBAC rule to
+                              let cert-manager request a token.
+                            properties:
+                              name:
+                                description: Name of the ServiceAccount used to request
+                                  a token.
+                                type: string
+                            required:
+                            - name
+                            type: object
                         required:
                         - role
-                        - secretRef
                         type: object
                       tokenSecretRef:
                         description: TokenSecretRef authenticates with Vault by presenting
@@ -9481,6 +9594,11 @@ spec:
                   be set if the Issuer is configured to use an ACME server to issue
                   certificates.
                 properties:
+                  lastPrivateKeyHash:
+                    description: LastPrivateKeyHash is a hash of the private key associated
+                      with the latest registered ACME account, in order to track changes
+                      made to registered account associated with the Issuer
+                    type: string
                   lastRegisteredEmail:
                     description: LastRegisteredEmail is the email associated with
                       the latest registered ACME account, in order to track changes
@@ -13883,8 +14001,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: orders.acme.cert-manager.io
 spec:
   group: acme.cert-manager.io
@@ -14129,8 +14247,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager
   namespace: cert-manager
 ---
@@ -14144,8 +14262,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector
   namespace: cert-manager
 ---
@@ -14163,8 +14281,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: startupapicheck
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-startupapicheck
   namespace: cert-manager
 ---
@@ -14178,8 +14296,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
   namespace: cert-manager
 ---
@@ -14200,8 +14318,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector:leaderelection
   namespace: cert-manager
 rules:
@@ -14236,8 +14354,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: startupapicheck
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-startupapicheck:create-cert
   namespace: cert-manager
 rules:
@@ -14257,8 +14375,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook:dynamic-serving
   namespace: cert-manager
 rules:
@@ -14289,8 +14407,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager:leaderelection
   namespace: cert-manager
 rules:
@@ -14356,8 +14474,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector
 rules:
 - apiGroups:
@@ -14395,6 +14513,7 @@ rules:
   - list
   - watch
   - update
+  - patch
 - apiGroups:
   - apiregistration.k8s.io
   resources:
@@ -14404,6 +14523,7 @@ rules:
   - list
   - watch
   - update
+  - patch
 - apiGroups:
   - apiextensions.k8s.io
   resources:
@@ -14413,6 +14533,7 @@ rules:
   - list
   - watch
   - update
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -14423,8 +14544,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-approve:cert-manager-io
 rules:
 - apiGroups:
@@ -14446,8 +14567,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-certificates
 rules:
 - apiGroups:
@@ -14517,8 +14638,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-certificatesigningrequests
 rules:
 - apiGroups:
@@ -14562,8 +14683,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-challenges
 rules:
 - apiGroups:
@@ -14669,8 +14790,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-clusterissuers
 rules:
 - apiGroups:
@@ -14717,8 +14838,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-ingress-shim
 rules:
 - apiGroups:
@@ -14788,8 +14909,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-issuers
 rules:
 - apiGroups:
@@ -14836,8 +14957,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-orders
 rules:
 - apiGroups:
@@ -14904,8 +15025,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
   name: cert-manager-edit
@@ -14949,8 +15070,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-view: "true"
@@ -14985,8 +15106,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook:subjectaccessreviews
 rules:
 - apiGroups:
@@ -15221,8 +15342,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector:leaderelection
   namespace: cert-manager
 roleRef:
@@ -15247,8 +15368,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: startupapicheck
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-startupapicheck:create-cert
   namespace: cert-manager
 roleRef:
@@ -15269,8 +15390,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook:dynamic-serving
   namespace: cert-manager
 roleRef:
@@ -15292,8 +15413,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager:leaderelection
   namespace: cert-manager
 roleRef:
@@ -15331,8 +15452,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15352,8 +15473,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-approve:cert-manager-io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15373,8 +15494,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-certificates
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15394,8 +15515,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-certificatesigningrequests
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15415,8 +15536,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-challenges
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15436,8 +15557,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-clusterissuers
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15457,8 +15578,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-ingress-shim
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15478,8 +15599,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-issuers
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15499,8 +15620,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-controller-orders
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15520,8 +15641,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook:subjectaccessreviews
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -15573,8 +15694,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
   namespace: cert-manager
 ---
@@ -15587,8 +15708,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager
   namespace: cert-manager
 spec:
@@ -15612,8 +15733,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
   namespace: cert-manager
 spec:
@@ -15671,8 +15792,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager
   namespace: cert-manager
 spec:
@@ -15694,27 +15815,30 @@ spec:
         app.kubernetes.io/instance: ackstorm-cert-manager
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: cert-manager
-        app.kubernetes.io/version: v1.11.3
-        helm.sh/chart: cert-manager-v1.11.3
+        app.kubernetes.io/version: v1.12.1
+        helm.sh/chart: cert-manager-v1.12.1
     spec:
       containers:
       - args:
         - --v=2
         - --cluster-resource-namespace=$(POD_NAMESPACE)
         - --leader-election-namespace=kube-system
-        - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.11.3
+        - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.12.1
         - --max-concurrent-challenges=60
         env:
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: quay.io/jetstack/cert-manager-controller:v1.11.3
+        image: quay.io/jetstack/cert-manager-controller:v1.12.1
         imagePullPolicy: IfNotPresent
         name: cert-manager-controller
         ports:
         - containerPort: 9402
           name: http-metrics
+          protocol: TCP
+        - containerPort: 9403
+          name: http-healthz
           protocol: TCP
         securityContext:
           allowPrivilegeEscalation: false
@@ -15738,8 +15862,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: cainjector
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-cainjector
   namespace: cert-manager
 spec:
@@ -15757,8 +15881,8 @@ spec:
         app.kubernetes.io/instance: ackstorm-cert-manager
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: cainjector
-        app.kubernetes.io/version: v1.11.3
-        helm.sh/chart: cert-manager-v1.11.3
+        app.kubernetes.io/version: v1.12.1
+        helm.sh/chart: cert-manager-v1.12.1
     spec:
       containers:
       - args:
@@ -15769,7 +15893,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: quay.io/jetstack/cert-manager-cainjector:v1.11.3
+        image: quay.io/jetstack/cert-manager-cainjector:v1.12.1
         imagePullPolicy: IfNotPresent
         name: cert-manager-cainjector
         securityContext:
@@ -15794,8 +15918,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
   namespace: cert-manager
 spec:
@@ -15813,8 +15937,8 @@ spec:
         app.kubernetes.io/instance: ackstorm-cert-manager
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: webhook
-        app.kubernetes.io/version: v1.11.3
-        helm.sh/chart: cert-manager-v1.11.3
+        app.kubernetes.io/version: v1.12.1
+        helm.sh/chart: cert-manager-v1.12.1
     spec:
       containers:
       - args:
@@ -15830,7 +15954,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: quay.io/jetstack/cert-manager-webhook:v1.11.3
+        image: quay.io/jetstack/cert-manager-webhook:v1.12.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -15965,8 +16089,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: startupapicheck
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-startupapicheck
   namespace: cert-manager
 spec:
@@ -15979,15 +16103,15 @@ spec:
         app.kubernetes.io/instance: ackstorm-cert-manager
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: startupapicheck
-        app.kubernetes.io/version: v1.11.3
-        helm.sh/chart: cert-manager-v1.11.3
+        app.kubernetes.io/version: v1.12.1
+        helm.sh/chart: cert-manager-v1.12.1
     spec:
       containers:
       - args:
         - check
         - api
         - --wait=1m
-        image: quay.io/jetstack/cert-manager-ctl:v1.11.3
+        image: quay.io/jetstack/cert-manager-ctl:v1.12.1
         imagePullPolicy: IfNotPresent
         name: cert-manager-startupapicheck
         securityContext:
@@ -16090,8 +16214,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
 webhooks:
 - admissionReviewVersions:
@@ -16199,8 +16323,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-cert-manager
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: webhook
-    app.kubernetes.io/version: v1.11.3
-    helm.sh/chart: cert-manager-v1.11.3
+    app.kubernetes.io/version: v1.12.1
+    helm.sh/chart: cert-manager-v1.12.1
   name: cert-manager-webhook
 webhooks:
 - admissionReviewVersions:
