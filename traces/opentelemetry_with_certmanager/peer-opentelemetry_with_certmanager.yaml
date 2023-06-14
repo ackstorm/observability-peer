@@ -16197,17 +16197,14 @@ spec:
     json\n    labels:\n      attributes:\n        container_name: \"\"\n        source:
     \"\"\n      resource:\n        host.name: \"hostname\"\nconnectors:\n  spanmetrics:\n
     \   namespace: span.metrics\nservice:\n  telemetry:\n    logs:\n      level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n
-    \ pipelines:\n    traces:\n      receivers: [otlp]\n      processors: [memory_limiter,
-    batch]\n      exporters: [logging, spanmetrics, otlphttp/tempo]\n    metrics:\n
-    \     receivers: [otlp, spanmetrics]\n      processors: [memory_limiter, batch]\n
-    \     exporters: [logging, prometheusremotewrite]\n    logs: \n      receivers:
+    \ pipelines:\n    traces:\n      receivers: [otlp, jaeger]\n      processors:
+    [memory_limiter, batch]\n      exporters: [logging, spanmetrics, otlphttp/tempo]\n
+    \   metrics:\n      receivers: [otlp, spanmetrics]\n      processors: [memory_limiter,
+    batch]\n      exporters: [logging, prometheusremotewrite]\n    logs: \n      receivers:
     [otlp]\n      processors: [memory_limiter, batch]\n      exporters: [logging,
     loki]\n"
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
-  ports:
-  - name: jaeger
-    port: 14268
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
