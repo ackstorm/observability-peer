@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana-promtail
+  namespace: observability-peer
+spec:
+  chart:
+    spec:
+      chart: promtail
+      sourceRef:
+        kind: HelmRepository
+        name: grafana-helm-charts
+      version: 6.11.2
+  interval: 24h
+  releaseName: ackstorm-promtail
+  values:
+    config:
+      clients:
+      - tenant_id: ${ENVIRONMENT}-${CLUSTER}
+        url: ${OBSERVER_URL}/loki/api/v1/push
+    fullnameOverride: grafana-promtail
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: grafana-helm-charts
+  namespace: observability-peer
+spec:
+  interval: 24h
+  url: https://grafana.github.io/helm-charts
