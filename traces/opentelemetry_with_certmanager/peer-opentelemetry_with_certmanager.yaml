@@ -16205,7 +16205,7 @@ spec:
     \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n
     \   endpoint: ${OBSERVER_URL}/api/v1/push\n    headers:\n      \"X-Scope-OrgID\":
     \"${ENVIRONMENT}-${CLUSTER}\"\n    target_info:\n      enabled: true\n    resource_to_telemetry_conversion:\n
-    \     enabled: true\n    enable_open_metrics: true\n  loki:\n    endpoint: ${OBSERVER_URL}/loki/api/v1/push\n
+    \     enabled: true\n  loki:\n    endpoint: ${OBSERVER_URL}/loki/api/v1/push\n
     \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    format:
     json\n    labels:\n      attributes:\n        container_name: \"\"\n        source:
     \"\"\n      resource:\n        host.name: \"hostname\"\nservice:\n  telemetry:\n
