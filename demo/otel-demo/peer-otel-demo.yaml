@@ -13,6 +13,7 @@ metadata:
     app.kubernetes.io/version: 0.1.13
     helm.sh/chart: otel-demo-backend-0.1.12
   name: otel-demo-backend
+  namespace: otel-demo
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -24,6 +25,7 @@ metadata:
     app.kubernetes.io/version: 0.1.14
     helm.sh/chart: otel-demo-frontend-0.1.14
   name: otel-demo-frontend
+  namespace: otel-demo
 ---
 apiVersion: v1
 kind: Service
@@ -36,6 +38,7 @@ metadata:
     app.kubernetes.io/version: 0.1.13
     helm.sh/chart: otel-demo-backend-0.1.12
   name: otel-demo-backend
+  namespace: otel-demo
 spec:
   ports:
   - name: http
@@ -58,6 +61,7 @@ metadata:
     app.kubernetes.io/version: 0.1.14
     helm.sh/chart: otel-demo-frontend-0.1.14
   name: otel-demo-frontend
+  namespace: otel-demo
 spec:
   ports:
   - name: http
@@ -79,6 +83,7 @@ metadata:
     app.kubernetes.io/version: 0.1.13
     helm.sh/chart: otel-demo-backend-0.1.12
   name: otel-demo-backend
+  namespace: otel-demo
 spec:
   replicas: 1
   selector:
@@ -131,6 +136,7 @@ metadata:
     app.kubernetes.io/version: 0.1.14
     helm.sh/chart: otel-demo-frontend-0.1.14
   name: otel-demo-frontend
+  namespace: otel-demo
 spec:
   replicas: 1
   selector:
@@ -187,6 +193,7 @@ metadata:
     app.kubernetes.io/version: 0.1.13
     helm.sh/chart: otel-demo-backend-0.1.12
   name: otel-demo-backend-test-connection
+  namespace: otel-demo
 spec:
   containers:
   - args:
@@ -209,6 +216,7 @@ metadata:
     app.kubernetes.io/version: 0.1.14
     helm.sh/chart: otel-demo-frontend-0.1.14
   name: otel-demo-frontend-test-connection
+  namespace: otel-demo
 spec:
   containers:
   - args:

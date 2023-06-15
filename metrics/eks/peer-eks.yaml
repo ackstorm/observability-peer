@@ -30330,6 +30330,7 @@ spec:
   enableAdminAPI: false
   enableFeatures:
   - memory-snapshot-on-shutdown
+  - exemplar-storage
   externalLabels:
     cluster: ${ENVIRONMENT}-${CLUSTER}
     env: ${ENVIRONMENT}
