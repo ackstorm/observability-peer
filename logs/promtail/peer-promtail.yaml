@@ -247,8 +247,8 @@ spec:
         by (namespace, job, route, instance) / sum(rate(promtail_request_duration_seconds_count[1m]))
         by (namespace, job, route, instance) > 10
       for: 5m
-      labels: null
-      severity: critical
+      labels:
+        severity: critical
     - alert: PromtailRequestLatency
       annotations:
         description: |
