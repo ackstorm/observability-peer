@@ -6256,8 +6256,8 @@ spec:
     [logging]\n    metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,
     metricstransform, batch]\n      exporters: [logging, prometheusremotewrite]\n
     \   metrics/spanmetrics:\n      receivers: [ otlp/dummy ]\n      exporters: [
-    otlphttp/tempo ]\n    logs: \n      receivers: [otlp]\n      processors: [memory_limiter,
-    batch]\n      exporters: [logging, loki]\n"
+    prometheusremotewrite ]\n    logs: \n      receivers: [otlp]\n      processors:
+    [memory_limiter, batch]\n      exporters: [logging, loki]\n"
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
 ---
