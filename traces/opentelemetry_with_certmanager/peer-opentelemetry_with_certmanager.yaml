@@ -16212,7 +16212,7 @@ spec:
     \     processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
     \     receivers: [otlp/dummy]\n      exporters: [otlp]\n    metrics:\n      receivers:
     [otlp]\n      processors: [memory_limiter,metricstransform,batch]\n      exporters:
-    [logging, prometheus]\n"
+    [logging, prometheusremotewrite]\n"
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
 ---
