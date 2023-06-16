@@ -16184,39 +16184,35 @@ metadata:
   namespace: observability-peer
 spec:
   config: "receivers:\n  otlp:\n    protocols:\n      grpc:\n      http:\n  jaeger:\n
-    \   protocols:\n      grpc:\n      thrift_binary:\n      thrift_compact:\n      thrift_http:\nprocessors:\n
-    \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
+    \   protocols:\n      grpc:\n      thrift_binary:\n      thrift_compact:\n      thrift_http:\n
+    \ otlp/dummy:\n    protocols:\n      grpc:\n        endpoint: \"localhost:12345\"\nexporters:\n
+    \ logging:\n    loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n
+    \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n
+    \     insecure: true\n  otlp:\n    endpoint: localhost:4317\n    tls:\n      insecure:
+    true\n  prometheus:\n    endpoint: prometheus-k8s.observability-peer.svc\n    resource_to_telemetry_conversion:\n
+    \     enabled: true\n    enable_open_metrics: true\nprocessors:\n  memory_limiter:\n
+    \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  spanmetrics:\n    metrics_exporter:
-    otlp/spanmetrics\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms,
-    100ms, 250ms]\n    dimensions_cache_size: 1500\n    dimensions:\n        - name:
-    http.method\n          default: GET\n        - name: http.status_code\n  servicegraph:\n
-    \   metrics_exporter: otlp/spanmetrics\n    latency_histogram_buckets: [100us,
-    1ms, 2ms, 6ms, 10ms, 100ms, 250ms] # Buckets for latency histogram\n    dimensions:
-    [cluster, namespace] # Additional dimensions (labels) to be added to the metrics
-    extracted from the resource and span attributes\n    store:\n      ttl: 2s\n      max_items:
-    200\n  resource:\n    attributes:\n      - key: service.name\n        value: \"serviceName\"\n
-    \       action: upsert\n  metricstransform:\n    transforms:\n      - include:
-    calls_total\n        action: update\n        new_name: traces_spanmetrics_calls_total\n
-    \       operations:\n          - action: update_label\n            label: operation\n
-    \           new_label: span.name\n      - include: latency\n        action: update\n
-    \       new_name: traces_spanmetrics_latency\nexporters:\n  otlp/spanmetrics:\n
-    \   endpoint: localhost:4317\n    tls:\n      insecure: true\n  logging:\n    loglevel:
-    warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n    headers:\n      \"X-Scope-OrgID\":
-    \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n
-    \   endpoint: ${OBSERVER_URL}/api/v1/push\n    headers:\n      \"X-Scope-OrgID\":
-    \"${ENVIRONMENT}-${CLUSTER}\"\n    target_info:\n      enabled: true\n    resource_to_telemetry_conversion:\n
-    \     enabled: true\n  loki:\n    endpoint: ${OBSERVER_URL}/loki/api/v1/push\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    format:
-    json\n    labels:\n      attributes:\n        container_name: \"\"\n        source:
-    \"\"\n      resource:\n        host.name: \"hostname\"\nservice:\n  telemetry:\n
-    \   logs:\n      level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    logs:
-    \n      receivers: [otlp]\n      processors: [memory_limiter, resource, batch]\n
-    \     exporters: [logging, loki]\n    traces:\n      receivers: [otlp, jaeger]\n
-    \     processors: [memory_limiter, resource, spanmetrics, servicegraph, batch]\n
-    \     exporters: [logging, otlphttp/tempo]\n    metrics/spanmetrics:\n      receivers:
-    [otlp]\n      processors: [metricstransform]\n      exporters: [logging, prometheusremotewrite]\n
-    \   metrics:\n      receivers: [otlp]\n      processors: [memory_limiter, resource,
-    batch]\n      exporters: [logging, prometheusremotewrite]\n"
+    'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n
+    \   dimensions_cache_size: 1500\n    dimensions:\n        - name: http.method\n
+    \         default: GET\n        - name: http.status_code\n  servicegraph:\n    metrics_exporter:
+    'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
+    # Buckets for latency histogram\n    dimensions: [namespace] # Additional dimensions
+    (labels) to be added to the metrics extracted from the resource and span attributes\n
+    \   store:\n      ttl: 2s\n      max_items: 200\n  attributes/spanname:\n    actions:\n
+    \     - key: span_name\n        from_attribute: span_name\n        action: upsert\n
+    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
+    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
+    \         - action: update_label\n            label: operation\n            new_label:
+    span.name\n      - include: latency\n        action: update\n        new_name:
+    traces_spanmetrics_latency\n\nservice:\n  #telemetry:\n  #  logs:\n  #    level:
+    ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
+    jaeger]\n      processors: [memory_limiter,spanmetrics,batch]\n      exporters:
+    [logging, otlphttp/tempo]\n    traces/servicegraph:\n      receivers: [otlp, jaeger]\n
+    \     processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
+    \     receivers: [otlp/dummy]\n      exporters: [otlp]\n    metrics:\n      receivers:
+    [otlp]\n      processors: [memory_limiter,metricstransform,batch]\n      exporters:
+    [logging, prometheus]\n"
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
 ---
