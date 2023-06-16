@@ -6287,7 +6287,7 @@ spec:
     \ #telemetry:\n  #  logs:\n  #    level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n
     \   traces:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
     \     exporters: [logging, otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
-    \     processors: [memory_limiter,metricstransform,batch]\n      exporters: [logging,k8sattributes,prometheusremotewrite]\n
+    \     processors: [memory_limiter,metricstransform,batch]\n      exporters: [logging,prometheusremotewrite]\n
     \   traces/servicegraph:\n      receivers: [otlp, jaeger]\n      processors: [servicegraph]\n
     \     exporters: [logging]\n    metrics/spanmetrics:\n      receivers: [otlp/dummy]\n
     \     exporters: [otlp]"
