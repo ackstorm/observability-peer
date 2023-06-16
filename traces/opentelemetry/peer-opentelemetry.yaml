@@ -6229,7 +6229,7 @@ spec:
     \ logging:\n    loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n
     \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n
     \     insecure: true\n  otlp:\n    endpoint: localhost:4317\n    tls:\n      insecure:
-    true\n  prometheus:\n    endpoint: prometheus-k8s.observability-peer.svc:9090\n
+    true\n  prometheus:\n    endpoint: http://prometheus-k8s.observability-peer.svc:9090/api/v1/push\n
     \   resource_to_telemetry_conversion:\n      enabled: true\n    enable_open_metrics:
     true\nprocessors:\n  memory_limiter:\n    check_interval: 2s\n    limit_percentage:
     75\n    spike_limit_percentage: 15\n  batch:\n    send_batch_size: 10000\n    timeout:
