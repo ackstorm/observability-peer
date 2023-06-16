@@ -86,7 +86,7 @@ spec:
         - name: JAEGER_AGENT_HOST
           value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
-          value: cluster=tns,namespace=tns
+          value: app_cluster=tns,app_namespace=tns
         - name: JAEGER_SAMPLER_TYPE
           value: const
         - name: JAEGER_SAMPLER_PARAM
@@ -121,7 +121,7 @@ spec:
         - name: JAEGER_AGENT_HOST
           value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
-          value: cluster=tns,namespace=tns
+          value: app_cluster=tns,app_namespace=tns
         - name: JAEGER_SAMPLER_TYPE
           value: const
         - name: JAEGER_SAMPLER_PARAM
@@ -157,7 +157,7 @@ spec:
         - name: JAEGER_AGENT_HOST
           value: opentelemetry-collector.observability-peer.svc
         - name: JAEGER_TAGS
-          value: cluster=tns,namespace=tns
+          value: app_cluster=tns,app_namespace=tns
         - name: JAEGER_SAMPLER_TYPE
           value: const
         - name: JAEGER_SAMPLER_PARAM

@@ -181,6 +181,42 @@ spec:
       securityContext: {}
       serviceAccountName: otel-demo-frontend
 ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kps
+  name: otel-demo-backend
+  namespace: otel-demo
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app: otel-demo-backend
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kps
+  name: otel-demo-frontend
+  namespace: otel-demo
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app: otel-demo-frontend
+---
 apiVersion: v1
 kind: Pod
 metadata:

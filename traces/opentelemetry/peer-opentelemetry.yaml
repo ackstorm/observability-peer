@@ -6269,17 +6269,18 @@ spec:
     \   dimensions_cache_size: 1500\n    dimensions:\n        - name: http.method\n
     \         default: GET\n        - name: http.status_code\n  servicegraph:\n    metrics_exporter:
     'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
-    # Buckets for latency histogram\n    #dimensions: [namespace] # Additional dimensions
-    (labels) to be added to the metrics extracted from the resource and span attributes\n
-    \   store:\n      ttl: 2s\n      max_items: 200\n  attributes/spanname:\n    actions:\n
-    \     - key: span_name\n        from_attribute: span_name\n        action: upsert\n
-    \ k8sattributes:\n    filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n  metricstransform:\n
-    \   transforms:\n      - include: calls_total\n        action: update\n        new_name:
-    traces_spanmetrics_calls_total\n        operations:\n          - action: update_label\n
-    \           label: operation\n            new_label: span.name\n      - include:
-    latency\n        action: update\n        new_name: traces_spanmetrics_latency\nservice:\n
-    \ #telemetry:\n  #  logs:\n  #    level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n
-    \   traces:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
+    # Buckets for latency histogram\n    dimensions: [k8s.namespace.name] # Additional
+    dimensions (labels) to be added to the metrics extracted from the resource and
+    span attributes\n    store:\n      ttl: 2s\n      max_items: 200\n  attributes/spanname:\n
+    \   actions:\n      - key: span_name\n        from_attribute: span_name\n        action:
+    upsert\n  k8sattributes:\n    filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n
+    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
+    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
+    \         - action: update_label\n            label: operation\n            new_label:
+    span.name\n      - include: latency\n        action: update\n        new_name:
+    traces_spanmetrics_latency\nservice:\n  #telemetry:\n  #  logs:\n  #    level:
+    ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
+    jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
     \     exporters: [logging,otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
     \     processors: [memory_limiter,k8sattributes,metricstransform,batch]\n      exporters:
     [logging,prometheusremotewrite]\n    traces/servicegraph:\n      receivers: [otlp,
