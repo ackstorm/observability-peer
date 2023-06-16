@@ -30314,6 +30314,7 @@ spec:
   enableAdminAPI: false
   enableFeatures:
   - memory-snapshot-on-shutdown
+  - remote-write-receiver
   - exemplar-storage
   externalLabels:
     cluster: ${ENVIRONMENT}-${CLUSTER}
