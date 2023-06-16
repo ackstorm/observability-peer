@@ -6261,7 +6261,7 @@ spec:
     \ logging:\n    loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n
     \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n
     \     insecure: true\n  otlp:\n    endpoint: localhost:4317\n    tls:\n      insecure:
-    true\n  prometheusremotewrite:\n    endpoint: http://prometheus-k8s.observability-peer.svc:9090/api/v1/push\n
+    true\n  prometheusremotewrite:\n    endpoint: http://prometheus-k8s.observability-peer.svc:9090/api/v1/write\n
     \   resource_to_telemetry_conversion:\n      enabled: true\nprocessors:\n  memory_limiter:\n
     \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  spanmetrics:\n    metrics_exporter:
@@ -6286,11 +6286,11 @@ spec:
     latency\n        action: update\n        new_name: traces_spanmetrics_latency\n\nservice:\n
     \ #telemetry:\n  #  logs:\n  #    level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n
     \   traces:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
-    \     exporters: [logging, otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
-    \     processors: [memory_limiter,metricstransform,batch]\n      exporters: [logging,prometheusremotewrite]\n
-    \   traces/servicegraph:\n      receivers: [otlp, jaeger]\n      processors: [servicegraph]\n
-    \     exporters: [logging]\n    metrics/spanmetrics:\n      receivers: [otlp/dummy]\n
-    \     exporters: [otlp]"
+    \     exporters: [logging,otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
+    \     processors: [memory_limiter,k8sattributes,metricstransform,batch]\n      exporters:
+    [logging,prometheusremotewrite]\n    traces/servicegraph:\n      receivers: [otlp,
+    jaeger]\n      processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
+    \     receivers: [otlp/dummy]\n      exporters: [otlp]"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
