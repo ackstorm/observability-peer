@@ -6277,18 +6277,23 @@ spec:
     \   filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n    extract:\n      metadata:\n
     \       - k8s.pod.name\n        - k8s.pod.uid\n        - k8s.deployment.name\n
     \       - k8s.namespace.name\n        - k8s.node.name\n        - k8s.pod.start_time\n
-    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
-    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
-    \         - action: update_label\n            label: operation\n            new_label:
-    span.name\n      - include: latency\n        action: update\n        new_name:
-    traces_spanmetrics_latency\n\nservice:\n  #telemetry:\n  #  logs:\n  #    level:
-    ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
-    jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
-    \     exporters: [logging, otlphttp/tempo]\n    traces/servicegraph:\n      receivers:
-    [otlp, jaeger]\n      processors: [servicegraph]\n      exporters: [logging]\n
-    \   metrics/spanmetrics:\n      receivers: [otlp/dummy]\n      exporters: [otlp]\n
-    \   metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,metricstransform,batch]\n
-    \     exporters: [logging, prometheusremotewrite]\n"
+    \   annotations:\n      - key_regex: opentel.* # extracts Keys & values of annotations
+    matching regex `opentel.*`\n        from: pod\n    labels:\n      - key_regex:
+    opentel.* # extracts Keys & values of labels matching regex `opentel.*`\n        from:
+    pod\n    pod_association:\n      - sources:\n        - from: resource_attribute\n
+    \         name: k8s.pod.ip\n      - sources:\n        - from: resource_attribute\n
+    \         name: k8s.pod.uid\n      - sources:\n        - from: connection\n  metricstransform:\n
+    \   transforms:\n      - include: calls_total\n        action: update\n        new_name:
+    traces_spanmetrics_calls_total\n        operations:\n          - action: update_label\n
+    \           label: operation\n            new_label: span.name\n      - include:
+    latency\n        action: update\n        new_name: traces_spanmetrics_latency\n\nservice:\n
+    \ #telemetry:\n  #  logs:\n  #    level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n
+    \   traces:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
+    \     exporters: [logging, otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
+    \     processors: [memory_limiter,metricstransform,batch]\n      exporters: [logging,k8sattributes,prometheusremotewrite]\n
+    \   traces/servicegraph:\n      receivers: [otlp, jaeger]\n      processors: [servicegraph]\n
+    \     exporters: [logging]\n    metrics/spanmetrics:\n      receivers: [otlp/dummy]\n
+    \     exporters: [otlp]"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
@@ -6297,7 +6302,6 @@ spec:
         fieldPath: spec.nodeName
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
-  serviceAccount: attributes-account
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
