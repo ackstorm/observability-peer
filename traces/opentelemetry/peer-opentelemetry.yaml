@@ -5797,6 +5797,23 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/name: observability-peer-otel-collector
+  name: observability-peer-otel-collector-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - namespaces
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
     app.kubernetes.io/name: opentelemetry-operator
   name: opentelemetry-operator-manager-role
 rules:
@@ -6029,6 +6046,21 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
+    app.kubernetes.io/name: observability-peer-otel-collector
+  name: observability-peer-otel-collector-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observability-peer-otel-collector-role
+subjects:
+- kind: ServiceAccount
+  name: opentelemetry-collector
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
     app.kubernetes.io/name: opentelemetry-operator
   name: opentelemetry-operator-manager-rolebinding
 roleRef:
@@ -6237,24 +6269,32 @@ spec:
     \   dimensions_cache_size: 1500\n    dimensions:\n        - name: http.method\n
     \         default: GET\n        - name: http.status_code\n  servicegraph:\n    metrics_exporter:
     'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
-    # Buckets for latency histogram\n    dimensions: [namespace] # Additional dimensions
+    # Buckets for latency histogram\n    #dimensions: [namespace] # Additional dimensions
     (labels) to be added to the metrics extracted from the resource and span attributes\n
     \   store:\n      ttl: 2s\n      max_items: 200\n  attributes/spanname:\n    actions:\n
     \     - key: span_name\n        from_attribute: span_name\n        action: upsert\n
+    \ k8sattributes:\n      filter:\n          node_from_env_var: KUBE_NODE_NAME\n
     \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
     update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
     \         - action: update_label\n            label: operation\n            new_label:
     span.name\n      - include: latency\n        action: update\n        new_name:
     traces_spanmetrics_latency\n\nservice:\n  #telemetry:\n  #  logs:\n  #    level:
     ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
-    jaeger]\n      processors: [memory_limiter,spanmetrics,batch]\n      exporters:
-    [logging, otlphttp/tempo]\n    traces/servicegraph:\n      receivers: [otlp, jaeger]\n
-    \     processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
-    \     receivers: [otlp/dummy]\n      exporters: [otlp]\n    metrics:\n      receivers:
-    [otlp]\n      processors: [memory_limiter,metricstransform,batch]\n      exporters:
-    [logging, prometheusremotewrite]\n"
+    jaeger]\n      processors: [memory_limiter,k8sattributes,spanmetrics,batch]\n
+    \     exporters: [logging, otlphttp/tempo]\n    traces/servicegraph:\n      receivers:
+    [otlp, jaeger]\n      processors: [servicegraph]\n      exporters: [logging]\n
+    \   metrics/spanmetrics:\n      receivers: [otlp/dummy]\n      exporters: [otlp]\n
+    \   metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,metricstransform,batch]\n
+    \     exporters: [logging, prometheusremotewrite]\n"
+  env:
+  - name: KUBE_NODE_NAME
+    valueFrom:
+      fieldRef:
+        apiVersion: v1
+        fieldPath: spec.nodeName
   image: otel/opentelemetry-collector-contrib:0.75.0
   mode: daemonset
+  serviceAccount: attributes-account
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
