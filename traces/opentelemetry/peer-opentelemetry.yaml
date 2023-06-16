@@ -6229,25 +6229,25 @@ spec:
     \ logging:\n    loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n
     \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n
     \     insecure: true\n  otlp:\n    endpoint: localhost:4317\n    tls:\n      insecure:
-    true\n  prometheus:\n    endpoint: prometheus-k8s.observability-peer.svc\n    resource_to_telemetry_conversion:\n
-    \     enabled: true\n    enable_open_metrics: true\nprocessors:\n  memory_limiter:\n
-    \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
-    15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  spanmetrics:\n    metrics_exporter:
-    'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n
-    \   dimensions_cache_size: 1500\n    dimensions:\n        - name: http.method\n
-    \         default: GET\n        - name: http.status_code\n  servicegraph:\n    metrics_exporter:
-    'otlp'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
-    # Buckets for latency histogram\n    dimensions: [namespace] # Additional dimensions
-    (labels) to be added to the metrics extracted from the resource and span attributes\n
-    \   store:\n      ttl: 2s\n      max_items: 200\n  attributes/spanname:\n    actions:\n
-    \     - key: span_name\n        from_attribute: span_name\n        action: upsert\n
-    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
-    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
-    \         - action: update_label\n            label: operation\n            new_label:
-    span.name\n      - include: latency\n        action: update\n        new_name:
-    traces_spanmetrics_latency\n\nservice:\n  #telemetry:\n  #  logs:\n  #    level:
-    ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
-    jaeger]\n      processors: [memory_limiter,spanmetrics,batch]\n      exporters:
+    true\n  prometheus:\n    endpoint: prometheus-k8s.observability-peer.svc:9090\n
+    \   resource_to_telemetry_conversion:\n      enabled: true\n    enable_open_metrics:
+    true\nprocessors:\n  memory_limiter:\n    check_interval: 2s\n    limit_percentage:
+    75\n    spike_limit_percentage: 15\n  batch:\n    send_batch_size: 10000\n    timeout:
+    10s\n  spanmetrics:\n    metrics_exporter: 'otlp'\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions_cache_size: 1500\n
+    \   dimensions:\n        - name: http.method\n          default: GET\n        -
+    name: http.status_code\n  servicegraph:\n    metrics_exporter: 'otlp'\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms] # Buckets for latency histogram\n    dimensions:
+    [namespace] # Additional dimensions (labels) to be added to the metrics extracted
+    from the resource and span attributes\n    store:\n      ttl: 2s\n      max_items:
+    200\n  attributes/spanname:\n    actions:\n      - key: span_name\n        from_attribute:
+    span_name\n        action: upsert\n  metricstransform:\n    transforms:\n      -
+    include: calls_total\n        action: update\n        new_name: traces_spanmetrics_calls_total\n
+    \       operations:\n          - action: update_label\n            label: operation\n
+    \           new_label: span.name\n      - include: latency\n        action: update\n
+    \       new_name: traces_spanmetrics_latency\n\nservice:\n  #telemetry:\n  #  logs:\n
+    \ #    level: ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers:
+    [otlp, jaeger]\n      processors: [memory_limiter,spanmetrics,batch]\n      exporters:
     [logging, otlphttp/tempo]\n    traces/servicegraph:\n      receivers: [otlp, jaeger]\n
     \     processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
     \     receivers: [otlp/dummy]\n      exporters: [otlp]\n    metrics:\n      receivers:
