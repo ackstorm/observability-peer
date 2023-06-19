@@ -30395,7 +30395,7 @@ spec:
   groups:
   - name: prometheus-rule-peer
     rules:
-    - alert: Watchdog
+    - alert: WatchdogPeer
       annotations:
         description: |
           This is an alert meant to ensure that the entire alerting pipeline is functional.
