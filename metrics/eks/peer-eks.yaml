@@ -30379,6 +30379,8 @@ spec:
         resources:
           requests:
             storage: ${VOLUME_SIZE}Gi
+  tsdb:
+    outOfOrderTimeWindow: 5m
   version: 2.41.0
 ---
 apiVersion: monitoring.coreos.com/v1
