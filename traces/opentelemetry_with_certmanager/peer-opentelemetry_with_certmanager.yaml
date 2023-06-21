@@ -15127,6 +15127,7 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - replicasets
   - pods
   - namespaces
   verbs:
