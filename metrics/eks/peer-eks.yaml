@@ -30580,7 +30580,7 @@ spec:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
     url: ${OBSERVER_URL}/api/v1/push
-  replicas: 2
+  replicas: 1
   resources:
     requests:
       memory: 100Mi
