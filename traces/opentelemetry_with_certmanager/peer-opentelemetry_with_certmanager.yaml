@@ -15127,13 +15127,23 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - replicasets
   - pods
   - namespaces
   verbs:
   - get
-  - watch
   - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
