@@ -29837,22 +29837,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/name: aws-node
-  name: aws-node
-  namespace: observability-peer
-spec:
-  clusterIP: None
-  ports:
-  - name: cni-metrics-port
-    port: 61678
-    targetPort: 61678
-  selector:
-    app.kubernetes.io/name: aws-node
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: blackbox-exporter
     app.kubernetes.io/part-of: kube-prometheus
@@ -30580,6 +30564,11 @@ spec:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
     url: ${OBSERVER_URL}/api/v1/push
+    write_relabel_configs:
+    - regex: (.*)
+      source_labels:
+      - __name__
+      target_label: __name__
   replicas: 1
   resources:
     requests:
@@ -30642,33 +30631,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app.kubernetes.io/name: aws-node
-  name: aws-node
-  namespace: observability-peer
-spec:
-  endpoints:
-  - interval: 30s
-    path: /metrics
-    port: cni-metrics-port
-    relabelings:
-    - action: replace
-      regex: (.*)
-      replacement: $1
-      sourceLabels:
-      - __meta_kubernetes_pod_node_name
-      targetLabel: instance
-  jobLabel: app.kubernetes.io/name
-  namespaceSelector:
-    matchNames:
-    - kube-system
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: aws-node
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: blackbox-exporter
     app.kubernetes.io/part-of: kube-prometheus
@@ -30702,7 +30664,12 @@ spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
     interval: 15s
-    targetPort: 9153
+    metricRelabelings:
+    - action: drop
+      regex: coredns_cache_misses_total
+      sourceLabels:
+      - __name__
+    port: metrics
   jobLabel: app.kubernetes.io/name
   namespaceSelector:
     matchNames:

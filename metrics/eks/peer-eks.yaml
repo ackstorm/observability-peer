@@ -30580,6 +30580,11 @@ spec:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
     url: ${OBSERVER_URL}/api/v1/push
+    write_relabel_configs:
+    - regex: (.*)
+      source_labels:
+      - __name__
+      target_label: __name__
   replicas: 1
   resources:
     requests:
