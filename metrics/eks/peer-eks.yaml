@@ -30579,12 +30579,13 @@ spec:
   remoteWrite:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
+    sendExemplars: true
     url: ${OBSERVER_URL}/api/v1/push
-    write_relabel_configs:
+    writeRelabelConfigs:
     - regex: (.*)
-      source_labels:
+      sourceLabels:
       - __name__
-      target_label: __name__
+      targetLabel: __name__
   replicas: 1
   resources:
     requests:
