@@ -28996,11 +28996,11 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29008,11 +29008,11 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -29363,11 +29363,11 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 rules:
 - apiGroups:
   - ""
@@ -29403,19 +29403,19 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
 subjects:
 - kind: ServiceAccount
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29516,18 +29516,18 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 subjects:
 - kind: ServiceAccount
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -29953,11 +29953,11 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   ports:
@@ -29969,7 +29969,7 @@ spec:
     targetPort: reloader-web
   selector:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
   sessionAffinity: ClientIP
@@ -30368,18 +30368,18 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   minAvailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
 ---
@@ -30506,13 +30506,12 @@ kind: Prometheus
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: peer
+  name: prometheus-peer
   namespace: observability-peer
-name: peer
 spec:
   additionalAlertRelabelConfigs:
     key: additional-relabel-configs.yaml
@@ -30527,7 +30526,7 @@ spec:
           labelSelector:
             matchLabels:
               app.kubernetes.io/component: prometheus
-              app.kubernetes.io/instance: peer
+              app.kubernetes.io/instance: prometheus-peer
               app.kubernetes.io/name: prometheus
               app.kubernetes.io/part-of: kube-prometheus
           namespaces:
@@ -30552,7 +30551,7 @@ spec:
   podMetadata:
     labels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 2.41.0
@@ -30583,7 +30582,7 @@ spec:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
-  serviceAccountName: prometheus-peer
+  serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   storage:
@@ -30975,11 +30974,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   endpoints:
@@ -30990,7 +30989,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
 ---
@@ -31123,11 +31122,11 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   egress:
@@ -31152,7 +31151,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
