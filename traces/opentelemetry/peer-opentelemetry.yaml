@@ -6274,7 +6274,7 @@ spec:
     \       endpoint: ${env:MY_POD_IP}:14268\n  zipkin:\n    endpoint: ${env:MY_POD_IP}:9411\n\nexporters:\n
     \ logging:\n    loglevel: warn\n  otlphttp/tempo: \n    endpoint: ${OBSERVER_URL}\n
     \   headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n
-    \     insecure: true\n  prometheusremotewrite:\n    endpoint: http://prometheus-peer.observability-peer.svc:9090/api/v1/write\n
+    \     insecure: false\n  prometheusremotewrite:\n    endpoint: http://prometheus-peer.observability-peer.svc:9090/api/v1/write\n
     \   resource_to_telemetry_conversion:\n      enabled: true\n\nprocessors:\n  memory_limiter:\n
     \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  groupbytrace:\n
