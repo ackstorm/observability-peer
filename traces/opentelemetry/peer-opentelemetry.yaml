@@ -6299,10 +6299,10 @@ spec:
     jaeger]\n      processors: [memory_limiter, k8sattributes, groupbytrace, spanmetrics,
     batch]\n      exporters: [logging, otlphttp/tempo]\n    traces/servicegraph:\n
     \     receivers: [otlp, jaeger]\n      processors: [servicegraph]\n      exporters:
-    [logging]\n    metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,
-    k8sattributes, metricstransform, batch]\n      exporters: [logging, prometheusremotewrite]\n
-    \   metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n      exporters:
-    [logging, otlp/spanmetrics]\n"
+    [logging, prometheusremotewrite]\n    metrics:\n      receivers: [otlp]\n      processors:
+    [memory_limiter, k8sattributes, metricstransform, batch]\n      exporters: [logging,
+    prometheusremotewrite]\n    metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n
+    \     exporters: [logging, otlp/spanmetrics]\n"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
