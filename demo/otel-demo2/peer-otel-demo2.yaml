@@ -1452,8 +1452,8 @@ spec:
       paths:
       - backend:
           service:
-            name: otel-demo
+            name: ackstorm-opentelemetry-demo-frontend
             port:
-              name: service
+              name: tcp-service
         path: /
         pathType: Prefix
