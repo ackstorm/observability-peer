@@ -6278,7 +6278,7 @@ spec:
     when this is fixed: https://github.com/open-telemetry/opentelemetry-demo/issues/737\n
     \ transform:\n    metric_statements:\n      - context: metric\n        statements:\n
     \         - set(description, \"Measures the duration of inbound HTTP requests\")
-    where name == \"http.server.duration\"\n\nconnectors:\n  spanmetrics:\n\nservice:\n
+    where name == \"http.server.duration\"\n\nconnectors:\n  spanmetrics: {}\n\nservice:\n
     \ pipelines:\n    traces:\n      receivers: [otlp, jaeger]\n      processors:
     [memory_limiter, batch]\n      exporters: [otlphttp/tempo, logging, spanmetrics]\n
     \   metrics:\n      receivers: [otlp, spanmetrics]\n      processors: [memory_limiter,
