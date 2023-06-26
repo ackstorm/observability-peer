@@ -6308,6 +6308,10 @@ spec:
       fieldRef:
         apiVersion: v1
         fieldPath: spec.nodeName
+  - name: MY_POD_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
   image: otel/opentelemetry-collector-contrib:0.80.0
   mode: daemonset
 ---
