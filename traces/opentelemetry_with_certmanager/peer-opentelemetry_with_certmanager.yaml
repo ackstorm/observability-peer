@@ -16234,30 +16234,33 @@ spec:
     \       endpoint: ${env:MY_POD_IP}:14268\n  zipkin:\n    endpoint: ${env:MY_POD_IP}:9411\n\n
     \ prometheus:\n    config:\n      scrape_configs:\n        - job_name: 'otel-collector'\n
     \         scrape_interval: 5s\n          static_configs:\n            - targets:
-    ['${env:MY_POD_IP}:8080']\n\nexporters:\n  logging:\n    loglevel: warn\n  otlphttp/tempo:
+    ['${env:MY_POD_IP}:8888']\n\nexporters:\n  logging:\n    loglevel: warn\n  otlphttp/tempo:
     \n    endpoint: ${OBSERVER_URL}\n    headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n
     \   tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint: http://prometheus-peer.observability-peer.svc:9090/api/v1/write\n
-    \   resource_to_telemetry_conversion:\n      enabled: true\n\nextensions:\n  health_check:
-    {}\n  memory_ballast:\n    size_in_percentage: 40\n\nprocessors:\n  memory_limiter:\n
-    \   check_interval: 5s\n    limit_percentage: 80\n    spike_limit_percentage:
-    25\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  # we can remove
-    when this is fixed: https://github.com/open-telemetry/opentelemetry-demo/issues/737\n
-    \ transform:\n    metric_statements:\n    - context: metric\n      statements:\n
-    \     - set(description, \"Measures the duration of inbound HTTP requests\") where
-    name == \"http.server.duration\"\n  k8sattributes:\n    filter:\n      node_from_env_var:
-    <KUBE_NODE_NAME>\n  metricstransform:\n    transforms:\n      - include: calls_total\n
-    \       action: update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
-    \         - action: update_label\n            label: operation\n            new_label:
-    span.name\n      - include: latency\n        action: update\n        new_name:
-    traces_spanmetrics_latency\n        \nconnectors:\n  spanmetrics: null\n\nservice:\n
-    \ extensions:\n  - health_check\n  - memory_ballast\n  pipelines:\n    traces:\n
-    \     receivers: [otlp, jaeger, zipkin]\n      processors: [memory_limiter, k8sattributes,
-    resource, spanmetrics, servicegraph, batch]\n      exporters: [otlphttp/tempo,
-    logging, spanmetrics]\n    metrics:\n      receivers: [otlp]\n      processors:
-    [memory_limiter, k8sattributes, transform, batch]\n      exporters: [prometheusremotewrite,
+    \   resource_to_telemetry_conversion:\n      enabled: true\n  otlp/spanmetrics:\n
+    \   endpoint: localhost:4317\n    tls:\n      insecure: true\n\nextensions:\n
+    \ health_check: {}\n  memory_ballast:\n    size_in_percentage: 40\n\nprocessors:\n
+    \ batch:\n    send_batch_size: 10000\n    timeout: 10s\n  memory_limiter:\n    check_interval:
+    5s\n    limit_percentage: 80\n    spike_limit_percentage: 25\n  k8sattributes:\n
+    \   filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n  # resource:\n  #   attributes:\n
+    \ #     - key: service.name\n  #       value: \"serviceName\"\n  #       action:
+    upsert\n  spanmetrics:\n    metrics_exporter: otlp/spanmetrics\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions_cache_size: 1500\n
+    \ servicegraph:\n    metrics_exporter: otlp/spanmetrics\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions: [cluster, namespace]\n
+    \   store:\n      ttl: 2s\n      max_items: 200\n  metricstransform:\n    transforms:\n
+    \     - include: calls_total\n        action: update\n        new_name: traces_spanmetrics_calls_total\n
+    \       operations:\n          - action: update_label\n            label: operation\n
+    \           new_label: span.name\n      - include: latency\n        action: update\n
+    \       new_name: traces_spanmetrics_latency\n        \n# connectors:\n#   spanmetrics:
+    null\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n  pipelines:\n
+    \   traces:\n      receivers: [otlp, jaeger, zipkin]\n      processors: [memory_limiter,
+    k8sattributes, spanmetrics, servicegraph, batch]\n      exporters: [otlphttp/tempo,
     logging]\n    metrics/spanmetrics:\n      receivers: [otlp]\n      processors:
-    [metricstransform]\n      exporters: [prometheusremotewrite, logging]\n  telemetry:\n
-    \   metrics:\n      address: ${env:MY_POD_IP}:8888"
+    [metricstransform, k8sattributes]\n      exporters: [prometheusremotewrite, logging]\n
+    \   metrics:\n      receivers: [prometheus]\n      processors: [memory_limiter,
+    batch]\n      exporters: [prometheusremotewrite, logging]\n  telemetry:\n    metrics:\n
+    \     address: ${env:MY_POD_IP}:8888\n"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
