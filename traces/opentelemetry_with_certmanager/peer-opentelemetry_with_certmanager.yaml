@@ -16255,11 +16255,10 @@ spec:
     ${SERVICE_TELEMETRY_LOGS_LEVEL}\n  pipelines:\n    traces:\n      receivers: [otlp,
     jaeger]\n      processors: [memory_limiter,k8sattributes,groupbytrace,spanmetrics,batch]\n
     \     exporters: [logging,otlphttp/tempo]\n    metrics:\n      receivers: [otlp]\n
-    \     processors: [memory_limiter,filter/ottl,k8sattributes,metricstransform,batch]\n
-    \     exporters: [logging,prometheusremotewrite]\n    traces/servicegraph:\n      receivers:
-    [otlp, jaeger]\n      processors: [servicegraph]\n      exporters: [logging]\n
-    \   metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n      exporters:
-    [otlp/spanmetrics]\n"
+    \     processors: [memory_limiter,k8sattributes,metricstransform,batch]\n      exporters:
+    [logging,prometheusremotewrite]\n    traces/servicegraph:\n      receivers: [otlp,
+    jaeger]\n      processors: [servicegraph]\n      exporters: [logging]\n    metrics/spanmetrics:\n
+    \     receivers: [otlp/spanmetrics]\n      exporters: [otlp/spanmetrics]\n"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
