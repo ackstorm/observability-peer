@@ -16237,7 +16237,8 @@ spec:
     \     \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n      insecure:
     true\n  otlp/spanmetrics:\n    endpoint: ${env:MY_POD_IP}:4317\n    tls:\n      insecure:
     true\n  prometheusremotewrite:\n    endpoint: http://prometheus-peer.observability-peer.svc:9090/api/v1/write\n
-    \   resource_to_telemetry_conversion:\n      enabled: true\n\nprocessors:\n  memory_limiter:\n
+    \   resource_to_telemetry_conversion:\n      enabled: true\n  exporters:\n    loki:\n
+    \     endpoint: ${OBSERVER_URL}/loki/api/v1/push\n\nprocessors:\n  memory_limiter:\n
     \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  groupbytrace:\n
     \   wait_duration: 30s\n    num_traces: 1000\n  spanmetrics:\n    metrics_exporter:
@@ -16264,10 +16265,12 @@ spec:
     [otlp, jaeger, zipkin]\n      processors: [memory_limiter, k8sattributes, groupbytrace,
     spanmetrics, batch]\n      exporters: [logging, otlphttp/observer]\n    traces/servicegraph:\n
     \     receivers: [otlp, jaeger, zipkin]\n      processors: [servicegraph]\n      exporters:
-    [logging]\n    metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,
-    k8sattributes, metricstransform, batch]\n      exporters: [logging, prometheusremotewrite]\n
-    \   metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n      exporters:
-    [logging, otlp/spanmetrics]\n  telemetry:\n    metrics:\n      address: ${env:MY_POD_IP}:8888\n"
+    [logging]\n    metrics:\n      receivers: [otlp, jaeger, zipkin]\n      processors:
+    [memory_limiter, k8sattributes, metricstransform, batch]\n      exporters: [logging,
+    prometheusremotewrite]\n    metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n
+    \     exporters: [logging, otlp/spanmetrics]\n    logging:\n      receivers: [otlp]\n
+    \     processors: [memory_limiter, k8sattributes, batch]\n      exporters: [logging,
+    loki]\n\n  telemetry:\n    metrics:\n      address: ${env:MY_POD_IP}:8888\n"
   env:
   - name: KUBE_NODE_NAME
     valueFrom:
