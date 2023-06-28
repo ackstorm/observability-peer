@@ -16265,7 +16265,7 @@ spec:
     [otlp, jaeger, zipkin]\n      processors: [memory_limiter, k8sattributes, groupbytrace,
     spanmetrics, batch]\n      exporters: [logging, otlphttp/observer]\n    traces/servicegraph:\n
     \     receivers: [otlp, jaeger, zipkin]\n      processors: [servicegraph]\n      exporters:
-    [logging]\n    metrics:\n      receivers: [otlp, jaeger]\n      processors: [memory_limiter,
+    [logging]\n    metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,
     k8sattributes, metricstransform, batch]\n      exporters: [logging, prometheusremotewrite]\n
     \   metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n      exporters:
     [logging, otlp/spanmetrics]\n    logs:\n      receivers: [otlp]\n      processors:
