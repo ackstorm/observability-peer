@@ -16268,7 +16268,7 @@ spec:
     [logging]\n    metrics:\n      receivers: [otlp, jaeger, zipkin]\n      processors:
     [memory_limiter, k8sattributes, metricstransform, batch]\n      exporters: [logging,
     prometheusremotewrite]\n    metrics/spanmetrics:\n      receivers: [otlp/spanmetrics]\n
-    \     exporters: [logging, otlp/spanmetrics]\n    logging:\n      receivers: [otlp]\n
+    \     exporters: [logging, otlp/spanmetrics]\n    logs:\n      receivers: [otlp]\n
     \     processors: [memory_limiter, k8sattributes, batch]\n      exporters: [logging,
     loki]\n\n  telemetry:\n    metrics:\n      address: ${env:MY_POD_IP}:8888\n"
   env:
