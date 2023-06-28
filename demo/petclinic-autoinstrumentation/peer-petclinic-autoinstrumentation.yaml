@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: petclinic-autoinstrumentation
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-petclinic
+  namespace: petclinic-autoinstrumentation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-petclinic
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: spring-petclinic
+    spec:
+      containers:
+      - image: ghcr.io/pavolloffay/spring-petclinic:latest
+        name: app
+        ports:
+        - containerPort: 8080
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: default-instrumentation
+  namespace: petclinic-autoinstrumentation
+spec:
+  env:
+  - name: OTEL_JAVAAGENT_LOGGING
+    value: application
+  exporter:
+    endpoint: http://opentelemetry-collector.observability-peer.svc:4317
+  propagators:
+  - tracecontext
+  - baggage
+  - b3
+  sampler:
+    argument: "1"
+    type: parentbased_traceidratio
