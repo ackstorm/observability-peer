@@ -16244,9 +16244,10 @@ spec:
     \   wait_duration: 30s\n    num_traces: 1000\n  spanmetrics:\n    metrics_exporter:
     'otlp/spanmetrics'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms,
     100ms, 250ms]\n    dimensions_cache_size: 1500\n    dimensions:\n        - name:
-    http.method\n          default: GET\n        - name: http.status_code\n  servicegraph:\n
-    \   metrics_exporter: 'otlp/spanmetrics'\n    latency_histogram_buckets: [100us,
-    1ms, 2ms, 6ms, 10ms, 100ms, 250ms] # Buckets for latency histogram\n    dimensions:
+    http.method\n          default: GET\n        - name: http.status_code\n    aggregation_temporality:
+    \"AGGREGATION_TEMPORALITY_CUMULATIVE\"     \n    metrics_flush_interval: 30s\n\n
+    \ servicegraph:\n    metrics_exporter: 'otlp/spanmetrics'\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms] # Buckets for latency histogram\n    dimensions:
     [k8s.namespace.name] # Additional dimensions (labels) to be added to the metrics
     extracted from the resource and span attributes\n    store:\n      ttl: 2s\n      max_items:
     200\n  attributes/spanname:\n    actions:\n      - key: span_name\n        from_attribute:
