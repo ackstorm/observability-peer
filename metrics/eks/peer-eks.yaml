@@ -28963,7 +28963,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -28972,10 +28972,10 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -28984,10 +28984,10 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -28996,11 +28996,11 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29008,11 +29008,11 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -29027,10 +29027,10 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -29149,7 +29149,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
 rules:
 - apiGroups:
   - ""
@@ -29269,10 +29269,10 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
 rules:
 - apiGroups:
   - monitoring.coreos.com
@@ -29363,11 +29363,11 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 rules:
 - apiGroups:
   - ""
@@ -29403,19 +29403,19 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: prometheus-peer-config
+  name: prometheus-prometheus-peer-config
 subjects:
 - kind: ServiceAccount
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29442,18 +29442,18 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: node-exporter-peer
+  name: node-exporter
 subjects:
 - kind: ServiceAccount
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29483,14 +29483,14 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
 subjects:
 - kind: ServiceAccount
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29498,17 +29498,17 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-operator
+  name: prometheus-operator-peer
 subjects:
 - kind: ServiceAccount
-  name: prometheus-operator
+  name: prometheus-operator-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29516,18 +29516,18 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
 subjects:
 - kind: ServiceAccount
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -29906,7 +29906,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
   namespace: observability-peer
 spec:
   clusterIP: None
@@ -29927,10 +29927,10 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 spec:
   clusterIP: None
@@ -29940,7 +29940,7 @@ spec:
     targetPort: https
   selector:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
 ---
 apiVersion: v1
@@ -29948,10 +29948,10 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
   namespace: observability-peer
 spec:
   clusterIP: None
@@ -29961,7 +29961,7 @@ spec:
     targetPort: https
   selector:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
 ---
 apiVersion: v1
@@ -29969,11 +29969,11 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   ports:
@@ -29985,7 +29985,7 @@ spec:
     targetPort: reloader-web
   selector:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
   sessionAffinity: ClientIP
@@ -30197,7 +30197,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
   namespace: observability-peer
 spec:
   replicas: 2
@@ -30294,32 +30294,32 @@ spec:
           runAsUser: 65532
       nodeSelector:
         kubernetes.io/os: linux
-      serviceAccountName: kube-state-metrics-peer
+      serviceAccountName: kube-state-metrics
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
   namespace: observability-peer
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
-      app.kubernetes.io/name: prometheus-operator
+      app.kubernetes.io/name: prometheus-operator-peer
       app.kubernetes.io/part-of: kube-prometheus
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: prometheus-operator
+        kubectl.kubernetes.io/default-container: prometheus-operator-peer
       labels:
         app.kubernetes.io/component: controller
-        app.kubernetes.io/name: prometheus-operator
+        app.kubernetes.io/name: prometheus-operator-peer
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 0.62.0
     spec:
@@ -30329,7 +30329,7 @@ spec:
         - --kubelet-service=kube-system/kubelet
         - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.62.0
         image: quay.io/prometheus-operator/prometheus-operator:v0.62.0
-        name: prometheus-operator
+        name: prometheus-operator-peer
         ports:
         - containerPort: 8080
           name: http
@@ -30377,25 +30377,25 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccountName: prometheus-operator
+      serviceAccountName: prometheus-operator-peer
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   minAvailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
 ---
@@ -30404,24 +30404,24 @@ kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: node-exporter-peer
+      app.kubernetes.io/name: node-exporter
       app.kubernetes.io/part-of: kube-prometheus
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: node-exporter-peer
+        kubectl.kubernetes.io/default-container: node-exporter
       labels:
         app.kubernetes.io/component: exporter
-        app.kubernetes.io/name: node-exporter-peer
+        app.kubernetes.io/name: node-exporter
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 1.5.0
     spec:
@@ -30438,7 +30438,7 @@ spec:
         - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
         - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
         image: quay.io/prometheus/node-exporter:v1.5.0
-        name: node-exporter-peer
+        name: node-exporter
         resources:
           limits:
             cpu: 250m
@@ -30502,7 +30502,7 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccountName: node-exporter-peer
+      serviceAccountName: node-exporter
       tolerations:
       - operator: Exists
       volumes:
@@ -30522,11 +30522,11 @@ kind: Prometheus
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: peer
+  name: prometheus-peer
   namespace: observability-peer
 spec:
   additionalAlertRelabelConfigs:
@@ -30542,7 +30542,7 @@ spec:
           labelSelector:
             matchLabels:
               app.kubernetes.io/component: prometheus
-              app.kubernetes.io/instance: peer
+              app.kubernetes.io/instance: prometheus-peer
               app.kubernetes.io/name: prometheus
               app.kubernetes.io/part-of: kube-prometheus
           namespaces:
@@ -30567,7 +30567,7 @@ spec:
   podMetadata:
     labels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 2.41.0
@@ -30578,6 +30578,8 @@ spec:
   remoteWrite:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
+    queue_config:
+      max_samples_per_send: 10000
     sendExemplars: true
     url: ${OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
@@ -30598,7 +30600,7 @@ spec:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
-  serviceAccountName: prometheus-peer
+  serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   storage:
@@ -30980,10 +30982,10 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 spec:
   endpoints:
@@ -31004,7 +31006,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: node-exporter-peer
+      app.kubernetes.io/name: node-exporter
       app.kubernetes.io/part-of: kube-prometheus
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -31012,7 +31014,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
   name: prometheus-operator
@@ -31028,7 +31030,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
-      app.kubernetes.io/name: prometheus-operator
+      app.kubernetes.io/name: prometheus-operator-peer
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 0.62.0
 ---
@@ -31037,11 +31039,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   endpoints:
@@ -31052,7 +31054,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
 ---
@@ -31096,7 +31098,7 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
-  name: kube-state-metrics-peer
+  name: kube-state-metrics
   namespace: observability-peer
 spec:
   egress:
@@ -31125,10 +31127,10 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: node-exporter-peer
+    app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 1.5.0
-  name: node-exporter-peer
+  name: node-exporter
   namespace: observability-peer
 spec:
   egress:
@@ -31144,7 +31146,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: node-exporter-peer
+      app.kubernetes.io/name: node-exporter
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
   - Egress
@@ -31155,10 +31157,10 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.62.0
-  name: prometheus-operator
+  name: prometheus-operator-peer
   namespace: observability-peer
 spec:
   egress:
@@ -31174,7 +31176,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: controller
-      app.kubernetes.io/name: prometheus-operator
+      app.kubernetes.io/name: prometheus-operator-peer
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
   - Egress
@@ -31185,11 +31187,11 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: peer
+    app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+  name: prometheus-prometheus-peer
   namespace: observability-peer
 spec:
   egress:
@@ -31214,7 +31216,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: peer
+      app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
