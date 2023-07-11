@@ -1329,25 +1329,6 @@ spec:
         runAsUser: 65534
       serviceAccountName: vpa-recommender
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: PodMonitor
-metadata:
-  name: vpa
-  namespace: observability-peer
-spec:
-  namespaceSelector:
-    matchNames:
-    - observability-peer
-  podMetricsEndpoints:
-  - interval: 1m
-    port: metrics
-  selector:
-    matchExpressions:
-    - key: app.kubernetes.io/name
-      operator: In
-      values:
-      - vpa
----
 apiVersion: v1
 kind: Pod
 metadata:
