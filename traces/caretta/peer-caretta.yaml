@@ -1,0 +1,281 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: caretta
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: caretta
+rules:
+- apiGroups:
+  - policy
+  - extensions
+  resourceNames:
+  - caretta
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - persistentvolumeclaims/status
+  - pods
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  - serviceaccounts
+  - services
+  - services/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - bindings
+  - events
+  - limitranges
+  - namespaces/status
+  - pods/log
+  - pods/status
+  - nodes
+  - replicationcontrollers/status
+  - resourcequotas
+  - resourcequotas/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - controllerrevisions
+  - daemonsets
+  - daemonsets/status
+  - deployments
+  - deployments/scale
+  - deployments/status
+  - replicasets
+  - replicasets/scale
+  - replicasets/status
+  - statefulsets
+  - statefulsets/scale
+  - statefulsets/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - cronjobs/status
+  - jobs
+  - jobs/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - daemonsets/status
+  - deployments
+  - deployments/scale
+  - deployments/status
+  - ingresses
+  - ingresses/status
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicasets/status
+  - replicationcontrollers/scale
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  - poddisruptionbudgets/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  - ingresses/status
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - watch
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: caretta
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: caretta
+subjects:
+- kind: ServiceAccount
+  name: caretta
+  namespace: observability-peer
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: caretta
+    app.kubernetes.io/instance: caretta
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: caretta
+    app.kubernetes.io/version: v0.0.16
+    helm.sh/chart: caretta-0.0.16
+  name: caretta
+  namespace: observability-peer
+spec:
+  selector:
+    matchLabels:
+      app: caretta
+      app.kubernetes.io/instance: caretta
+      app.kubernetes.io/name: caretta
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app: caretta
+        app.kubernetes.io/instance: caretta
+        app.kubernetes.io/name: caretta
+    spec:
+      containers:
+      - env:
+        - name: RESOLVE_DNS
+          value: "true"
+        - name: PROMETHEUS_PORT
+          value: "7117"
+        - name: PROMETHEUS_ENDPOINT
+          value: /metrics
+        - name: POLL_INTERVAL
+          value: "30"
+        image: quay.io/groundcover/caretta:v0.0.16
+        imagePullPolicy: Always
+        name: caretta
+        ports:
+        - containerPort: 7117
+          name: prom-metrics
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 150m
+            memory: 300Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /proc
+          name: proc
+        - mountPath: /sys/kernel/debug
+          name: debug
+      securityContext: {}
+      serviceAccountName: caretta
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /proc
+        name: proc
+      - hostPath:
+          path: /sys/kernel/debug
+        name: debug
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: caretta
+  namespace: observability-peer
+spec:
+  namespaceSelector:
+    matchNames:
+    - observability-peer
+  podMetricsEndpoints:
+  - interval: 30s
+    port: prom-metrics
+    relabelings:
+    - action: keep
+      regex: caretta
+      replacement: $1
+      separator: ;
+      sourceLabels:
+      - __meta_kubernetes_pod_label_app
+    - action: labelmap
+      regex: __meta_kubrnetes_pod_label_(.+)
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_name
+      targetLabel: caretta_pod
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_node_name
+      targetLabel: caretta_node
+  selector:
+    matchExpressions:
+    - key: app.kubernetes.io/name
+      operator: In
+      values:
+      - caretta
