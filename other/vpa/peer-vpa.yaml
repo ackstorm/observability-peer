@@ -769,18 +769,6 @@ metadata:
   namespace: observability-peer
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-dashboard
-  namespace: observability-peer
----
-apiVersion: v1
 automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
@@ -895,47 +883,6 @@ rules:
   - get
   - list
   - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-dashboard
-rules:
-- apiGroups:
-  - autoscaling.k8s.io
-  resources:
-  - verticalpodautoscalers
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - apps
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - pods
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - argoproj.io
-  resources:
-  - rollouts
-  verbs:
-  - get
-  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -1189,25 +1136,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-dashboard
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: goldilocks-dashboard
-subjects:
-- kind: ServiceAccount
-  name: goldilocks-dashboard
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
   name: vpa-actor
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1279,29 +1207,6 @@ subjects:
   name: vpa-test
   namespace: observability-peer
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-dashboard
-  namespace: observability-peer
-spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/name: goldilocks
-  type: ClusterIP
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1352,70 +1257,6 @@ spec:
           runAsUser: 10324
       securityContext: {}
       serviceAccountName: goldilocks-controller
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-dashboard
-  namespace: observability-peer
-spec:
-  replicas: 0
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: dashboard
-      app.kubernetes.io/instance: ackstorm-goldilocks
-      app.kubernetes.io/name: goldilocks
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: dashboard
-        app.kubernetes.io/instance: ackstorm-goldilocks
-        app.kubernetes.io/name: goldilocks
-    spec:
-      containers:
-      - command:
-        - /goldilocks
-        - dashboard
-        - --exclude-containers=linkerd-proxy,istio-proxy
-        - -v2
-        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.8.3
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-        name: goldilocks
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: http
-        resources:
-          limits:
-            cpu: 25m
-            memory: 256Mi
-          requests:
-            cpu: 25m
-            memory: 256Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 10324
-      securityContext: {}
-      serviceAccountName: goldilocks-dashboard
 ---
 apiVersion: apps/v1
 kind: Deployment
