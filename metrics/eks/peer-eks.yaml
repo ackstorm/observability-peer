@@ -30578,8 +30578,8 @@ spec:
   remoteWrite:
   - headers:
       X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
-    queue_config:
-      max_samples_per_send: 10000
+    queueConfig:
+      maxSamplesPerSend: 10000
     sendExemplars: true
     url: ${OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
