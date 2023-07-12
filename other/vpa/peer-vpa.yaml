@@ -1245,6 +1245,12 @@ spec:
         - --history-length=4d
         - --storage=prometheus
         - --target-cpu-percentile=0.90
+        - --prometheus-cadvisor-job-name=kubelet
+        - --container-pod-name-label=pod
+        - --container-name-label=container
+        - --metric-for-pod-labels=kube_pod_labels{job="kube-state-metrics"}[4d]
+        - --pod-namespace-label=namespace
+        - --pod-name-label=pod
         image: registry.k8s.io/autoscaling/vpa-recommender:0.13.0
         imagePullPolicy: Always
         name: recommender
