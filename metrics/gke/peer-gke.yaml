@@ -30432,6 +30432,11 @@ spec:
         - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/containerd/.+|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
         - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
         - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
+        - --no-collector.arp
+        - --no-collector.ipvs
+        - --no-collector.sockstat
+        - --no-collector.softnet
+        - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
         image: quay.io/prometheus/node-exporter:v1.5.0
         name: node-exporter
         resources:
@@ -30753,6 +30758,10 @@ spec:
       sourceLabels:
       - __name__
       - le
+    - action: drop
+      regex: (etcd_request_duration_seconds_buckt|apiserver_request_sli_duration_seconds_bucket|apiserver_request_slo_duration_seconds_bucket|apiserver_request_duration_seconds_bucket)
+      sourceLabels:
+      - __name__
     port: https
     scheme: https
     tlsConfig:
@@ -30939,6 +30948,11 @@ spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
     interval: 15s
+    metricRelabelings:
+    - action: drop
+      regex: node_(nf_conntrack_stat|netstat_.*6|timex_pps|network_carrie|network_iface|scrape).*
+      sourceLabels:
+      - __name__
     port: https
     relabelings:
     - action: replace
