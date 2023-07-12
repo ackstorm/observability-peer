@@ -30602,7 +30602,7 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  retention: 4h
+  retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:

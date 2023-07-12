@@ -1240,7 +1240,12 @@ spec:
         app: vpa-recommender
     spec:
       containers:
-      - image: registry.k8s.io/autoscaling/vpa-recommender:0.13.0
+      - args:
+        - --prometheus-address=http://prometheus-operated.observability-peer.svc:9090
+        - --history-length=4d
+        - --storage=prometheus
+        - --target-cpu-percentile=0.90
+        image: registry.k8s.io/autoscaling/vpa-recommender:0.13.0
         imagePullPolicy: Always
         name: recommender
         ports:
