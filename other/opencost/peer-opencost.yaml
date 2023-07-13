@@ -175,6 +175,8 @@ spec:
       - env:
         - name: PROMETHEUS_SERVER_ENDPOINT
           value: http://prometheus-operated.observability-peer.svc:9090
+        - name: CLOUD_PROVIDER_API_KEY
+          value: ${CLOUD_PROVIDER_API_KEY}
         - name: CLUSTER_ID
           value: ${CLUSTER}
         image: quay.io/kubecost1/kubecost-cost-model:prod-1.104.4
