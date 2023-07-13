@@ -257,27 +257,8 @@ spec:
   endpoints:
   - honorLabels: true
     interval: 30s
-    metricRelabelings:
-    - action: keep
-      regex: kubecost_cluster_info|kubecost_cluster_management_cost|kubecost_http_requests_total|kubecost_http_response_size_bytes
-        summary|kubecost_http_response_time_seconds histogram|kubecost_network_internet_egress_cost|kubecost_network_region_egress_cost|kubecost_network_zone_egress_cost|kubecost_node_is_spot|node_cpu_hourly_cost|node_gpu_hourly_cost|node_ram_hourly_cost|node_total_hourly_cost|opencost_build_info|pv_hourly_cost
-      sourceLabels:
-      - __name__
     path: /metrics
     port: http
-    relabelings:
-    - action: keep
-      regex: opencost.*
-      sourceLabels:
-      - __meta_kubernetes_pod_label_app_kubernetes_io_name
-    - action: replace
-      sourceLabels:
-      - __meta_kubernetes_pod_node_name
-      targetLabel: instance
-    - action: replace
-      sourceLabels:
-      - __meta_kubernetes_namespace
-      targetLabel: namespace
     scheme: http
   namespaceSelector:
     matchNames:
