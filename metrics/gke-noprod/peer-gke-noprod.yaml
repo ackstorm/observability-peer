@@ -30405,7 +30405,13 @@ spec:
         - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
         image: quay.io/prometheus/node-exporter:v1.5.0
         name: node-exporter
-        resources: {}
+        resources:
+          limits:
+            cpu: 250m
+            memory: 180Mi
+          requests:
+            cpu: 20m
+            memory: 80Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30439,7 +30445,13 @@ spec:
         - containerPort: 9100
           hostPort: 9100
           name: https
-        resources: {}
+        resources:
+          limits:
+            cpu: 20m
+            memory: 40Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30543,9 +30555,7 @@ spec:
       - __name__
       targetLabel: __name__
   replicas: 2
-  resources:
-    requests:
-      memory: 100Mi
+  resources: {}
   retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
