@@ -30571,7 +30571,9 @@ spec:
       - __name__
       targetLabel: __name__
   replicas: 2
-  resources: {}
+  resources:
+    limits: {}
+    requrests: {}
   retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
