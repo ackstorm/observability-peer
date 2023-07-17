@@ -30573,7 +30573,7 @@ spec:
   replicas: 2
   resources:
     limits: {}
-    requrests: {}
+    requests: {}
   retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
