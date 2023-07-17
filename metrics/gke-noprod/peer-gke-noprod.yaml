@@ -30034,13 +30034,7 @@ spec:
         ports:
         - containerPort: 19115
           name: http
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30058,13 +30052,7 @@ spec:
         - --volume-dir=/etc/blackbox_exporter/
         image: jimmidyson/configmap-reload:v0.5.0
         name: module-configmap-reloader
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30165,6 +30153,7 @@ spec:
             port: 80
           initialDelaySeconds: 10
           timeoutSeconds: 1
+        resources: {}
         volumeMounts:
         - mountPath: /etc/agent
           name: config
@@ -30173,6 +30162,7 @@ spec:
         - --webhook-url=http://localhost:80/-/reload
         image: jimmidyson/configmap-reload:v0.8.0
         name: config-reloader
+        resources: {}
         volumeMounts:
         - mountPath: /etc/agent
           name: config
@@ -30221,13 +30211,7 @@ spec:
         - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,verticalpodautoscalers,volumeattachments
         image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.7.0
         name: kube-state-metrics
-        resources:
-          limits:
-            cpu: 100m
-            memory: 250Mi
-          requests:
-            cpu: 10m
-            memory: 80Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30245,13 +30229,7 @@ spec:
         ports:
         - containerPort: 8443
           name: https-main
-        resources:
-          limits:
-            cpu: 40m
-            memory: 40Mi
-          requests:
-            cpu: 20m
-            memory: 20Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30328,13 +30306,7 @@ spec:
         ports:
         - containerPort: 8080
           name: http
-        resources:
-          limits:
-            cpu: 200m
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30351,13 +30323,7 @@ spec:
         ports:
         - containerPort: 8443
           name: https
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30439,13 +30405,7 @@ spec:
         - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
         image: quay.io/prometheus/node-exporter:v1.5.0
         name: node-exporter
-        resources:
-          limits:
-            cpu: 250m
-            memory: 180Mi
-          requests:
-            cpu: 20m
-            memory: 80Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30479,13 +30439,7 @@ spec:
         - containerPort: 9100
           hostPort: 9100
           name: https
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
+        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

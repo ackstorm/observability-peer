@@ -30243,7 +30243,7 @@ spec:
             memory: 250Mi
           requests:
             cpu: 10m
-            memory: 190Mi
+            memory: 80Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -30460,7 +30460,8 @@ spec:
             cpu: 250m
             memory: 180Mi
           requests:
-            cpu: 50m
+            cpu: 20m
+            memory: 80Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
