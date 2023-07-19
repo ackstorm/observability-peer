@@ -185,22 +185,22 @@ spec:
         image: quay.io/kubecost1/kubecost-cost-model:prod-1.104.4
         imagePullPolicy: IfNotPresent
         livenessProbe:
-          failureThreshold: 3
+          failureThreshold: 6
           httpGet:
             path: /healthz
             port: 9003
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 10
         name: opencost
         ports:
         - containerPort: 9003
           name: http
         readinessProbe:
-          failureThreshold: 3
+          failureThreshold: 6
           httpGet:
             path: /healthz
             port: 9003
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 10
         resources:
           limits:
