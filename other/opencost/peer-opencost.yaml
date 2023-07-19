@@ -182,7 +182,7 @@ spec:
           value: "true"
         - name: PROM_CLUSTER_ID_LABEL
           value: cluster
-        image: quay.io/kubecost1/kubecost-cost-model:prod-1.104.4
+        image: quay.io/kubecost1/kubecost-cost-model:prod-1.105.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 6
@@ -196,7 +196,7 @@ spec:
         - containerPort: 9003
           name: http
         readinessProbe:
-          failureThreshold: 6
+          failureThreshold: 12
           httpGet:
             path: /healthz
             port: 9003
@@ -205,10 +205,10 @@ spec:
         resources:
           limits:
             cpu: 100m
-            memory: 100Mi
+            memory: 200Mi
           requests:
             cpu: 10m
-            memory: 60Mi
+            memory: 80Mi
       serviceAccountName: opencost
 ---
 apiVersion: monitoring.coreos.com/v1
