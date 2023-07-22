@@ -30832,11 +30832,11 @@ spec:
     - regex: (.+)
       sourceLabels:
       - label_node_pool
-      targetLabel: node_pool
+      targetLabel: label_node_pool
     - regex: (.+)
       sourceLabels:
-      - eks_amazonaws_com_nodegroup
-      targetLabel: node_pool
+      - label_eks_amazonaws_com_nodegroup
+      targetLabel: label_node_pool
     port: https-main
     relabelings:
     - action: labeldrop
