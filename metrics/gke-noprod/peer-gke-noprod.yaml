@@ -30118,11 +30118,11 @@ spec:
         imagePullPolicy: Always
         name: mimir-sync
         resources: {}
-        securityContext:
-          fsGroup: 65534
-          runAsNonRoot: true
-          runAsUser: 65534
-        serviceAccountName: mimir-sync-peer
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: mimir-sync-peer
 ---
 apiVersion: apps/v1
 kind: Deployment
