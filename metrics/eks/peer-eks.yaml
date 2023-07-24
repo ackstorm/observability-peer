@@ -28935,7 +28935,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ackstorm-mimir-sync
+  name: ackstorm-mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -29002,27 +29002,6 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: ackstorm-mimir-sync
-  namespace: observability-peer
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - get
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - prometheusrules
-  verbs:
-  - list
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
   labels:
     app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: prometheus-peer
@@ -29062,6 +29041,26 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ackstorm-mimir-sync-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - prometheusrules
+  verbs:
+  - list
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -29349,20 +29348,6 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: ackstorm-mimir-sync
-  namespace: observability-peer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ackstorm-mimir-sync
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-mimir-sync
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
   labels:
     app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: prometheus-peer
@@ -29416,6 +29401,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: node-exporter
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ackstorm-mimir-sync-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ackstorm-mimir-sync-peer
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30200,7 +30198,7 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: ackstorm-mimir-sync
+  name: ackstorm-mimir-sync-peer
   namespace: observability-peer
 spec:
   concurrencyPolicy: Forbid
@@ -30227,7 +30225,7 @@ spec:
             imagePullPolicy: Always
             name: ackstorm-mimir-sync
           restartPolicy: OnFailure
-          serviceAccountName: ackstorm-mimir-sync
+          serviceAccountName: ackstorm-mimir-sync-peer
   schedule: '*/5 * * * *'
   successfulJobsHistoryLimit: 0
 ---
