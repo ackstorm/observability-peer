@@ -30217,7 +30217,7 @@ spec:
         - --port=8081
         - --telemetry-host=127.0.0.1
         - --telemetry-port=8082
-        - --metric-labels-allowlist=nodes=[node_pool,eks_amazonaws_com_nodegroup]
+        - --metric-labels-allowlist=nodes=[*]
         - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,verticalpodautoscalers,volumeattachments
         image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.7.0
         name: kube-state-metrics
@@ -30806,15 +30806,23 @@ spec:
     - regex: (.+)
       sourceLabels:
       - label_node_pool
-      targetLabel: label_nodegroup
+      targetLabel: label_node_pool
     - regex: (.+)
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
-      targetLabel: label_nodegroup
+      targetLabel: label_node_pool
     port: https-main
     relabelings:
     - action: labeldrop
       regex: (pod|service|endpoint|namespace)
+    - regex: (.+)
+      sourceLabels:
+      - label_node_pool
+      targetLabel: label_node_pool
+    - regex: (.+)
+      sourceLabels:
+      - label_eks_amazonaws_com_nodegroup
+      targetLabel: label_node_pool
     scheme: https
     scrapeTimeout: 30s
     tlsConfig:
