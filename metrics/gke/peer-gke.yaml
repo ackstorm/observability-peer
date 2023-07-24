@@ -30805,7 +30805,7 @@ spec:
       targetLabel: instance
     - regex: (.+)
       sourceLabels:
-      - label_node_pool
+      - label_cloud_google_com_gke_nodepool
       targetLabel: label_node_pool
     - regex: (.+)
       sourceLabels:
@@ -30817,12 +30817,12 @@ spec:
       regex: (pod|service|endpoint|namespace)
     - regex: (.+)
       sourceLabels:
-      - label_node_pool
-      targetLabel: label_node_pool
+      - label_cloud_google_com_gke_nodepool
+      targetLabel: label_nodegroup
     - regex: (.+)
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
-      targetLabel: label_node_pool
+      targetLabel: label_nodegroup
     scheme: https
     scrapeTimeout: 30s
     tlsConfig:
