@@ -30157,7 +30157,6 @@ spec:
           runAsNonRoot: true
           runAsUser: 65534
         serviceAccountName: mimir-sync-peer
-      imagePullPolicy: Always
 ---
 apiVersion: apps/v1
 kind: Deployment
