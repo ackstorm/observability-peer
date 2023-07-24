@@ -28933,12 +28933,6 @@ spec:
     subresources: {}
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
----
-apiVersion: v1
 automountServiceAccountToken: false
 kind: ServiceAccount
 metadata:
@@ -28960,6 +28954,12 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.7.0
   name: kube-state-metrics
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -29041,26 +29041,6 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ackstorm-mimir-sync-peer
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - get
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - prometheusrules
-  verbs:
-  - list
-  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -29210,6 +29190,26 @@ rules:
   verbs:
   - list
   - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mimir-sync-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - prometheusrules
+  verbs:
+  - list
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -29406,19 +29406,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ackstorm-mimir-sync-peer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ackstorm-mimir-sync-peer
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
   labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kube-state-metrics
@@ -29432,6 +29419,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kube-state-metrics
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mimir-sync-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: mimir-sync-peer
+subjects:
+- kind: ServiceAccount
+  name: mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30100,6 +30100,53 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    kubernetes.io/app: mimir-sync-peer
+  name: mimir-sync-peer
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mimir-sync-peer
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        app: mimir-sync-peer
+    spec:
+      containers:
+      - command:
+        - python3
+        - /app/main.py
+        env:
+        - name: ROLE
+          value: peer
+        - name: MIMIR_URL
+          value: ${OBSERVER_URL}
+        - name: TENANT_ID
+          value: ${ENVIRONMENT}-${CLUSTER}
+        image: public.ecr.aws/ackstorm/mimir-sync:main
+        imagePullPolicy: Always
+        name: mimir-sync
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+      imagePullPolicy: Always
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: mimir-sync-peer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
@@ -30178,40 +30225,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: prometheus-operator-peer
----
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
-spec:
-  concurrencyPolicy: Forbid
-  failedJobsHistoryLimit: 1
-  jobTemplate:
-    spec:
-      template:
-        metadata:
-          annotations:
-            cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
-        spec:
-          containers:
-          - command:
-            - python3
-            - /app/main.py
-            env:
-            - name: ROLE
-              value: peer
-            - name: MIMIR_URL
-              value: ${OBSERVER_URL}
-            - name: TENANT_ID
-              value: ${ENVIRONMENT}-${CLUSTER}
-            image: public.ecr.aws/ackstorm/mimir-sync:main
-            imagePullPolicy: Always
-            name: ackstorm-mimir-sync
-          restartPolicy: OnFailure
-          serviceAccountName: ackstorm-mimir-sync-peer
-  schedule: '*/5 * * * *'
-  successfulJobsHistoryLimit: 0
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
