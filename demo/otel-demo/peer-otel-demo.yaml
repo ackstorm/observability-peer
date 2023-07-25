@@ -101,7 +101,7 @@ spec:
         - name: BACKEND_LISTEN
           value: 0.0.0.0:80
         - name: JAEGER_ENDPOINT
-          value: http://opentelemetry-collector.observability-peer.svc:14268/api/traces
+          value: http://opentelemetry-peer-collector.observability-peer.svc:14268/api/traces
         image: jtyr/otel-demo:backend-0.1.13
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -156,7 +156,7 @@ spec:
         - name: FRONTEND_LISTEN
           value: 0.0.0.0:80
         - name: JAEGER_ENDPOINT
-          value: http://opentelemetry-collector.observability-peer.svc:14268/api/traces
+          value: http://opentelemetry-peer-collector.observability-peer.svc:14268/api/traces
         image: jtyr/otel-demo:frontend-0.1.14
         imagePullPolicy: IfNotPresent
         livenessProbe:

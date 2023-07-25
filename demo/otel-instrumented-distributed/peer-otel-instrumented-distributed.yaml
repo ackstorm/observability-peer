@@ -443,7 +443,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -522,7 +522,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -600,7 +600,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -686,7 +686,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -782,7 +782,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -856,7 +856,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -932,7 +932,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1028,7 +1028,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1108,7 +1108,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1187,7 +1187,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1285,7 +1285,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1385,7 +1385,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1467,7 +1467,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1553,7 +1553,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1631,7 +1631,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1707,7 +1707,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1787,7 +1787,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1869,7 +1869,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:
@@ -1943,7 +1943,7 @@ spec:
       containers:
       - env:
         - name: OTEL_COLLECTOR_NAME
-          value: opentelemetry-collector.observability-peer.svc
+          value: opentelemetry-peer-collector.observability-peer.svc
         - name: OTEL_SERVICE_NAME
           valueFrom:
             fieldRef:

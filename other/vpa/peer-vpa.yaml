@@ -757,7 +757,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
     helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -787,7 +787,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
     helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
 rules:
 - apiGroups:
   - apps
@@ -1051,14 +1051,14 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
     helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
 subjects:
 - kind: ServiceAccount
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1182,7 +1182,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
     helm.sh/chart: goldilocks-6.7.0
-  name: goldilocks-controller
+  name: goldilocks-peer-controller
   namespace: observability-peer
 spec:
   replicas: 1
@@ -1222,7 +1222,7 @@ spec:
           runAsNonRoot: true
           runAsUser: 10324
       securityContext: {}
-      serviceAccountName: goldilocks-controller
+      serviceAccountName: goldilocks-peer-controller
 ---
 apiVersion: apps/v1
 kind: Deployment

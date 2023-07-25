@@ -77,7 +77,7 @@ spec:
         - name: JAEGER_AGENT_PORT
           value: "6831"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://opentelemetry-collector.observability-peer.svc:4318
+          value: http://opentelemetry-peer-collector.observability-peer.svc:4318
         image: jaegertracing/example-hotrod:1.45.0
         imagePullPolicy: IfNotPresent
         livenessProbe:

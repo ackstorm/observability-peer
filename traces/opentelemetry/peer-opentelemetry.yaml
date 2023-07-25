@@ -6065,7 +6065,7 @@ roleRef:
   name: observability-peer-otel-collector-role
 subjects:
 - kind: ServiceAccount
-  name: opentelemetry-collector
+  name: opentelemetry-peer-collector
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -6258,7 +6258,7 @@ spec:
       - __meta_kubernetes_pod_phase
   selector:
     matchLabels:
-      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-peer-collector
 ---
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
@@ -6328,7 +6328,7 @@ spec:
     valueFrom:
       fieldRef:
         fieldPath: status.podIP
-  image: otel/opentelemetry-collector-contrib:0.80.0
+  image: otel/opentelemetry-peer-collector-contrib:0.80.0
   mode: daemonset
 ---
 apiVersion: admissionregistration.k8s.io/v1
