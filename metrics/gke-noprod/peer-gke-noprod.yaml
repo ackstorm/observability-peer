@@ -30111,9 +30111,9 @@ spec:
         - name: ROLE
           value: peer
         - name: MIMIR_URL
-          value: ${OBSERVER_URL}
+          value: ${PEER_OBSERVER_URL}
         - name: TENANT_ID
-          value: ${ENVIRONMENT}-${CLUSTER}
+          value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
         image: public.ecr.aws/ackstorm/mimir-sync:main
         imagePullPolicy: Always
         name: mimir-sync
@@ -30387,8 +30387,8 @@ spec:
   - remote-write-receiver
   - exemplar-storage
   externalLabels:
-    cluster: ${ENVIRONMENT}-${CLUSTER}
-    env: ${ENVIRONMENT}
+    cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    env: ${PEER_ENVIRONMENT}
   image: quay.io/prometheus/prometheus:v2.41.0
   nodeSelector:
     kubernetes.io/os: linux
@@ -30405,11 +30405,11 @@ spec:
   probeSelector: {}
   remoteWrite:
   - headers:
-      X-Scope-OrgID: ${ENVIRONMENT}-${CLUSTER}
+      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:
       maxSamplesPerSend: 5000
     sendExemplars: true
-    url: ${OBSERVER_URL}/api/v1/push
+    url: ${PEER_OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
     - regex: (.*)
       sourceLabels:
@@ -30437,7 +30437,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: ${VOLUME_SIZE}Gi
+            storage: ${PEER_PROMETHEUS_VOLUME_SIZE}Gi
   tsdb:
     outOfOrderTimeWindow: 5m
   version: 2.41.0

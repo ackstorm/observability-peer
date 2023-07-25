@@ -66,7 +66,7 @@ metadata:
   namespace: observability-peer
 stringData:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - tenant_id: ${ENVIRONMENT}-${CLUSTER}\n    url: ${OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
+    \ - tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
     {}\n    kubernetes_sd_configs:\n      - role: pod\n    relabel_configs:\n      -
@@ -116,7 +116,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 23fc237eca749b400a1aa84ca7d69c4b7ad40354b7268e4453c05f5c30cb317f
+        checksum/config: 7090e34e153699fc9d06e9262baee753dfdbc172afa0208a2f4b2060bd7c005a
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail

@@ -6273,26 +6273,27 @@ spec:
     ${env:MY_POD_IP}:14268\n      thrift_compact:\n        endpoint: ${env:MY_POD_IP}:6831\n
     \ zipkin:\n    endpoint: ${env:MY_POD_IP}:9411\n  otlp/spanmetrics:\n    protocols:\n
     \     grpc:\n        endpoint: \"localhost:12345\"\n\nexporters:\n  logging:\n
-    \   loglevel: warn\n  otlphttp/observer: \n    endpoint: ${OBSERVER_URL}\n    headers:\n
-    \     \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n    tls:\n      insecure:
-    true\n  otlp/spanmetrics:\n    endpoint: ${env:MY_POD_IP}:4317\n    tls:\n      insecure:
-    true\n  prometheusremotewrite:\n    endpoint: http://prometheus-operated.observability-peer.svc:9090/api/v1/write\n
+    \   loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
+    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n
+    \   tls:\n      insecure: true\n  otlp/spanmetrics:\n    endpoint: ${env:MY_POD_IP}:4317\n
+    \   tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint: http://prometheus-operated.observability-peer.svc:9090/api/v1/write\n
     \   resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
-    ${OBSERVER_URL}/loki/api/v1/push\n    headers:\n      \"X-Scope-OrgID\": \"${ENVIRONMENT}-${CLUSTER}\"\n\nprocessors:\n
-    \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
-    15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  groupbytrace:\n
-    \   wait_duration: 30s\n    num_traces: 1000\n  spanmetrics:\n    metrics_exporter:
+    ${PEER_OBSERVER_URL}/loki/api/v1/push\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n\nprocessors:\n  memory_limiter:\n    check_interval:
+    2s\n    limit_percentage: 75\n    spike_limit_percentage: 15\n  batch:\n    send_batch_size:
+    10000\n    timeout: 10s\n  groupbytrace:\n    wait_duration: 30s\n    num_traces:
+    1000\n  spanmetrics:\n    metrics_exporter: 'otlp/spanmetrics'\n    latency_histogram_buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions_cache_size: 1500\n
+    \   dimensions:\n        - name: http.method\n          default: GET\n        -
+    name: http.status_code\n    aggregation_temporality: \"AGGREGATION_TEMPORALITY_CUMULATIVE\"
+    \    \n    metrics_flush_interval: 30s\n  servicegraph:\n    metrics_exporter:
     'otlp/spanmetrics'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms,
-    100ms, 250ms]\n    dimensions_cache_size: 1500\n    dimensions:\n        - name:
-    http.method\n          default: GET\n        - name: http.status_code\n    aggregation_temporality:
-    \"AGGREGATION_TEMPORALITY_CUMULATIVE\"     \n    metrics_flush_interval: 30s\n
-    \ servicegraph:\n    metrics_exporter: 'otlp/spanmetrics'\n    latency_histogram_buckets:
-    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms] # Buckets for latency histogram\n    dimensions:
-    [k8s.namespace.name] # Additional dimensions (labels) to be added to the metrics
-    extracted from the resource and span attributes\n    store:\n      ttl: 2s\n      max_items:
-    200\n  attributes/cluster:\n    actions:\n      - key: environment\n        value:
-    \"${ENVIRONMENT}\"\n        action: insert\n      - key: cluster\n        value:
-    \"${ENVIRONMENT}-${CLUSTER}\"\n        action: insert\n  # attributes/spanname:\n
+    100ms, 250ms] # Buckets for latency histogram\n    dimensions: [k8s.namespace.name]
+    # Additional dimensions (labels) to be added to the metrics extracted from the
+    resource and span attributes\n    store:\n      ttl: 2s\n      max_items: 200\n
+    \ attributes/cluster:\n    actions:\n      - key: environment\n        value:
+    \"${PEER_ENVIRONMENT}\"\n        action: insert\n      - key: cluster\n        value:
+    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n        action: insert\n  # attributes/spanname:\n
     \ #   actions:\n  #     - key: span_name\n  #       from_attribute: span_name\n
     \ #       action: upsert\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n
     \   passthrough: false\n    filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n
