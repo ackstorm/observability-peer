@@ -29045,7 +29045,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: blackbox-exporter
+  name: blackbox-exporter-peer
 rules:
 - apiGroups:
   - authentication.k8s.io
@@ -29373,12 +29373,12 @@ metadata:
     app.kubernetes.io/name: blackbox-exporter
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
-  name: blackbox-exporter
+  name: blackbox-exporter-peer
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: blackbox-exporter
+  name: blackbox-exporter-peer
 subjects:
 - kind: ServiceAccount
   name: blackbox-exporter
@@ -29885,6 +29885,7 @@ metadata:
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
   namespace: observability-peer
+name: blackbox-exporter-peer
 spec:
   replicas: 1
   selector:
