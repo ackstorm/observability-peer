@@ -173,7 +173,7 @@ spec:
         - name: PROMETHEUS_SERVER_ENDPOINT
           value: http://prometheus-operated.observability-peer.svc:9090
         - name: CLOUD_PROVIDER_API_KEY
-          value: ${CLOUD_PROVIDER_API_KEY}
+          value: ${PEER_CLOUD_PROVIDER_API_KEY}
         - name: CLUSTER_ID
           value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
         - name: EMIT_KSM_V1_METRICS
