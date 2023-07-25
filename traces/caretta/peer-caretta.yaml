@@ -179,7 +179,7 @@ metadata:
     app.kubernetes.io/name: caretta
     app.kubernetes.io/version: v0.0.16
     helm.sh/chart: caretta-0.0.16
-  name: caretta
+  name: caretta-peer
   namespace: observability-peer
 spec:
   selector:

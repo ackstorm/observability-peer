@@ -6243,7 +6243,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: opentelemetry
+  name: opentelemetry-peer
   namespace: observability-peer
 spec:
   namespaceSelector:

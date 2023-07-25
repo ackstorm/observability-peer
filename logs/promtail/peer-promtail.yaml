@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -19,7 +19,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
 rules:
 - apiGroups:
   - ""
@@ -43,14 +43,14 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: grafana-promtail
+  name: grafana-promtail-peer
 subjects:
 - kind: ServiceAccount
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -62,7 +62,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 stringData:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
@@ -106,7 +106,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail-metrics
+  name: grafana-promtail-peer-metrics
   namespace: observability-peer
 spec:
   clusterIP: None
@@ -130,7 +130,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 spec:
   selector:
@@ -140,7 +140,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: b276cf2f23c1f3b32fe07d6a7c58a9a2ee7a8b725ac0bb60dadbfa230aec8455
+        checksum/config: cff1c69025af866df13500eaa1791c3ad306a399215b345cfc3ca5ce736c3f88
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
@@ -197,7 +197,7 @@ spec:
       securityContext:
         runAsGroup: 0
         runAsUser: 0
-      serviceAccountName: grafana-promtail
+      serviceAccountName: grafana-promtail-peer
       tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
@@ -208,7 +208,7 @@ spec:
       volumes:
       - name: config
         secret:
-          secretName: grafana-promtail
+          secretName: grafana-promtail-peer
       - hostPath:
           path: /run/promtail
         name: run
@@ -230,11 +230,11 @@ metadata:
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
     role: observer
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 spec:
   groups:
-  - name: grafana-promtail
+  - name: grafana-promtail-peer
     rules:
     - alert: PromtailRequestErrors
       annotations:
@@ -273,7 +273,7 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-  name: grafana-promtail
+  name: grafana-promtail-peer
   namespace: observability-peer
 spec:
   endpoints:

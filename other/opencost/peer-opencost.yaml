@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -22,7 +22,7 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
 rules:
 - apiGroups:
   - ""
@@ -107,14 +107,14 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: opencost
+  name: opencost-peer
 subjects:
 - kind: ServiceAccount
-  name: opencost
+  name: opencost-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
   namespace: observability-peer
 spec:
   ports:
@@ -149,7 +149,7 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
   namespace: observability-peer
 spec:
   replicas: 1
@@ -191,7 +191,7 @@ spec:
             port: 9003
           initialDelaySeconds: 60
           periodSeconds: 10
-        name: opencost
+        name: opencost-peer
         ports:
         - containerPort: 9003
           name: http
@@ -209,7 +209,7 @@ spec:
           requests:
             cpu: 10m
             memory: 80Mi
-      serviceAccountName: opencost
+      serviceAccountName: opencost-peer
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -221,7 +221,7 @@ metadata:
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.104.4
     helm.sh/chart: opencost-1.17.2
-  name: opencost
+  name: opencost-peer
   namespace: observability-peer
 spec:
   endpoints:
