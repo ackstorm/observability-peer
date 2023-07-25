@@ -28938,7 +28938,7 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
@@ -29045,7 +29045,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: blackbox-exporter-peer
+  name: blackbox-exporter
 rules:
 - apiGroups:
   - authentication.k8s.io
@@ -29370,15 +29370,15 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
-  name: blackbox-exporter-peer
+  name: blackbox-exporter
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: blackbox-exporter-peer
+  name: blackbox-exporter
 subjects:
 - kind: ServiceAccount
   name: blackbox-exporter
@@ -29517,7 +29517,7 @@ kind: ConfigMap
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter-configuration
@@ -29749,7 +29749,7 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
@@ -29764,7 +29764,7 @@ spec:
     targetPort: http
   selector:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
 ---
 apiVersion: v1
@@ -29864,18 +29864,19 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
   namespace: observability-peer
-name: blackbox-exporter-peer
+metatada:
+  name: blackblox-exporter-peer
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: blackbox-exporter
+      app.kubernetes.io/name: blackbox-exporter-peer
       app.kubernetes.io/part-of: kube-prometheus
   template:
     metadata:
@@ -29883,7 +29884,7 @@ spec:
         kubectl.kubernetes.io/default-container: blackbox-exporter
       labels:
         app.kubernetes.io/component: exporter
-        app.kubernetes.io/name: blackbox-exporter
+        app.kubernetes.io/name: blackbox-exporter-peer
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 0.23.0
     spec:
@@ -29894,7 +29895,7 @@ spec:
               labelSelector:
                 matchLabels:
                   app.kubernetes.io/component: exporter
-                  app.kubernetes.io/name: blackbox-exporter
+                  app.kubernetes.io/name: blackbox-exporter-peer
                   app.kubernetes.io/part-of: kube-prometheus
               namespaces:
               - observability-peer
@@ -30508,7 +30509,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
@@ -30525,7 +30526,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: blackbox-exporter
+      app.kubernetes.io/name: blackbox-exporter-peer
       app.kubernetes.io/part-of: kube-prometheus
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -30895,7 +30896,7 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: blackbox-exporter
+    app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
   name: blackbox-exporter
@@ -30916,7 +30917,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: blackbox-exporter
+      app.kubernetes.io/name: blackbox-exporter-peer
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
   - Egress
