@@ -30881,7 +30881,7 @@ spec:
       - __name__
     - action: replace
       regex: (.+)
-      replacement: kube-state-metrics
+      replacement: node-exporter
       sourceLabels:
       - job
       targetLabel: job
