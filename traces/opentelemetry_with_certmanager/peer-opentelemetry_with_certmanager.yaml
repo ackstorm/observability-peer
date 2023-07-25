@@ -16288,7 +16288,7 @@ spec:
     valueFrom:
       fieldRef:
         fieldPath: status.podIP
-  image: otel/opentelemetry-peer-collector-contrib:0.80.0
+  image: otel/opentelemetry-collector-contrib:0.80.0
   mode: daemonset
 ---
 apiVersion: admissionregistration.k8s.io/v1
