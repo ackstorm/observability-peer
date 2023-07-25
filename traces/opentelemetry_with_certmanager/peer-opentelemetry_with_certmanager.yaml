@@ -16223,7 +16223,7 @@ spec:
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: opentelemetry
+  name: opentelemetry-peer
   namespace: observability-peer
 spec:
   config: "receivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint: ${env:MY_POD_IP}:4317\n
