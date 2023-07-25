@@ -29867,10 +29867,8 @@ metadata:
     app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.23.0
-  name: blackbox-exporter
-  namespace: observability-peer
-metatada:
   name: blackblox-exporter-peer
+  namespace: observability-peer
 spec:
   replicas: 1
   selector:
