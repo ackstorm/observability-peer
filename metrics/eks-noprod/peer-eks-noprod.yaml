@@ -30436,7 +30436,7 @@ spec:
       sourceLabels:
       - __name__
       targetLabel: __name__
-  replicas: 2
+  replicas: 1
   retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:

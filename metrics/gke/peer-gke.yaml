@@ -30444,7 +30444,7 @@ spec:
       sourceLabels:
       - __name__
       targetLabel: __name__
-  replicas: 2
+  replicas: 1
   resources:
     requests:
       memory: 100Mi
