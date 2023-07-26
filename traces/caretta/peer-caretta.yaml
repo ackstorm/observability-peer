@@ -167,7 +167,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: caretta-peer
-  namespace: caretta-peer
+  namespace: observability-peer
 ---
 apiVersion: apps/v1
 kind: DaemonSet
