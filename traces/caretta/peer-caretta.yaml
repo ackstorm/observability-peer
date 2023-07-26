@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: caretta
+  name: caretta-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: caretta
+  name: caretta-peer
 rules:
 - apiGroups:
   - policy
@@ -159,15 +159,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: caretta
+  name: caretta-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: caretta
+  name: caretta-peer
 subjects:
 - kind: ServiceAccount
-  name: caretta
-  namespace: observability-peer
+  name: caretta-peer
+  namespace: caretta-peer
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -228,7 +228,7 @@ spec:
         - mountPath: /sys/kernel/debug
           name: debug
       securityContext: {}
-      serviceAccountName: caretta
+      serviceAccountName: caretta-peer
       tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/control-plane
@@ -247,7 +247,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: caretta
+  name: caretta-peer
   namespace: observability-peer
 spec:
   namespaceSelector:

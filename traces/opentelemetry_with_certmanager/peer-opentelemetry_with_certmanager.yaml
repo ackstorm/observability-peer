@@ -16214,6 +16214,7 @@ spec:
       - __meta_kubernetes_pod_phase
   selector:
     matchLabels:
+      app.kubernetes.io/component: opentelemetry-collector
       app.kubernetes.io/name: opentelemetry-peer-collector
 ---
 apiVersion: opentelemetry.io/v1alpha1
