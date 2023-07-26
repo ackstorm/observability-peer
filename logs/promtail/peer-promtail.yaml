@@ -97,7 +97,9 @@ stringData:
     \       - __meta_kubernetes_pod_container_name\n        target_label: __path__\n
     \     - action: drop\n        regex: ingress-nginx\n        source_labels:\n        -
     app\n      - action: drop\n        regex: nginx\n        source_labels:\n        -
-    component\n  \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: true\n"
+    component\n      - action: drop\n        regex: \"true\"\n        source_labels:\n
+    \       - __meta_kubernetes_pod_label_nolog\n  \n  \n\nlimits_config:\n  \n\ntracing:\n
+    \ enabled: true\n"
 ---
 apiVersion: v1
 kind: Service
@@ -142,7 +144,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 20bfbe00bc937db42a6ecdaf1cd76c3322887de3280bc88551ba3e54d453d06f
+        checksum/config: 4159515bc015d42ed2295b5f29a69d6943c513c852b1cd5aaf1ed2330881835f
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
