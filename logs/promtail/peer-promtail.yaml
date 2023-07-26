@@ -95,7 +95,9 @@ stringData:
     /var/log/pods/*$1/*.log\n        separator: /\n        source_labels:\n        -
     __meta_kubernetes_pod_annotationpresent_kubernetes_io_config_hash\n        - __meta_kubernetes_pod_annotation_kubernetes_io_config_hash\n
     \       - __meta_kubernetes_pod_container_name\n        target_label: __path__\n
-    \ \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: true\n"
+    \     - action: drop\n        regex: ingress-nginx\n        source_labels:\n        -
+    app\n      - action: drop\n        regex: nginx\n        source_labels:\n        -
+    component\n  \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: true\n"
 ---
 apiVersion: v1
 kind: Service
@@ -140,7 +142,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9ed3b60f98e3952c61b2d2d2e36a0a9e3dc6655708cbaeec87796b17583258f4
+        checksum/config: 20bfbe00bc937db42a6ecdaf1cd76c3322887de3280bc88551ba3e54d453d06f
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
