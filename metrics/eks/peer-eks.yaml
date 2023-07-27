@@ -30142,6 +30142,11 @@ spec:
           value: ${PEER_OBSERVER_URL}
         - name: TENANT_ID
           value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        - name: KEY
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: observability-tenant-auth
         image: public.ecr.aws/ackstorm/mimir-sync:main
         imagePullPolicy: Always
         name: mimir-sync
