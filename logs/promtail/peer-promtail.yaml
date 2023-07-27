@@ -151,11 +151,22 @@ spec:
       containers:
       - args:
         - -config.file=/etc/promtail/promtail.yaml
+        - -config.expand-env
         env:
         - name: HOSTNAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: observability-tenant-auth
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: observability-tenant-auth
         image: docker.io/grafana/promtail:2.8.2
         imagePullPolicy: IfNotPresent
         name: promtail

@@ -30425,7 +30425,14 @@ spec:
   probeNamespaceSelector: {}
   probeSelector: {}
   remoteWrite:
-  - headers:
+  - basicAuth:
+      password:
+        key: password
+        name: observability-tenant-auth
+      username:
+        key: username
+        name: observability-tenant-auth
+    headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:
       maxSamplesPerSend: 5000

@@ -185,7 +185,7 @@ spec:
         image: quay.io/kubecost1/kubecost-cost-model:prod-1.105.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
-          failureThreshold: 6
+          failureThreshold: 12
           httpGet:
             path: /healthz
             port: 9003
