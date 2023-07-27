@@ -16266,7 +16266,7 @@ spec:
     span.name\n      - include: latency\n        action: update\n        new_name:
     traces_spanmetrics_latency\n\nextensions:\n  health_check: {}\n  memory_ballast:\n
     \   size_in_percentage: 40\n  basicauth/observer:\n    client_auth:\n      username:
-    \"${env:USERNAME}\"\n      password: \"${env:PASSWORD}\"\n\nservice:\n  extensions:\n
+    ${env:USERNAME}\n      password: ${env:PASSWORD}\n\nservice:\n  extensions:\n
     \ - health_check\n  - memory_ballast\n  - basicauth/observer\n  pipelines:\n    traces:\n
     \     receivers: [otlp, jaeger, zipkin]\n      processors: [memory_limiter, k8sattributes,
     groupbytrace, spanmetrics, attributes/cluster, batch]\n      exporters: [logging,
