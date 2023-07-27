@@ -30130,7 +30130,7 @@ spec:
           value: ${PEER_OBSERVER_URL}
         - name: TENANT_ID
           value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-        - name: AUTHKEY
+        - name: TENANT_PASSWORD
           valueFrom:
             secretKeyRef:
               key: password
