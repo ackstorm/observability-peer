@@ -66,7 +66,7 @@ metadata:
   namespace: observability-peer
 stringData:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - basic_auth:\n      password: $$PASSWORD\n      username: $$USERNAME\n    tenant_id:
+    \ - basic_auth:\n      password: $PASSWORD\n      username: $USERNAME\n    tenant_id:
     ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
@@ -144,7 +144,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9804a982ff017afeba13033f35893e75933b589f7ede10993cc918a244dba4fc
+        checksum/config: 50ebbd58b122529f54caf7eb9bb5cd016b325b98dd1758a8760ba88792b61ce6
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
