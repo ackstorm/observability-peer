@@ -30453,17 +30453,6 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   probeSelector: {}
-  remoteRead:
-  - basicAuth:
-      password:
-        key: password
-        name: observability-tenant-auth
-      username:
-        key: username
-        name: observability-tenant-auth
-    headers:
-      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    url: ${PEER_OBSERVER_URL}/prometheus/api/v1/read
   remoteWrite:
   - basicAuth:
       password:
@@ -30487,7 +30476,7 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  retention: 4h
+  retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
@@ -30499,6 +30488,17 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
+  storage:
+    volumeClaimTemplate:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${PEER_PROMETHEUS_VOLUME_SIZE}Gi
+        storageClassName: ${PEER_STORAGE_CLASS}
   tsdb:
     outOfOrderTimeWindow: 5m
   version: 2.41.0
