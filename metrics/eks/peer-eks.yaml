@@ -30463,7 +30463,7 @@ spec:
         name: observability-tenant-auth
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    url: ${PEER_OBSERVER_URL}/api/v1/read
+    url: ${PEER_OBSERVER_URL}/prometheus/api/v1/read
   remoteWrite:
   - basicAuth:
       password:
