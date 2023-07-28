@@ -30454,6 +30454,7 @@ spec:
   ruleSelector:
     matchLabels:
       role: peer
+  scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
@@ -30471,7 +30472,6 @@ spec:
         resources:
           requests:
             storage: ${PEER_PROMETHEUS_VOLUME_SIZE}Gi
-        storageClassName: ${PEER_STORAGE_CLASS}
   tsdb:
     outOfOrderTimeWindow: 5m
   version: 2.41.0
