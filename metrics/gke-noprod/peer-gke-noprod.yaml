@@ -30396,7 +30396,6 @@ spec:
   - memory-snapshot-on-shutdown
   - remote-write-receiver
   - exemplar-storage
-  - agent
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
