@@ -1244,7 +1244,7 @@ spec:
         - --prometheus-address=http://prometheus-operated.observability-peer.svc:9090
         - --history-length=4d
         - --storage=prometheus
-        - --target-cpu-percentile=0.90
+        - --target-cpu-percentile=0.95
         - --prometheus-cadvisor-job-name=kubelet
         - --container-pod-name-label=pod
         - --container-name-label=container

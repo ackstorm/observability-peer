@@ -30442,9 +30442,7 @@ spec:
       password:
         key: password
         name: observability-tenant-auth
-      username:
-        key: username
-        name: observability-tenant-auth
+      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:

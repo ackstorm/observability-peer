@@ -30436,6 +30436,7 @@ spec:
   - memory-snapshot-on-shutdown
   - remote-write-receiver
   - exemplar-storage
+  - agent
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
@@ -30453,14 +30454,21 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   probeSelector: {}
+  remoteRead:
+  - basicAuth:
+      password:
+        key: password
+        name: observability-tenant-auth
+      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    headers:
+      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    url: ${PEER_OBSERVER_URL}/api/v1/push
   remoteWrite:
   - basicAuth:
       password:
         key: password
         name: observability-tenant-auth
-      username:
-        key: username
-        name: observability-tenant-auth
+      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:
@@ -30476,7 +30484,6 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  retention: 4d
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
