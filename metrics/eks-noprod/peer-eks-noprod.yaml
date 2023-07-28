@@ -30439,7 +30439,7 @@ spec:
         name: observability-tenant-auth
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    url: ${PEER_OBSERVER_URL}/api/v1/push
+    url: ${PEER_OBSERVER_URL}/api/v1/read
   remoteWrite:
   - basicAuth:
       password:
@@ -30460,6 +30460,7 @@ spec:
       - __name__
       targetLabel: __name__
   replicas: 1
+  retention: 4h
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
