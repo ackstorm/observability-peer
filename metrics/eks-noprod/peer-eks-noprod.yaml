@@ -30435,7 +30435,9 @@ spec:
       password:
         key: password
         name: observability-tenant-auth
-      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+      username:
+        key: username
+        name: observability-tenant-auth
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     url: ${PEER_OBSERVER_URL}/api/v1/push
@@ -30444,7 +30446,9 @@ spec:
       password:
         key: password
         name: observability-tenant-auth
-      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+      username:
+        key: username
+        name: observability-tenant-auth
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:
