@@ -66,7 +66,7 @@ metadata:
   namespace: observability-peer
 stringData:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - basic_auth:\n      password: $TENANT_PASSWORD\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
+    \ - basic_auth:\n      password: $(TENANT_PASSWORD)\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
@@ -144,7 +144,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 55f688bd9674f7cc380427f0006e9b8643edc6eb6537b669a68641a6aea65103
+        checksum/config: ea2f5b92dea9436ea4f9b8fa1f111e067c128e825a26db87133f5a0ce47240a5
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
@@ -153,6 +153,7 @@ spec:
       - args:
         - -config.file=/etc/promtail/promtail.yaml
         - -config.expand-env
+        - --server.enable-runtime-reload
         env:
         - name: HOSTNAME
           valueFrom:
