@@ -54,17 +54,7 @@ subjects:
   namespace: observability-peer
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: ackstorm-promtail
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.8.2
-    helm.sh/chart: promtail-6.11.2
-  name: promtail-peer
-  namespace: observability-peer
-stringData:
+data:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
     \ - basic_auth:\n      password: ${TENANT_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
@@ -103,6 +93,16 @@ stringData:
     __meta_kubernetes_pod_label_observability_ackstorm_io_logging\n      - action:
     drop\n        regex: (kube-system|observability)\n        source_labels:\n        -
     namespace\n  \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: false\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-promtail
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: promtail
+    app.kubernetes.io/version: 2.8.2
+    helm.sh/chart: promtail-6.11.2
+  name: promtail-peer
+  namespace: observability-peer
 ---
 apiVersion: v1
 kind: Service
@@ -147,7 +147,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 5419e929fd237c2cb614f1b082f45d9f107fd4cda1ce7c1b9e43809177b70003
+        checksum/config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
@@ -220,9 +220,9 @@ spec:
         key: node-role.kubernetes.io/control-plane
         operator: Exists
       volumes:
-      - name: config
-        secret:
-          secretName: promtail-peer
+      - configMap:
+          name: promtail-peer
+        name: config
       - hostPath:
           path: /run/promtail
         name: run
