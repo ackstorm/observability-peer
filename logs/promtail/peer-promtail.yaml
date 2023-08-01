@@ -71,9 +71,9 @@ stringData:
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - burst:
     5\n        by_label_name: app\n        drop: true\n        limits: null\n        rate:
-    5\n      - metrics:\n          line_count_total:\n            config:\n              action:
-    inc\n              match_all: true\n            description: A running counter
-    of all lines with their corresponding labels\n            type: Counter\n    kubernetes_sd_configs:\n
+    5\n      - line_count_total:\n          config:\n            action: inc\n            match_all:
+    true\n          description: A running counter of all lines with their corresponding
+    labels\n          type: Counter\n        metrics: null\n    kubernetes_sd_configs:\n
     \     - role: pod\n    relabel_configs:\n      - source_labels:\n          - __meta_kubernetes_pod_controller_name\n
     \       regex: ([0-9a-z-.]+?)(-[0-9a-f]{8,10})?\n        action: replace\n        target_label:
     __tmp_controller_name\n      - source_labels:\n          - __meta_kubernetes_pod_label_app_kubernetes_io_name\n
@@ -147,7 +147,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: bb17e7dde0d6283ebb63972d2f24d2f7f4e0037890e41d86356c7b0912e4aa7d
+        checksum/config: 588512de028c2a1000088c7b66421cc64d97eac722ef5d2d78b9ddd0a17052d2
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
