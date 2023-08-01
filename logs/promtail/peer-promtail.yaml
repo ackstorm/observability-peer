@@ -69,10 +69,13 @@ stringData:
     \ - basic_auth:\n      password: ${TENANT_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
-    for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
-    {}\n    kubernetes_sd_configs:\n      - role: pod\n    relabel_configs:\n      -
-    source_labels:\n          - __meta_kubernetes_pod_controller_name\n        regex:
-    ([0-9a-z-.]+?)(-[0-9a-f]{8,10})?\n        action: replace\n        target_label:
+    for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - burst:
+    5\n        by_label_name: app\n        drop: true\n        limits: null\n        rate:
+    5\n      - metrics:\n          line_count_total:\n            config:\n              action:
+    inc\n              match_all: true\n            description: A running counter
+    of all lines with their corresponding labels\n            type: Counter\n    kubernetes_sd_configs:\n
+    \     - role: pod\n    relabel_configs:\n      - source_labels:\n          - __meta_kubernetes_pod_controller_name\n
+    \       regex: ([0-9a-z-.]+?)(-[0-9a-f]{8,10})?\n        action: replace\n        target_label:
     __tmp_controller_name\n      - source_labels:\n          - __meta_kubernetes_pod_label_app_kubernetes_io_name\n
     \         - __meta_kubernetes_pod_label_app\n          - __tmp_controller_name\n
     \         - __meta_kubernetes_pod_name\n        regex: ^;*([^;]+)(;.*)?$\n        action:
@@ -99,7 +102,7 @@ stringData:
     \     - action: drop\n        regex: \"false\"\n        source_labels:\n        -
     __meta_kubernetes_pod_label_observability_ackstorm_io_logging\n      - action:
     drop\n        regex: (kube-system|observability)\n        source_labels:\n        -
-    namespace\n  \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: true\n"
+    namespace\n  \n  \n\nlimits_config:\n  \n\ntracing:\n  enabled: false\n"
 ---
 apiVersion: v1
 kind: Service
@@ -144,7 +147,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 8223b8cc4f4724341fcc423bb839163d13e9267540420ba6864de96f2f5f774b
+        checksum/config: bb17e7dde0d6283ebb63972d2f24d2f7f4e0037890e41d86356c7b0912e4aa7d
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
