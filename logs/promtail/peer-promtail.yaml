@@ -294,7 +294,7 @@ spec:
         description: |
           A running counter of all lines with their corresponding label
         summary: '[Promtail] application log rate limit exceeded'
-      expr: increase(promtail_custom_line_count_total[1m])/60 > 25
+      expr: increase(promtail_custom_line_count_total[1m])/60 > 20
       for: 5m
       labels:
         severity: critical
