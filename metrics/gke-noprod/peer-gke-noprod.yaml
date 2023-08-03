@@ -30438,13 +30438,13 @@ spec:
   groups:
   - name: prometheus-rule-peer
     rules:
-    - annotations:
+    - alert: WatchdogPeer
+      annotations:
         description: Always firing alert to check if peer is alive from observer
       expr: vector(1)
       labels:
         observability: peer
         severity: critical
-      name: WatchdogPeer
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
