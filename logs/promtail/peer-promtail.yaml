@@ -60,8 +60,9 @@ data:
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - limit:\n
-    \         burst: 25\n          by_label_name: app\n          drop: true\n          rate:
-    25\n      - metrics:\n          line_count_total:\n            config:\n              action:
+    \         burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
+    app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
+    \     - metrics:\n          line_count_total:\n            config:\n              action:
     inc\n              match_all: true\n            description: A running counter
     of all lines with their corresponding labels\n            type: Counter\n    kubernetes_sd_configs:\n
     \     - role: pod\n    relabel_configs:\n      - source_labels:\n          - __meta_kubernetes_pod_controller_name\n
@@ -250,6 +251,13 @@ spec:
   groups:
   - name: promtail-peer
     rules:
+    - alert: PromtailNotRunning
+      annotations:
+        summary: Promtail is not running
+      expr: absent(up{job="promtail-peer-metrics"}) > 0
+      for: 5m
+      labels:
+        severity: critical
     - alert: PromtailRequestErrors
       annotations:
         description: |
@@ -277,24 +285,12 @@ spec:
       for: 5m
       labels:
         severity: critical
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    release: prometheus
-  name: promtail-peer-extra
-  namespace: observability-peer
-spec:
-  groups:
-  - name: promtail-peer-extra
-    rules:
     - alert: PromtailRateLimitExceeded
       annotations:
         description: |
           A running counter of all lines with their corresponding label
-        summary: '[Promtail] application log rate limit exceeded'
-      expr: increase(promtail_custom_line_count_total[1m])/60 > 20
+        summary: Promtail application log rate near limit or exceeded (will drop logs)
+      expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.9
       for: 5m
       labels:
         severity: critical
