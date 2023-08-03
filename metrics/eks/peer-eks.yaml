@@ -29525,37 +29525,6 @@ metadata:
 ---
 apiVersion: v1
 data:
-  additional-relabel-configs.yaml: |
-    IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjCiMjIE5PSVNFIFJFRFVDVElPTiAgICAjIwojIy
-    MjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCiMgU2tpcCBhbGVydHMgYmFzZWQgb24gbGFiZWxz
-    OiBwcm9tZXRoZXVzLmlvL2FsZXJ0OiAiZmFsc2UiCi0gc291cmNlX2xhYmVsczogW19fbW
-    V0YV9rdWJlcm5ldGVzX3BvZF9hbm5vdGF0aW9uX3Byb21ldGhldXNfaW9fYWxlcnRdCiAg
-    cmVnZXg6ICdmYWxzZScKICBhY3Rpb246IGRyb3AKICAKIyBJZ25vcmUgYWxlcnRzIGZvci
-    BtYW5hZ2VkIGNsdXN0ZXJzCi0gc291cmNlX2xhYmVsczogW2FsZXJ0bmFtZV0KICByZWdl
-    eDogJyhLdWJlU2NoZWR1bGVyRG93bnxLdWJlQ29udHJvbGxlck1hbmFnZXJEb3dufEJsYW
-    NrYm94TG93VXB0aW1lMzBkKScKICBhY3Rpb246IGRyb3AKCiMgSWdub3JlIHNvbWUgZGVm
-    YXVsdCBhbGVydHMKLSBzb3VyY2VfbGFiZWxzOiBbYWxlcnRuYW1lXQogIHJlZ2V4OiAnKE
-    JsYWNrYm94TG93VXB0aW1lMzBkKScKICBhY3Rpb246IGRyb3AKCiMgU2V2ZXJpdHkgdG8g
-    aW5mbyBLdWJlUGVyc2lzdGVudFZvbHVtZUZpbGxpbmdVcCBmb3IgdGhhbm9zLWNvbXBhY3
-    QgUFYKLSBzb3VyY2VfbGFiZWxzOiBbcGVyc2lzdGVudHZvbHVtZWNsYWltXQogIHJlZ2V4
-    OiAnZGF0YS10aGFub3MtY29tcGFjdC0wJwogIHRhcmdldF9sYWJlbDogc2V2ZXJpdHkKIC
-    ByZXBsYWNlbWVudDogJ2luZm8nCgojIFNldmVyaXR5IHRvIGluZm8gS3ViZVBlcnNpc3Rl
-    bnRWb2x1bWVGaWxsaW5nVXAgZm9yIHRoYW5vcy1jb21wYWN0IFBWCi0gc291cmNlX2xhYm
-    VsczogW2FsZXJ0bmFtZV0KICByZWdleDogJyhLdWJlU3RhdGVNZXRyaWNzTGlzdEVycm9y
-    cyknCiAgdGFyZ2V0X2xhYmVsOiBzZXZlcml0eQogIHJlcGxhY2VtZW50OiAnaW5mbycKCi
-    MgQ2hhbmdlIHNvbWUgYWxlcnRzIHRvIHdhcm5pbmcKLSBzb3VyY2VfbGFiZWxzOiBbYWxl
-    cnRuYW1lXQogIHJlZ2V4OiAnKEt1YmVDUFVPdmVyY29tbWl0fEt1YmVybmV0ZXNWb2x1bW
-    VGdWxsSW5Gb3VyRGF5c3xUaGFub3NRdWVyeUdycGNDbGllbnRFcnJvclJhdGV8Tm9kZU5l
-    dHdvcmtJbnRlcmZhY2VGbGFwcGluZ3xLdWJlQWdncmVnYXRlZEFQSUVycm9ycyknCiAgdG
-    FyZ2V0X2xhYmVsOiBzZXZlcml0eQogIHJlcGxhY2VtZW50OiAnd2FybmluZycKCg==
-kind: Secret
-metadata:
-  name: additional-relabel-configs
-  namespace: observability-peer
-type: Opaque
----
-apiVersion: v1
-data:
   additional-scrape-configs.yaml: |
     IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKIyMgQkxBQ0tCT1ggQU5OT1RBVElPTlMgIy
     MKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCiMgQWRpdGlvbmFsIGNvbmZpZyBmb3Ig
@@ -30407,9 +30376,6 @@ metadata:
   name: prometheus-peer
   namespace: observability-peer
 spec:
-  additionalAlertRelabelConfigs:
-    key: additional-relabel-configs.yaml
-    name: additional-relabel-configs
   additionalScrapeConfigs:
     key: additional-scrape-configs.yaml
     name: additional-scrape-configs
@@ -30540,21 +30506,13 @@ spec:
   groups:
   - name: prometheus-rule-peer
     rules:
-    - alert: WatchdogPeer
-      annotations:
-        description: |
-          This is an alert meant to ensure that the entire alerting pipeline is functional.
-          This alert is always firing, therefore it should always be firing in Alertmanager
-          and always fire against a receiver. There are integrations with various notification
-          mechanisms that send a notification when this alert is not firing. For example the
-          "DeadMansSnitch" integration in PagerDuty.
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/general/watchdog
-        summary: An alert that should always be firing to certify that Alertmanager
-          is working properly.
+    - annotations:
+        description: Always firing alert to check if peer is alive from observer
       expr: vector(1)
       labels:
         observability: peer
         severity: critical
+      name: WatchdogPeer
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
