@@ -30077,6 +30077,8 @@ spec:
   selector:
     matchLabels:
       app: mimir-sync-peer
+  strategy:
+    type: Recreate
   template:
     metadata:
       annotations:
