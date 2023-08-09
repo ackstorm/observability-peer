@@ -30079,6 +30079,8 @@ spec:
         - python3
         - /app/main.py
         env:
+        - name: FOR_GOD_SHAKE_THIS
+          value: "1"
         - name: ROLE
           value: peer
         - name: MIMIR_URL
