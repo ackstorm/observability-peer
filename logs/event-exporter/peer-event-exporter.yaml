@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: event-exporter-peer
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: event-exporter-peer
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: event-exporter-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: event-exporter-peer
+subjects:
+- kind: ServiceAccount
+  name: event-exporter-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
+  config.yaml: "logLevel: error\nlogFormat: json\nmetricsNamePrefix: event_exporter_\nroute:\n
+    \ routes:\n    - match:\n        - receiver: \"stdout\"\nreceivers:\n  - name:
+    \"stdout\"\n    stdout: \n      deDot: true\n"
+kind: ConfigMap
+metadata:
+  name: event-exporter-peer-cfg
+  namespace: observability-peer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-exporter-peer
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-exporter-peer
+      version: v1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "2112"
+        prometheus.io/scrape: "true"
+      labels:
+        app: event-exporter-peer
+        version: v1
+    spec:
+      containers:
+      - args:
+        - -conf=/data/config.yaml
+        image: ghcr.io/resmoio/kubernetes-event-exporter:v1.4
+        imagePullPolicy: IfNotPresent
+        name: event-exporter
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - mountPath: /data
+          name: cfg
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: event-exporter-peer
+      volumes:
+      - configMap:
+          name: event-exporter-peer-cfg
+        name: cfg
