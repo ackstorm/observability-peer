@@ -30394,34 +30394,6 @@ spec:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
   image: quay.io/prometheus/prometheus:v2.41.0
-  metricRelabelings:
-  - action: replace
-    regex: ([0-9a-z-.]+?)(-[0-9a-f]{8,10})?
-    sourceLabels:
-    - __meta_kubernetes_pod_controller_name
-    targetLabel: __tmp_controller_name
-  - action: replace
-    regex: ^;*([^;]+)(;.*)?$
-    sourceLabels:
-    - __meta_kubernetes_pod_label_app_kubernetes_io_name
-    - __meta_kubernetes_pod_label_app
-    - __tmp_controller_name
-    - __meta_kubernetes_pod_name
-    targetLabel: app
-  - action: replace
-    regex: ^;*([^;]+)(;.*)?$
-    sourceLabels:
-    - __meta_kubernetes_pod_label_app_kubernetes_io_instance
-    - __meta_kubernetes_pod_label_release
-    targetLabel: instance
-  - action: replace
-    regex: ^;*([^;]+)(;.*)?$
-    sourceLabels:
-    - __meta_kubernetes_pod_label_app_kubernetes_io_component
-    - __meta_kubernetes_pod_label_component
-    targetLabel: component
-  - action: labeldrop
-    regex: applications_argoproj_io_app_name|pod_template_hash|linkerd_io_|helm_sh_chart|app_kubernetes_io_
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
@@ -30454,6 +30426,8 @@ spec:
       sourceLabels:
       - __name__
       targetLabel: __name__
+    - action: labeldrop
+      regex: example-label
   replicas: 1
   resources:
     requests:
