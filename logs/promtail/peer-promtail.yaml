@@ -59,9 +59,10 @@ data:
     \ - basic_auth:\n      password: ${TENANT_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
-    for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - limit:\n
-    \         burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
-    app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
+    for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - match:\n
+    \         action: drop\n          drop_counter_reason: debug_line\n          selector:
+    '{app=~\".+\"} |~ \"DEBUG\"'\n      - limit:\n          burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
+    \         by_label_name: app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
     \     - metrics:\n          line_count_total:\n            config:\n              action:
     inc\n              match_all: true\n            description: A running counter
     of all lines with their corresponding labels\n            type: Counter\n    kubernetes_sd_configs:\n
@@ -286,6 +287,15 @@ spec:
       for: 5m
       labels:
         severity: critical
+    - alert: PromtailRateLimitExceeded
+      annotations:
+        description: Promtail application log rate near limit or exceeded (will drop
+          logs)
+        summary: Promtail application log rate near limit or exceeded (will drop logs)
+      expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.8
+      for: 5m
+      labels:
+        severity: major
     - alert: PromtailRateLimitExceeded
       annotations:
         description: Promtail application log rate near limit or exceeded (will drop
