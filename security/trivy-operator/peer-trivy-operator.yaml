@@ -2766,7 +2766,7 @@ spec:
       containers:
       - env:
         - name: OPERATOR_NAMESPACE
-          value: default
+          value: observability-peer
         - name: OPERATOR_TARGET_NAMESPACES
           value: ""
         - name: OPERATOR_EXCLUDE_NAMESPACES
