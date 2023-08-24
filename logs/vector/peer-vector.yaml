@@ -1,0 +1,492 @@
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-aggregator-peer
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - nodes
+  - pods
+  verbs:
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vector-agent-peer
+subjects:
+- kind: ServiceAccount
+  name: vector-agent-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
+  vector.yaml: |
+    api:
+      enabled: false
+    data_dir: /vector-data-dir
+    sinks:
+      loki_journal:
+        address: vector-aggregator-peer:6000
+        compression: true
+        inputs:
+        - journal_logs
+        type: vector
+        version: "2"
+      loki_kubernetes:
+        address: vector-aggregator-peer:6010
+        compression: true
+        inputs:
+        - kubernetes_logs
+        type: vector
+        version: "2"
+      prom_exporter:
+        address: 0.0.0.0:9090
+        inputs:
+        - vector_metrics
+        type: prometheus_exporter
+    sources:
+      journal_logs:
+        journal_directory: /var/log/journal
+        type: journald
+      kubernetes_logs:
+        pod_annotation_fields:
+          container_image: container_image
+          container_name: container_name
+          pod_annotations: pod_annotations
+          pod_labels: pod_labels
+          pod_name: pod_name
+        type: kubernetes_logs
+      vector_metrics:
+        type: internal_metrics
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
+  vector.yaml: |
+    api:
+      address: 0.0.0.0:8686
+      enabled: true
+    data_dir: /vector-data-dir
+    sinks:
+      loki_journal:
+        auth:
+          password: ${TENANT_PASSWORD}
+          strategy: basic
+          user: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        batch:
+          max_bytes: 2049000
+        encoding:
+          codec: json
+        endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push
+        inputs:
+        - journal_logs
+        labels:
+          hostname: '{{ host }}'
+        out_of_order_action: accept
+        remove_label_fields: true
+        remove_timestamp: true
+        tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        type: loki
+      loki_kubernetes:
+        auth:
+          password: ${TENANT_PASSWORD}
+          strategy: basic
+          user: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        batch:
+          max_bytes: 2049000
+        encoding:
+          codec: json
+        endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push
+        inputs:
+        - kubernetes_logs_remap
+        labels:
+          app: '{{ custom_app_name }}'
+          namespace: '{{ kubernetes.pod_namespace }}'
+          node: '{{ kubernetes.pod_node_name }}'
+        out_of_order_action: accept
+        remove_label_fields: true
+        remove_timestamp: true
+        tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        type: loki
+      prom_exporter:
+        address: 0.0.0.0:9090
+        inputs:
+        - vector_metrics
+        type: prometheus_exporter
+    sources:
+      journal_logs:
+        address: 0.0.0.0:6000
+        type: vector
+        version: "2"
+      kubernetes_logs:
+        address: 0.0.0.0:6010
+        type: vector
+        version: "2"
+      vector_metrics:
+        type: internal_metrics
+    transforms:
+      kubernetes_logs_remap:
+        inputs:
+        - kubernetes_logs
+        source: |
+          # Standardize 'app' index
+          .custom_app_name = .pod_labels."app.kubernetes.io/name" || .pod_labels.app || .pod_labels."k8s-app" || "unknown"
+        type: remap
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-aggregator-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer-headless
+  namespace: observability-peer
+spec:
+  clusterIP: None
+  ports:
+  - name: loki-journal
+    port: 6000
+    protocol: TCP
+    targetPort: 6000
+  - name: loki-kubernetes
+    port: 6010
+    protocol: TCP
+    targetPort: 6010
+  - name: prom-exporter
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/name: vector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-aggregator-peer
+  namespace: observability-peer
+spec:
+  ports:
+  - name: api
+    port: 8686
+    protocol: TCP
+    targetPort: 8686
+  - name: prom-exporter
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  - name: journal-logs
+    port: 6000
+    protocol: TCP
+    targetPort: 6000
+  - name: kubernetes-logs
+    port: 6010
+    protocol: TCP
+    targetPort: 6010
+  selector:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/name: vector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-aggregator-peer-headless
+  namespace: observability-peer
+spec:
+  clusterIP: None
+  ports:
+  - name: api
+    port: 8686
+    protocol: TCP
+    targetPort: 8686
+  - name: prom-exporter
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  - name: journal-logs
+    port: 6000
+    protocol: TCP
+    targetPort: 6000
+  - name: kubernetes-logs
+    port: 6010
+    protocol: TCP
+    targetPort: 6010
+  selector:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/name: vector
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: Aggregator
+    app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-aggregator-peer
+  namespace: observability-peer
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: Aggregator
+      app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+      app.kubernetes.io/name: vector
+  serviceName: vector-aggregator-peer-headless
+  template:
+    metadata:
+      annotations:
+        checksum/config: a112000640076caf0cfde569af1e4ed6a9df8e9d9b438eb6afc737d552d1e499
+      labels:
+        app.kubernetes.io/component: Aggregator
+        app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
+        app.kubernetes.io/name: vector
+        vector.dev/exclude: "true"
+    spec:
+      containers:
+      - args:
+        - --config-dir
+        - /etc/vector/
+        env: null
+        image: timberio/vector:0.32.0-distroless-libc
+        imagePullPolicy: IfNotPresent
+        name: vector
+        ports:
+        - containerPort: 8686
+          name: api
+          protocol: TCP
+        - containerPort: 9090
+          name: prom-exporter
+          protocol: TCP
+        - containerPort: 6000
+          name: journal-logs
+          protocol: TCP
+        - containerPort: 6010
+          name: kubernetes-logs
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /vector-data-dir
+          name: data
+        - mountPath: /etc/vector/
+          name: config
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      serviceAccountName: vector-aggregator-peer
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - emptyDir: {}
+        name: data
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: vector-aggregator-peer
+  volumeClaimTemplates: null
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: Agent
+    app.kubernetes.io/instance: ackstorm-vector-agent-peer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vector
+    app.kubernetes.io/version: 0.32.0-distroless-libc
+    helm.sh/chart: vector-0.24.0
+  name: vector-agent-peer
+  namespace: observability-peer
+spec:
+  minReadySeconds: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: Agent
+      app.kubernetes.io/instance: ackstorm-vector-agent-peer
+      app.kubernetes.io/name: vector
+  template:
+    metadata:
+      annotations:
+        checksum/config: d5441bc9ca5de4369c5c49ad71d1528e861727c19abc39c445dbdaeaf0311aa0
+      labels:
+        app.kubernetes.io/component: Agent
+        app.kubernetes.io/instance: ackstorm-vector-agent-peer
+        app.kubernetes.io/name: vector
+        vector.dev/exclude: "true"
+    spec:
+      containers:
+      - args:
+        - --config-dir
+        - /etc/vector/
+        env:
+        - name: VECTOR_SELF_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: VECTOR_SELF_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: VECTOR_SELF_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PROCFS_ROOT
+          value: /host/proc
+        - name: SYSFS_ROOT
+          value: /host/sys
+        - name: VECTOR_LOG
+          value: info
+        image: timberio/vector:0.32.0-distroless-libc
+        imagePullPolicy: IfNotPresent
+        name: vector
+        ports:
+        - containerPort: 6000
+          name: loki-journal
+          protocol: TCP
+        - containerPort: 6010
+          name: loki-kubernetes
+          protocol: TCP
+        - containerPort: 9090
+          name: prom-exporter
+          protocol: TCP
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /vector-data-dir
+          name: data
+        - mountPath: /etc/vector/
+          name: config
+          readOnly: true
+        - mountPath: /var/log/
+          name: var-log
+          readOnly: true
+        - mountPath: /var/lib
+          name: var-lib
+          readOnly: true
+        - mountPath: /host/proc
+          name: procfs
+          readOnly: true
+        - mountPath: /host/sys
+          name: sysfs
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      serviceAccountName: vector-agent-peer
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: vector-agent-peer
+      - hostPath:
+          path: /var/lib/vector
+        name: data
+      - hostPath:
+          path: /var/log/
+        name: var-log
+      - hostPath:
+          path: /var/lib/
+        name: var-lib
+      - hostPath:
+          path: /proc
+        name: procfs
+      - hostPath:
+          path: /sys
+        name: sysfs
