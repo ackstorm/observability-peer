@@ -42687,7 +42687,11 @@ spec:
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
-    labels: {}
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: prometheus-peer
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}
