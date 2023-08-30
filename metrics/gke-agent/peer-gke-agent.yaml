@@ -42666,8 +42666,6 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  ruleNamespaceSelector: {}
-  ruleSelector: {}
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
