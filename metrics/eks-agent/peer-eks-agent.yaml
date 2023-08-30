@@ -30442,11 +30442,8 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  retention: 4d
   ruleNamespaceSelector: {}
-  ruleSelector:
-    matchLabels:
-      role: peer
+  ruleSelector: {}
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
@@ -30455,8 +30452,6 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
-  tsdb:
-    outOfOrderTimeWindow: 5m
   version: 2.41.0
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -30482,26 +30477,6 @@ spec:
         < 10
       for: 10m
       labels:
-        severity: critical
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    prometheus: k8s
-    role: peer
-  name: prometheus-rule-peer
-  namespace: observability-peer
-spec:
-  groups:
-  - name: prometheus-rule-peer
-    rules:
-    - alert: WatchdogPeer
-      annotations:
-        description: Always firing alert to check if peer is alive from observer
-      expr: vector(1)
-      labels:
-        observability: peer
         severity: critical
 ---
 apiVersion: monitoring.coreos.com/v1

@@ -29715,22 +29715,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/name: aws-node
-  name: aws-node
-  namespace: observability-peer
-spec:
-  clusterIP: None
-  ports:
-  - name: cni-metrics-port
-    port: 61678
-    targetPort: 61678
-  selector:
-    app.kubernetes.io/name: aws-node
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: blackbox-exporter-peer
     app.kubernetes.io/part-of: kube-prometheus
@@ -30442,11 +30426,8 @@ spec:
   resources:
     requests:
       memory: 100Mi
-  retention: 4d
   ruleNamespaceSelector: {}
-  ruleSelector:
-    matchLabels:
-      role: peer
+  ruleSelector: {}
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
@@ -30455,81 +30436,7 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
-  tsdb:
-    outOfOrderTimeWindow: 5m
   version: 2.41.0
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/name: prometheus-vpc-cni-rules
-    app.kubernetes.io/part-of: kube-prometheus
-  name: aws-vpc-cni-rules
-  namespace: observability-peer
-spec:
-  groups:
-  - name: aws-vpc-cni.rules
-    rules:
-    - alert: AwsVpcCniWarmIPsLow
-      annotations:
-        description: |
-          Instance {{ $labels.instance }} has only {{ $value }} warm IPs which is lower than set threshold of 10.
-          It could mean the current subnet is out of available IP addresses or the CNI is unable to request them from the EC2 API.
-        summary: AWS VPC CNI has a low warm IP pool
-      expr: sum by(instance) (awscni_total_ip_addresses) - sum by(instance) (awscni_assigned_ip_addresses)
-        < 10
-      for: 10m
-      labels:
-        severity: critical
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    prometheus: k8s
-    role: peer
-  name: prometheus-rule-peer
-  namespace: observability-peer
-spec:
-  groups:
-  - name: prometheus-rule-peer
-    rules:
-    - alert: WatchdogPeer
-      annotations:
-        description: Always firing alert to check if peer is alive from observer
-      expr: vector(1)
-      labels:
-        observability: peer
-        severity: critical
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app.kubernetes.io/name: aws-node
-  name: aws-node
-  namespace: observability-peer
-spec:
-  endpoints:
-  - interval: 30s
-    path: /metrics
-    port: cni-metrics-port
-    relabelings:
-    - action: replace
-      regex: (.*)
-      replacement: $1
-      sourceLabels:
-      - __meta_kubernetes_pod_node_name
-      targetLabel: instance
-  jobLabel: app.kubernetes.io/name
-  namespaceSelector:
-    matchNames:
-    - kube-system
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: aws-node
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -30568,7 +30475,12 @@ spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
     interval: 15s
-    targetPort: 9153
+    metricRelabelings:
+    - action: drop
+      regex: coredns_cache_misses_total
+      sourceLabels:
+      - __name__
+    port: metrics
   jobLabel: app.kubernetes.io/name
   namespaceSelector:
     matchNames:
