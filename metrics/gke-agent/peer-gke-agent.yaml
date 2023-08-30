@@ -42633,17 +42633,6 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   probeSelector: {}
-  remoteRead:
-  - basicAuth:
-      password:
-        key: password
-        name: observability-tenant-auth
-      username:
-        key: username
-        name: observability-tenant-auth
-    headers:
-      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    url: ${PEER_OBSERVER_URL}/prometheus/api/v1/read
   remoteWrite:
   - basicAuth:
       password:
