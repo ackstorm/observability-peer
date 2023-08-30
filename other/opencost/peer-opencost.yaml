@@ -171,7 +171,7 @@ spec:
       containers:
       - env:
         - name: PROMETHEUS_SERVER_ENDPOINT
-          value: http://prometheus-operated.observability-peer.svc:9090
+          value: http://my-prometheus.opencost.svc:9090
         - name: CLOUD_PROVIDER_API_KEY
           value: ${PEER_CLOUD_PROVIDER_API_KEY}
         - name: CLUSTER_ID
