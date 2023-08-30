@@ -41704,10 +41704,7 @@ spec:
     port: 8080
     targetPort: reloader-web
   selector:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: prometheus-peer
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/name: prometheus-agent
   sessionAffinity: ClientIP
 ---
 apiVersion: apps/v1
@@ -42675,10 +42672,6 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: PrometheusAgent
 metadata:
   labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: prometheus-peer
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/part-of: kube-prometheus
     prometheus: k8s
     role: peer
   name: prometheus-peer
@@ -42694,11 +42687,7 @@ spec:
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
-    labels:
-      app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: prometheus-peer
-      app.kubernetes.io/name: prometheus
-      app.kubernetes.io/part-of: kube-prometheus
+    labels: {}
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}
@@ -42736,7 +42725,7 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
-  version: v2.41.0
+  version: v2.46.0
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
