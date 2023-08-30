@@ -42259,7 +42259,6 @@ spec:
   - memory-snapshot-on-shutdown
   - remote-write-receiver
   - exemplar-storage
-  enforcedTargetLimit: 1
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}

@@ -42618,7 +42618,6 @@ spec:
     key: additional-scrape-configs.yaml
     name: additional-scrape-configs
   enableRemoteWriteReceiver: true
-  enforcedTargetLimit: 1
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
