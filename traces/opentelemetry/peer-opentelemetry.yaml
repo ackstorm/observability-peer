@@ -8376,7 +8376,7 @@ spec:
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n    tls:\n      insecure: true\n  otlp/spanmetrics:\n
     \   endpoint: ${env:MY_POD_IP}:4317\n    tls:\n      insecure: true\n  prometheusremotewrite:\n
-    \   endpoint: http://prometheus-operated.observability-peer.svc:9090/api/v1/write\n
+    \   endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n
     \   resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
     ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator: basicauth/observer\n
     \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n\nprocessors:\n

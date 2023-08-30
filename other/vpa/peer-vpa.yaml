@@ -1241,7 +1241,7 @@ spec:
     spec:
       containers:
       - args:
-        - --prometheus-address=http://prometheus-operated.observability-peer.svc:9090
+        - --prometheus-address=http://prometheus-prometheus-peer.observability-peer.svc:9090
         - --history-length=4d
         - --storage=prometheus
         - --target-cpu-percentile=0.95
