@@ -42236,75 +42236,6 @@ spec:
     type: RollingUpdate
 ---
 apiVersion: monitoring.coreos.com/v1
-kind: PrometheusAgent
-metadata:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: prometheus-peer
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/part-of: kube-prometheus
-    prometheus: k8s
-    role: peer
-  name: prometheus-rule-peer
-  namespace: observability-peer
-spec:
-  additionalScrapeConfigs:
-    key: additional-scrape-configs.yaml
-    name: additional-scrape-configs
-  enableRemoteWriteReceiver: true
-  externalLabels:
-    cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    env: ${PEER_ENVIRONMENT}
-  nodeSelector:
-    kubernetes.io/os: linux
-  podMetadata:
-    labels:
-      app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: prometheus-peer
-      app.kubernetes.io/name: prometheus
-      app.kubernetes.io/part-of: kube-prometheus
-  podMonitorNamespaceSelector: {}
-  podMonitorSelector: {}
-  probeNamespaceSelector: {}
-  probeSelector: {}
-  remoteWrite:
-  - basicAuth:
-      password:
-        key: password
-        name: observability-tenant-auth
-      username:
-        key: username
-        name: observability-tenant-auth
-    headers:
-      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-    queueConfig:
-      maxSamplesPerSend: 5000
-    sendExemplars: true
-    url: ${PEER_OBSERVER_URL}/api/v1/push
-    writeRelabelConfigs:
-    - regex: (.*)
-      sourceLabels:
-      - __name__
-      targetLabel: __name__
-    - action: labeldrop
-      regex: example-label
-  replicas: 1
-  resources:
-    requests:
-      memory: 100Mi
-  ruleNamespaceSelector: {}
-  ruleSelector: {}
-  scrapeInterval: 60s
-  securityContext:
-    fsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 1000
-  serviceAccountName: prometheus-prometheus-peer
-  serviceMonitorNamespaceSelector: {}
-  serviceMonitorSelector: {}
-  version: v2.41.0
----
-apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   labels:
@@ -42740,6 +42671,75 @@ spec:
       app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: PrometheusAgent
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: prometheus-peer
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: peer
+  name: prometheus-rule-peer
+  namespace: observability-peer
+spec:
+  additionalScrapeConfigs:
+    key: additional-scrape-configs.yaml
+    name: additional-scrape-configs
+  enableRemoteWriteReceiver: true
+  externalLabels:
+    cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    env: ${PEER_ENVIRONMENT}
+  nodeSelector:
+    kubernetes.io/os: linux
+  podMetadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: prometheus-peer
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+  podMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  probeNamespaceSelector: {}
+  probeSelector: {}
+  remoteWrite:
+  - basicAuth:
+      password:
+        key: password
+        name: observability-tenant-auth
+      username:
+        key: username
+        name: observability-tenant-auth
+    headers:
+      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    queueConfig:
+      maxSamplesPerSend: 5000
+    sendExemplars: true
+    url: ${PEER_OBSERVER_URL}/api/v1/push
+    writeRelabelConfigs:
+    - regex: (.*)
+      sourceLabels:
+      - __name__
+      targetLabel: __name__
+    - action: labeldrop
+      regex: example-label
+  replicas: 1
+  resources:
+    requests:
+      memory: 100Mi
+  ruleNamespaceSelector: {}
+  ruleSelector: {}
+  scrapeInterval: 60s
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: prometheus-prometheus-peer
+  serviceMonitorNamespaceSelector: {}
+  serviceMonitorSelector: {}
+  version: v2.41.0
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
