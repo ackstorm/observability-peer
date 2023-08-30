@@ -30448,7 +30448,9 @@ spec:
     requests:
       memory: 100Mi
   ruleNamespaceSelector: {}
-  ruleSelector: {}
+  ruleSelector:
+    matchLabels:
+      something_that_never: match
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
