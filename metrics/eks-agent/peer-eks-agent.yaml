@@ -30395,6 +30395,13 @@ spec:
           - observability-peer
           topologyKey: kubernetes.io/hostname
         weight: 100
+  containers:
+  - args:
+    - --config.file=/etc/prometheus/config_out/prometheus.env.yaml
+    - --storage.agent.path=/prometheus
+    - --enable-feature=agent
+    - --web.enable-lifecycle
+    name: prometheus
   enableAdminAPI: false
   enableFeatures:
   - agent
