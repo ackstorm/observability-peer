@@ -42618,7 +42618,7 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     prometheus: k8s
     role: peer
-  name: prometheus-rule-peer
+  name: prometheus-peer
   namespace: observability-peer
 spec:
   additionalScrapeConfigs:
