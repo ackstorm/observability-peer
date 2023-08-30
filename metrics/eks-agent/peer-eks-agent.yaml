@@ -30367,48 +30367,25 @@ spec:
     type: RollingUpdate
 ---
 apiVersion: monitoring.coreos.com/v1
-kind: Prometheus
+kind: PrometheusAgent
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: prometheus-peer
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.41.0
-  name: prometheus-peer
+    prometheus: k8s
+    role: peer
+  name: prometheus-rule-peer
   namespace: observability-peer
 spec:
   additionalScrapeConfigs:
     key: additional-scrape-configs.yaml
     name: additional-scrape-configs
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - podAffinityTerm:
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/component: prometheus
-              app.kubernetes.io/instance: prometheus-peer
-              app.kubernetes.io/name: prometheus
-              app.kubernetes.io/part-of: kube-prometheus
-          namespaces:
-          - observability-peer
-          topologyKey: kubernetes.io/hostname
-        weight: 100
-  containers:
-  - args:
-    - --config.file=/etc/prometheus/config_out/prometheus.env.yaml
-    - --storage.agent.path=/prometheus
-    - --enable-feature=agent
-    - --web.enable-lifecycle
-    name: prometheus
-  enableAdminAPI: false
-  enableFeatures:
-  - agent
+  enableRemoteWriteReceiver: true
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
-  image: quay.io/prometheus/prometheus:v2.41.0
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
@@ -30417,7 +30394,6 @@ spec:
       app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 2.41.0
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}
@@ -30448,9 +30424,7 @@ spec:
     requests:
       memory: 100Mi
   ruleNamespaceSelector: {}
-  ruleSelector:
-    matchLabels:
-      something_that_never: match
+  ruleSelector: {}
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
@@ -30459,7 +30433,7 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
-  version: 2.41.0
+  version: v2.41.0
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
