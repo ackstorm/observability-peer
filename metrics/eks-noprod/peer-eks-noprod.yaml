@@ -42515,18 +42515,6 @@ spec:
       regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
       sourceLabels:
       - __name__
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - __name__
-      targetLabel: instance
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - job
-      targetLabel: job
     - regex: (.+)
       sourceLabels:
       - label_cloud_google_com_gke_nodepool
@@ -42539,6 +42527,18 @@ spec:
     relabelings:
     - action: labeldrop
       regex: (pod|service|endpoint|namespace)
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - __name__
+      targetLabel: instance
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - job
+      targetLabel: job
     scheme: https
     scrapeTimeout: 30s
     tlsConfig:

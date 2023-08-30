@@ -42366,18 +42366,6 @@ spec:
       regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
       sourceLabels:
       - __name__
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - __name__
-      targetLabel: instance
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - job
-      targetLabel: job
     - regex: (.+)
       sourceLabels:
       - label_cloud_google_com_gke_nodepool
@@ -42390,6 +42378,18 @@ spec:
     relabelings:
     - action: labeldrop
       regex: (pod|service|endpoint|namespace)
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - __name__
+      targetLabel: instance
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - job
+      targetLabel: job
     scheme: https
     scrapeTimeout: 30s
     tlsConfig:
@@ -42621,6 +42621,7 @@ spec:
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
+  image: quay.io/prometheus/prometheus:v2.46.0
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
@@ -42629,6 +42630,7 @@ spec:
       app.kubernetes.io/instance: prometheus-peer
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 2.46.0
   podMonitorNamespaceSelector: {}
   podMonitorSelector: {}
   probeNamespaceSelector: {}
@@ -42666,7 +42668,7 @@ spec:
   serviceAccountName: prometheus-prometheus-peer
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
-  version: v2.46.0
+  version: 2.46.0
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
