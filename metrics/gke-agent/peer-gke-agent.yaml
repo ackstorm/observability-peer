@@ -30382,8 +30382,6 @@ spec:
   enableAdminAPI: false
   enableFeatures:
   - agent
-  - remote-write-receiver
-  - exemplar-storage
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     env: ${PEER_ENVIRONMENT}
