@@ -2095,7 +2095,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -2107,7 +2107,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -2137,7 +2137,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator-leader-election
+  name: trivy-operator-peer-leader-election
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -2574,15 +2574,15 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: trivy-operator
+  name: trivy-operator-peer
 subjects:
 - kind: ServiceAccount
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -2594,15 +2594,15 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator-leader-election
+  name: trivy-operator-peer-leader-election
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: trivy-operator-leader-election
+  name: trivy-operator-peer-leader-election
 subjects:
 - kind: ServiceAccount
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -2614,14 +2614,14 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: trivy-operator
 subjects:
 - kind: ServiceAccount
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -2724,7 +2724,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 spec:
   clusterIP: None
@@ -2746,7 +2746,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 spec:
   replicas: 1
@@ -2774,7 +2774,7 @@ spec:
         - name: OPERATOR_TARGET_WORKLOADS
           value: pod,replicaset,replicationcontroller,statefulset,daemonset,cronjob,job
         - name: OPERATOR_SERVICE_ACCOUNT
-          value: trivy-operator
+          value: trivy-operator-peer
         - name: OPERATOR_LOG_DEV_MODE
           value: "false"
         - name: OPERATOR_SCAN_JOB_TTL
@@ -2876,7 +2876,7 @@ spec:
           privileged: false
           readOnlyRootFilesystem: true
       securityContext: {}
-      serviceAccountName: trivy-operator
+      serviceAccountName: trivy-operator-peer
 ---
 apiVersion: aquasecurity.github.io/v1alpha1
 kind: ClusterComplianceReport
@@ -4120,7 +4120,7 @@ metadata:
     app.kubernetes.io/name: trivy-operator
     app.kubernetes.io/version: 0.15.1
     helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator
+  name: trivy-operator-peer
   namespace: observability-peer
 spec:
   endpoints:
