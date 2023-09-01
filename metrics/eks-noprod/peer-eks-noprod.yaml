@@ -42548,7 +42548,6 @@ spec:
     scheme: https
     tlsConfig:
       insecureSkipVerify: true
-  interval: 30s
   jobLabel: app.kubernetes.io/name
   selector:
     matchLabels:
