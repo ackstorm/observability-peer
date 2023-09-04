@@ -41952,10 +41952,7 @@ spec:
         app: mimir-sync-peer
     spec:
       containers:
-      - command:
-        - python3
-        - /app/main.py
-        env:
+      - env:
         - name: FOR_GOD_SHAKE_THIS
           value: "1"
         - name: ROLE
@@ -41969,7 +41966,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-tenant-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:latest
+        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.0
         imagePullPolicy: Always
         name: mimir-sync
         resources:
