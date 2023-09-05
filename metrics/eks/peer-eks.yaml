@@ -42343,7 +42343,7 @@ spec:
     url: ${PEER_OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
     - action: labeldrop
-      regex: pod_template_hash|controller_revision_hash|k8s_replicaset_name|k8s_pod_uid|id|
+      regex: pod_template_hash|controller_revision_hash|k8s_replicaset_name|k8s_pod_uid|
     - action: labeldrop
       regex: applications_argoproj_io_.*
     - action: labeldrop
