@@ -32638,6 +32638,44 @@ spec:
                   - server
                   type: object
                 type: array
+              dnsSDConfigs:
+                description: DNSSDConfigs defines a list of DNS service discovery
+                  configurations.
+                items:
+                  description: DNSSDConfig allows specifying a set of DNS domain names
+                    which are periodically queried to discover a list of targets.
+                    The DNS servers to be contacted are read from /etc/resolv.conf.
+                    See https://prometheus.io/docs/prometheus/latest/configuration/configuration/#dns_sd_config
+                  properties:
+                    names:
+                      description: A list of DNS domain names to be queried.
+                      items:
+                        type: string
+                      minItems: 1
+                      type: array
+                    port:
+                      description: The port number used if the query type is not SRV
+                        Ignored for SRV records
+                      type: integer
+                    refreshInterval:
+                      description: RefreshInterval configures the time after which
+                        the provided names are refreshed. If not set, Prometheus uses
+                        its default value.
+                      pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                      type: string
+                    type:
+                      description: The type of DNS query to perform. One of SRV, A,
+                        AAAA or MX. If not set, Prometheus uses its default value.
+                      enum:
+                      - SRV
+                      - A
+                      - AAAA
+                      - MX
+                      type: string
+                  required:
+                  - names
+                  type: object
+                type: array
               fileSDConfigs:
                 description: FileSDConfigs defines a list of file service discovery
                   configurations.
@@ -42071,26 +42109,6 @@ spec:
           type: RuntimeDefault
       serviceAccountName: prometheus-operator-peer
 ---
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: prometheus-peer
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.46.0
-  name: prometheus-prometheus-peer
-  namespace: observability-peer
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: prometheus-peer
-      app.kubernetes.io/name: prometheus
-      app.kubernetes.io/part-of: kube-prometheus
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -42288,7 +42306,7 @@ spec:
       sourceLabels:
       - __name__
     - action: drop
-      regex: apiserver_(request_count|request_latencies|request_latencies_summary|dropped_requests|storage_data_key_generation_latencies_microseconds|storage_transformation_failures_total|storage_transformation_latencies_microseconds|proxy_tunnel_sync_latency_secs|longrunning_gauge|registered_watchers)
+      regex: apiserver_(request_count|request_latencies|request_latencies_summary|dropped_requests|storage_data_key_generation_latencies_microseconds|storage_transformation_failures_total|storage_transformation_latencies_microseconds|proxy_tunnel_sync_latency_secs|longrunning_gauge|registered_watchers|storage_db_total_size_in_bytes)
       sourceLabels:
       - __name__
     - action: drop
@@ -42427,7 +42445,7 @@ spec:
       sourceLabels:
       - __name__
     - action: drop
-      regex: apiserver_(request_count|request_latencies|request_latencies_summary|dropped_requests|storage_data_key_generation_latencies_microseconds|storage_transformation_failures_total|storage_transformation_latencies_microseconds|proxy_tunnel_sync_latency_secs|longrunning_gauge|registered_watchers)
+      regex: apiserver_(request_count|request_latencies|request_latencies_summary|dropped_requests|storage_data_key_generation_latencies_microseconds|storage_transformation_failures_total|storage_transformation_latencies_microseconds|proxy_tunnel_sync_latency_secs|longrunning_gauge|registered_watchers|storage_db_total_size_in_bytes)
       sourceLabels:
       - __name__
     - action: drop
