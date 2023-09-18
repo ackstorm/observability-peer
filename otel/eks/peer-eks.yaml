@@ -10159,6 +10159,12 @@ metadata:
   name: opentelemetry-operator
   namespace: observability-peer
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opentelemetry-peer-targetallocator
+  namespace: observability-peer
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -10681,6 +10687,57 @@ rules:
   - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opentelemetry-peer-targetallocator-role
+rules:
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
@@ -10819,6 +10876,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: opentelemetry-peer-collector
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: opentelemetry-peer-targetallocator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opentelemetry-peer-targetallocator-role
+subjects:
+- kind: ServiceAccount
+  name: opentelemetry-peer-targetallocator
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -12182,10 +12252,14 @@ spec:
   image: otel/opentelemetry-collector-contrib:0.85.0
   mode: daemonset
   targetAllocator:
+    allocationStrategy: consistent-hashing
     enabled: true
+    filterStrategy: relabel-config
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
     prometheusCR:
       enabled: true
-    serviceAccount: opentelemetry-targetallocator-sa
+    replicas: 1
+    serviceAccount: opentelemetry-peer-targetallocator
 ---
 apiVersion: v1
 kind: Pod
