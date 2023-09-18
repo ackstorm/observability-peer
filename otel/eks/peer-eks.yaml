@@ -12146,13 +12146,13 @@ spec:
     parser-docker\n      - expr: body matches \"^[^ Z]+ \"\n        output: parser-crio\n
     \     - expr: body matches \"^[^ Z]+Z\"\n        output: parser-containerd\n      type:
     router\n    - id: parser-crio\n      regex: ^(?P<time>[^ Z]+) (?P<stream>stdout|stderr)
-    (?P<logtag>[^ ]*) ?(?P<log>.*)$\n      timestamp:\n        layout: 2006-01-02T15:04:05.999999999Z07:00\n
+    (?P<logtag>[^ ]*) ?(?P<log>.*)$$\n      timestamp:\n        layout: 2006-01-02T15:04:05.999999999Z07:00\n
     \       layout_type: gotime\n        parse_from: attributes.time\n      type:
     regex_parser\n    - combine_field: attributes.log\n      combine_with: \"\"\n
     \     id: crio-recombine\n      is_last_entry: attributes.logtag == 'F'\n      max_log_size:
     102400\n      output: extract_metadata_from_filepath\n      source_identifier:
     attributes[\"log.file.path\"]\n      type: recombine\n    - id: parser-containerd\n
-    \     regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$\n
+    \     regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$$\n
     \     timestamp:\n        layout: '%Y-%m-%dT%H:%M:%S.%LZ'\n        parse_from:
     attributes.time\n      type: regex_parser\n    - combine_field: attributes.log\n
     \     combine_with: \"\"\n      id: containerd-recombine\n      is_last_entry:
@@ -12161,7 +12161,7 @@ spec:
     \   - id: parser-docker\n      output: extract_metadata_from_filepath\n      timestamp:\n
     \       layout: '%Y-%m-%dT%H:%M:%S.%LZ'\n        parse_from: attributes.time\n
     \     type: json_parser\n    - id: extract_metadata_from_filepath\n      parse_from:
-    attributes[\"log.file.path\"]\n      regex: ^.*\\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\\-]+)\\/(?P<container_name>[^\\._]+)\\/(?P<restart_count>\\d+)\\.log$\n
+    attributes[\"log.file.path\"]\n      regex: ^.*\\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\\-]+)\\/(?P<container_name>[^\\._]+)\\/(?P<restart_count>\\d+)\\.log$$\n
     \     type: regex_parser\n    - from: attributes.stream\n      to: attributes[\"log.iostream\"]\n
     \     type: move\n    - from: attributes.container_name\n      to: resource[\"k8s.container.name\"]\n
     \     type: move\n    - from: attributes.namespace\n      to: resource[\"k8s.namespace.name\"]\n
