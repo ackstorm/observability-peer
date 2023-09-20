@@ -7830,7 +7830,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mimir-sync-peer
+  name: ackstorm-mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -7886,6 +7886,26 @@ rules:
   verbs:
   - create
   - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ackstorm-mimir-sync-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - prometheusrules
+  verbs:
+  - list
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -8173,26 +8193,6 @@ rules:
   - /metrics
   - /metrics/cadvisor
   verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: mimir-sync-peer
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - get
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - prometheusrules
-  verbs:
-  - list
   - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -8470,6 +8470,19 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  name: ackstorm-mimir-sync-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ackstorm-mimir-sync-peer
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-mimir-sync-peer
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
   name: ackstorm-opentelemetry-collector-cluster-stats
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -8504,19 +8517,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: ackstorm-opentelemetry-collector-traces-collector
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: mimir-sync-peer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: mimir-sync-peer
-subjects:
-- kind: ServiceAccount
-  name: mimir-sync-peer
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -8610,14 +8610,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: mimir-sync-peer
-  name: mimir-sync-peer
+    app.kubernetes.io/name: ackstorm-mimir-sync-peer
+  name: ackstorm-mimir-sync-peer
   namespace: observability-peer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mimir-sync-peer
+      app: ackstorm-mimir-sync-peer
   strategy:
     type: Recreate
   template:
@@ -8625,7 +8625,7 @@ spec:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
       labels:
-        app: mimir-sync-peer
+        app: ackstorm-mimir-sync-peer
     spec:
       containers:
       - env:
@@ -8661,7 +8661,7 @@ spec:
         fsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
-      serviceAccountName: mimir-sync-peer
+      serviceAccountName: ackstorm-mimir-sync-peer
 ---
 apiVersion: apps/v1
 kind: Deployment
