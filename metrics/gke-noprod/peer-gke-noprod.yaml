@@ -41983,7 +41983,7 @@ spec:
       containers:
       - env:
         - name: FOR_GOD_SHAKE_THIS
-          value: "1"
+          value: "2"
         - name: ROLE
           value: peer
         - name: MIMIR_URL
