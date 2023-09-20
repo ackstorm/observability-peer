@@ -212,6 +212,26 @@ spec:
       serviceAccountName: opencost-peer
 ---
 apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: opencost-peer
+  name: opencost-peer
+  namespace: observability-peer
+spec:
+  groups:
+  - name: opencost-peer
+    rules:
+    - alert: OpenCostNotRunning
+      annotations:
+        description: EventExporter is not running
+        summary: EventExporter is not running
+      expr: absent(up{job="opencost-peer"}) > 0
+      for: 5m
+      labels:
+        severity: major
+---
+apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
