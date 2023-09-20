@@ -4112,6 +4112,26 @@ spec:
   reportType: summary
 ---
 apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: trivy-operator-peer
+  name: trivy-operator-peer
+  namespace: observability-peer
+spec:
+  groups:
+  - name: trivy-operator-peer
+    rules:
+    - alert: TrivyOperatorNotRunning
+      annotations:
+        description: TrivyOperator is not running
+        summary: TrivyOperator is not running
+      expr: absent(up{job="trivy-operator-peer"}) > 0
+      for: 5m
+      labels:
+        severity: major
+---
+apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:

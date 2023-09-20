@@ -247,7 +247,6 @@ metadata:
     app.kubernetes.io/name: promtail
     app.kubernetes.io/version: 2.8.2
     helm.sh/chart: promtail-6.11.2
-    role: observer
   name: promtail-peer
   namespace: observability-peer
 spec:
