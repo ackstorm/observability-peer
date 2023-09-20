@@ -42315,7 +42315,7 @@ spec:
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
-      role: peer
+      role: no-match
   scrapeInterval: 60s
   securityContext:
     fsGroup: 2000
