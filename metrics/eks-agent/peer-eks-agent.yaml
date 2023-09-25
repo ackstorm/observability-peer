@@ -42693,13 +42693,15 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.46.0
     prometheus: k8s
-    role: peer
   name: prometheus-peer
   namespace: observability-peer
 spec:
   additionalScrapeConfigs:
     key: additional-scrape-configs.yaml
     name: additional-scrape-configs
+  enableFeatures:
+  - auto-gomaxprocs
+  - new-service-discovery-manager
   enableRemoteWriteReceiver: true
   externalLabels:
     cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
