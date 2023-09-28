@@ -2782,7 +2782,7 @@ spec:
         - name: OPERATOR_SCAN_JOB_TIMEOUT
           value: 5m
         - name: OPERATOR_CONCURRENT_SCAN_JOBS_LIMIT
-          value: "5"
+          value: "3"
         - name: OPERATOR_CONCURRENT_NODE_COLLECTOR_LIMIT
           value: "1"
         - name: OPERATOR_SCAN_JOB_RETRY_AFTER

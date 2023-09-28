@@ -41745,7 +41745,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ackstorm-mimir-sync-peer
+      app.kubernetes.io/name: ackstorm-mimir-sync-peer
   strategy:
     type: Recreate
   template:
@@ -41753,7 +41753,7 @@ spec:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
       labels:
-        app: ackstorm-mimir-sync-peer
+        app.kubernetes.io/name: ackstorm-mimir-sync-peer
     spec:
       containers:
       - env:
@@ -41763,13 +41763,13 @@ spec:
           value: peer
         - name: MIMIR_URL
           value: ${PEER_OBSERVER_URL}
-        - name: TENANT_ID
+        - name: PEER_ID
           value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
-        - name: TENANT_PASSWORD
+        - name: PEER_PASSWORD
           valueFrom:
             secretKeyRef:
               key: password
-              name: observability-tenant-auth
+              name: observability-peer-auth
         image: public.ecr.aws/ackstorm/mimir-sync:v1.0.0
         imagePullPolicy: Always
         name: mimir-sync
@@ -42315,10 +42315,10 @@ spec:
   - basicAuth:
       password:
         key: password
-        name: observability-tenant-auth
+        name: observability-peer-auth
       username:
         key: username
-        name: observability-tenant-auth
+        name: observability-peer-auth
     headers:
       X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
     queueConfig:

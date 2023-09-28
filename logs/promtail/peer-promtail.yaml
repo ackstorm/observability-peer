@@ -56,12 +56,14 @@ subjects:
 apiVersion: v1
 data:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - basic_auth:\n      password: ${TENANT_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
+    \ - basic_auth:\n      password: ${PEER_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
     {}\n      - docker: {}\n      - match:\n          action: drop\n          drop_counter_reason:
-    debug_line\n          selector: '{app=~\".+\"} |~ \"DEBUG\"'\n      - limit:\n
+    debug_line\n          selector: '{app=~\".+\"} |~ \"DEBUG\"'\n      - match:\n
+    \         action: drop\n          drop_counter_reason: scan-vulnerabilityreport\n
+    \         selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n      - limit:\n
     \         burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
     app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
     \     - metrics:\n          line_count_total:\n            config:\n              action:
@@ -166,11 +168,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: TENANT_PASSWORD
+        - name: PEER_PASSWORD
           valueFrom:
             secretKeyRef:
               key: password
-              name: observability-tenant-auth
+              name: observability-peer-auth
         image: docker.io/grafana/promtail:2.8.2
         imagePullPolicy: IfNotPresent
         name: promtail
@@ -273,7 +275,7 @@ spec:
         by (namespace, job, route, instance) > 10
       for: 5m
       labels:
-        severity: critical
+        severity: major
     - alert: PromtailRequestLatency
       annotations:
         description: |-
@@ -285,16 +287,15 @@ spec:
         by (le)) > 1
       for: 5m
       labels:
-        severity: critical
+        severity: major
     - alert: PromtailRateLimitExceeded
       annotations:
-        description: Promtail application log rate near limit or exceeded (will drop
-          logs)
-        summary: Promtail application log rate near limit or exceeded (will drop logs)
+        description: Promtail application log rate near limit
+        summary: Promtail application log rate near limit
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.8
       for: 5m
       labels:
-        severity: major
+        severity: warning
     - alert: PromtailRateLimitExceeded
       annotations:
         description: Promtail application log rate near limit or exceeded (will drop
@@ -303,7 +304,7 @@ spec:
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.9
       for: 5m
       labels:
-        severity: critical
+        severity: major
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

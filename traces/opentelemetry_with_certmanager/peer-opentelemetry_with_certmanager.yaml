@@ -18388,7 +18388,7 @@ spec:
     span.name\n      - include: latency\n        action: update\n        new_name:
     traces_spanmetrics_latency\n\nextensions:\n  health_check: {}\n  memory_ballast:\n
     \   size_in_percentage: 40\n  basicauth/observer:\n    client_auth:\n      username:
-    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n      password: $TENANT_PASSWORD # Avoid
+    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n      password: $PEER_PASSWORD # Avoid
     flux substitution\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
     zipkin]\n      processors: [memory_limiter, k8sattributes, groupbytrace, spanmetrics,
@@ -18410,11 +18410,11 @@ spec:
     valueFrom:
       fieldRef:
         fieldPath: status.podIP
-  - name: TENANT_PASSWORD
+  - name: PEER_PASSWORD
     valueFrom:
       secretKeyRef:
         key: password
-        name: observability-tenant-auth
+        name: observability-peer-auth
   image: otel/opentelemetry-collector-contrib:0.83.0
   mode: daemonset
 ---
