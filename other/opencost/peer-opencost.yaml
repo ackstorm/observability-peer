@@ -182,7 +182,7 @@ spec:
           value: "true"
         - name: PROM_CLUSTER_ID_LABEL
           value: cluster
-        image: quay.io/kubecost1/kubecost-cost-model:prod-1.105.0
+        image: quay.io/kubecost1/kubecost-cost-model:prod-1.104.4
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 12
@@ -224,8 +224,8 @@ spec:
     rules:
     - alert: OpenCostNotRunning
       annotations:
-        description: EventExporter is not running
-        summary: EventExporter is not running
+        description: OpenCost is not running
+        summary: OpenCost is not running
       expr: absent(up{job="opencost-peer"}) > 0
       for: 5m
       labels:
