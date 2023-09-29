@@ -176,6 +176,8 @@ spec:
           value: ${PEER_CLOUD_PROVIDER_API_KEY}
         - name: CLUSTER_ID
           value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        - name: CLOUD_PROVIDER_API_KEY
+          value: AIzaSyD29bGxmHAVEOBYtgd8sYM2gM2ekfxQX4U
         - name: EMIT_KSM_V1_METRICS
           value: "false"
         - name: EMIT_KSM_V1_METRICS_ONLY
