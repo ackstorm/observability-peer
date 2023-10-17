@@ -56,7 +56,7 @@ subjects:
 apiVersion: v1
 data:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - basic_auth:\n      password: ${PEER_PASSWORD}\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
+    \ - basic_auth:\n      password: $PEER_PASSWORD\n      username: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n
     \   tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
