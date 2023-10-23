@@ -8627,7 +8627,7 @@ spec:
       labels:
         app.kubernetes.io/name: ackstorm-mimir-sync-peer
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       containers:
       - env:
         - name: FOR_GOD_SHAKE_THIS
