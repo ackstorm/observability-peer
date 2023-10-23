@@ -41771,6 +41771,7 @@ spec:
       labels:
         app.kubernetes.io/name: ackstorm-mimir-sync-peer
     spec:
+      automountServiceAccountToken: false
       containers:
       - env:
         - name: FOR_GOD_SHAKE_THIS
@@ -41786,7 +41787,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:latest
+        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.0
         imagePullPolicy: Always
         name: mimir-sync
         resources: {}
@@ -41799,6 +41800,8 @@ spec:
         fsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: ackstorm-mimir-sync-peer
 ---
 apiVersion: apps/v1
