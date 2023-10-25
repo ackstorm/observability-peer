@@ -18354,13 +18354,13 @@ spec:
     \     grpc:\n        endpoint: \"localhost:12345\"\n\nexporters:\n  logging:\n
     \   loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
-    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n    tls:\n      insecure: true\n  otlp/spanmetrics:\n
-    \   endpoint: ${env:MY_POD_IP}:4317\n    tls:\n      insecure: true\n  prometheusremotewrite:\n
+    \"${PEER_ID}\"\n    tls:\n      insecure: true\n  otlp/spanmetrics:\n    endpoint:
+    ${env:MY_POD_IP}:4317\n    tls:\n      insecure: true\n  prometheusremotewrite:\n
     \   endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n
     \   resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
     ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator: basicauth/observer\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n\nprocessors:\n
-    \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
+    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n  memory_limiter:\n
+    \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  groupbytrace:\n
     \   wait_duration: 30s\n    num_traces: 1000\n  spanmetrics:\n    metrics_exporter:
     'otlp/spanmetrics'\n    latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms,
@@ -18373,26 +18373,26 @@ spec:
     extracted from the resource and span attributes\n    store:\n      ttl: 2s\n      max_items:
     200\n  attributes/cluster:\n    actions:\n      - key: environment\n        value:
     \"${PEER_ENVIRONMENT}\"\n        action: insert\n      - key: cluster\n        value:
-    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n        action: insert\n  # attributes/spanname:\n
-    \ #   actions:\n  #     - key: span_name\n  #       from_attribute: span_name\n
-    \ #       action: upsert\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n
-    \   passthrough: false\n    filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n
-    \   extract:\n      metadata:\n        - k8s.pod.name\n        - k8s.pod.uid\n
-    \       - k8s.deployment.name\n        - k8s.namespace.name\n        - k8s.node.name\n
-    \       - k8s.pod.start_time\n    pod_association:\n      - sources:\n          -
-    from: resource_attribute\n            name: k8s.pod.ip\n      - sources:\n          -
-    from: resource_attribute\n            name: k8s.pod.uid\n      - sources:\n          -
-    from: connection\n  metricstransform:\n    transforms:\n      - include: calls_total\n
-    \       action: update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
+    \"${PEER_ID}\"\n        action: insert\n  # attributes/spanname:\n  #   actions:\n
+    \ #     - key: span_name\n  #       from_attribute: span_name\n  #       action:
+    upsert\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n    passthrough:
+    false\n    filter:\n      node_from_env_var: <KUBE_NODE_NAME>\n    extract:\n
+    \     metadata:\n        - k8s.pod.name\n        - k8s.pod.uid\n        - k8s.deployment.name\n
+    \       - k8s.namespace.name\n        - k8s.node.name\n        - k8s.pod.start_time\n
+    \   pod_association:\n      - sources:\n          - from: resource_attribute\n
+    \           name: k8s.pod.ip\n      - sources:\n          - from: resource_attribute\n
+    \           name: k8s.pod.uid\n      - sources:\n          - from: connection\n
+    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
+    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
     \         - action: update_label\n            label: operation\n            new_label:
     span.name\n      - include: latency\n        action: update\n        new_name:
     traces_spanmetrics_latency\n\nextensions:\n  health_check: {}\n  memory_ballast:\n
     \   size_in_percentage: 40\n  basicauth/observer:\n    client_auth:\n      username:
-    \"${PEER_ENVIRONMENT}-${PEER_CLUSTER}\"\n      password: $PEER_PASSWORD # Avoid
-    flux substitution\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
-    \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
-    zipkin]\n      processors: [memory_limiter, k8sattributes, groupbytrace, spanmetrics,
-    attributes/cluster, batch]\n      exporters: [logging, otlphttp/observer]\n    traces/servicegraph:\n
+    \"${PEER_ID}\"\n      password: $PEER_PASSWORD # Avoid flux substitution\n\nservice:\n
+    \ extensions:\n  - health_check\n  - memory_ballast\n  - basicauth/observer\n
+    \ pipelines:\n    traces:\n      receivers: [otlp, jaeger, zipkin]\n      processors:
+    [memory_limiter, k8sattributes, groupbytrace, spanmetrics, attributes/cluster,
+    batch]\n      exporters: [logging, otlphttp/observer]\n    traces/servicegraph:\n
     \     receivers: [otlp, jaeger, zipkin]\n      processors: [servicegraph]\n      exporters:
     [logging]\n    metrics:\n      receivers: [otlp]\n      processors: [memory_limiter,
     k8sattributes, metricstransform, batch]\n      exporters: [logging, prometheusremotewrite]\n

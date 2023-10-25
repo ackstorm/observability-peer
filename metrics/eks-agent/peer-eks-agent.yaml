@@ -41778,7 +41778,7 @@ spec:
         - name: MIMIR_URL
           value: ${PEER_OBSERVER_URL}
         - name: PEER_ID
-          value: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+          value: ${PEER_ID}
         - name: PEER_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -42707,7 +42707,7 @@ spec:
   - new-service-discovery-manager
   enableRemoteWriteReceiver: true
   externalLabels:
-    cluster: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+    cluster: ${PEER_ID}
     env: ${PEER_ENVIRONMENT}
   image: quay.io/prometheus/prometheus:v2.46.0
   nodeSelector:
@@ -42732,7 +42732,7 @@ spec:
         key: username
         name: observability-peer-auth
     headers:
-      X-Scope-OrgID: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+      X-Scope-OrgID: ${PEER_ID}
     queueConfig:
       maxSamplesPerSend: 5000
     sendExemplars: true

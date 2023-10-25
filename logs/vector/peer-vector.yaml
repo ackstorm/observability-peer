@@ -132,7 +132,7 @@ data:
         auth:
           password: ${PEER_PASSWORD}
           strategy: basic
-          user: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+          user: ${PEER_ID}
         batch:
           max_bytes: 2049000
         encoding:
@@ -145,13 +145,13 @@ data:
         out_of_order_action: accept
         remove_label_fields: true
         remove_timestamp: true
-        tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        tenant_id: ${PEER_ID}
         type: loki
       loki_kubernetes:
         auth:
           password: ${PEER_PASSWORD}
           strategy: basic
-          user: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+          user: ${PEER_ID}
         batch:
           max_bytes: 2049000
         encoding:
@@ -166,7 +166,7 @@ data:
         out_of_order_action: accept
         remove_label_fields: true
         remove_timestamp: true
-        tenant_id: ${PEER_ENVIRONMENT}-${PEER_CLUSTER}
+        tenant_id: ${PEER_ID}
         type: loki
       prom_exporter:
         address: 0.0.0.0:9090
@@ -334,7 +334,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 79fb7a87a2e42cbaadbe4a1f7a36e28e30499e2298f312f466620a9a50e24d04
+        checksum/config: 771a201eea944416abee7bda6ec445caae93234f824dafd4809bedf29c248bd2
       labels:
         app.kubernetes.io/component: Aggregator
         app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
