@@ -56,7 +56,7 @@ subjects:
 apiVersion: v1
 data:
   promtail.yaml: "server:\n  log_level: info\n  http_listen_port: 3101\n  \n\nclients:\n
-    \ - basic_auth:\n      password: $PEER_PASSWORD\n      username: ${PEER_ID}\n
+    \ - basic_auth:\n      password: ${PEER_PASSWORD}\n      username: ${PEER_ID}\n
     \   tenant_id: ${PEER_ID}\n    url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n
     \ filename: /run/promtail/positions.yaml\n\nscrape_configs:\n  # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
@@ -302,6 +302,14 @@ spec:
           logs)
         summary: Promtail application log rate near limit or exceeded (will drop logs)
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.9
+      for: 5m
+      labels:
+        severity: major
+    - alert: PromtailIsNotSendingLogs
+      annotations:
+        description: No metrics with status_code == 204
+        summary: Promtail is not sending logs
+      expr: absent(promtail_request_duration_seconds_count{status_code="204"}) > 0
       for: 5m
       labels:
         severity: major
