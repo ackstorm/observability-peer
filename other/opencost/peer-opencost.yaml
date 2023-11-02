@@ -180,6 +180,8 @@ spec:
           value: "false"
         - name: EMIT_KSM_V1_METRICS_ONLY
           value: "true"
+        - name: LOG_LEVEL
+          value: info
         - name: PROM_CLUSTER_ID_LABEL
           value: cluster
         image: quay.io/kubecost1/kubecost-cost-model:prod-1.104.4

@@ -260,7 +260,7 @@ spec:
         description: Promtail is not running
         summary: Promtail is not running
       expr: absent(up{job="promtail-peer-metrics"}) > 0
-      for: 5m
+      for: 10m
       labels:
         severity: critical
     - alert: PromtailRequestErrors
@@ -273,7 +273,7 @@ spec:
       expr: 100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|failed"}[1m]))
         by (namespace, job, route, instance) / sum(rate(promtail_request_duration_seconds_count[1m]))
         by (namespace, job, route, instance) > 10
-      for: 5m
+      for: 10m
       labels:
         severity: major
     - alert: PromtailRequestLatency
@@ -284,8 +284,8 @@ spec:
             LABELS = {{ $labels }}
         summary: Promtail request latency (instance {{ $labels.instance }})
       expr: histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m]))
-        by (le)) > 1
-      for: 5m
+        by (le)) > 3
+      for: 10m
       labels:
         severity: major
     - alert: PromtailRateLimitExceeded
@@ -293,7 +293,7 @@ spec:
         description: Promtail application log rate near limit
         summary: Promtail application log rate near limit
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.8
-      for: 5m
+      for: 10m
       labels:
         severity: warning
     - alert: PromtailRateLimitExceeded
@@ -302,7 +302,7 @@ spec:
           logs)
         summary: Promtail application log rate near limit or exceeded (will drop logs)
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.9
-      for: 5m
+      for: 10m
       labels:
         severity: major
     - alert: PromtailIsNotSendingLogs
@@ -310,7 +310,7 @@ spec:
         description: No metrics with status_code == 204
         summary: Promtail is not sending logs
       expr: absent(promtail_request_duration_seconds_count{status_code="204"}) > 0
-      for: 5m
+      for: 10m
       labels:
         severity: major
 ---
