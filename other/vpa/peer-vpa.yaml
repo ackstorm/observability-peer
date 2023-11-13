@@ -1256,3 +1256,20 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: vpa-recommender
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: vpa-recommender
+  namespace: observability-peer
+spec:
+  namespaceSelector:
+    matchNames:
+    - observability-peer
+  podMetricsEndpoints:
+  - interval: 30s
+    path: /metrics
+    port: metrics
+  selector:
+    matchLabels:
+      app: vpa-recommender
