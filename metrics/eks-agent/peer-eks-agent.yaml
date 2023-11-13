@@ -42062,7 +42062,7 @@ spec:
     spec:
       containers:
       - args:
-        - --metric-labels-allowlist: nodes=[*]
+        - --metric-labels-allowlist=nodes=[*]
         - --port=8080
         - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
         - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
