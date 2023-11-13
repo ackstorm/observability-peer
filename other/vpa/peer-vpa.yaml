@@ -1260,16 +1260,39 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: vpa-recommender
+  name: vpa-recommender-peer
   namespace: observability-peer
 spec:
   namespaceSelector:
     matchNames:
     - observability-peer
   podMetricsEndpoints:
-  - interval: 60s
-    path: /metrics
-    port: prometheus
+  - port: prometheus
+    relabelings:
+    - action: keep
+      regex: Running
+      sourceLabels:
+      - __meta_kubernetes_pod_phase
   selector:
     matchLabels:
       app: vpa-recommender
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: vpa-recommender-peer
+  name: vpa-recommender-peer
+  namespace: observability-peer
+spec:
+  groups:
+  - name: vpa-recommender-peer
+    rules:
+    - alert: VPARecommenderNotRunning
+      annotations:
+        description: VPARecommender is not running
+        summary: VPARecommender is not running
+      expr: absent(up{job="vpa-recommender-peer"}) > 0
+      for: 5m
+      labels:
+        severity: major
