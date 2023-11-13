@@ -7834,6 +7834,21 @@ metadata:
   namespace: observability-peer
 ---
 apiVersion: v1
+imagePullSecrets: null
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
@@ -8199,6 +8214,234 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - daemonsets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - limitranges
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - resourcequotas
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
     app.kubernetes.io/managed-by: Helm
@@ -8523,6 +8766,27 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-state-metrics-peer
+subjects:
+- kind: ServiceAccount
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
     app.kubernetes.io/managed-by: Helm
@@ -8558,6 +8822,113 @@ subjects:
 - kind: ServiceAccount
   name: opentelemetry-operator
   namespace: observability-peer
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    kind: CustomResourceStateMetrics
+    spec:
+      resources:
+      - groupVersionKind:
+          group: autoscaling.k8s.io
+          kind: VerticalPodAutoscaler
+          version: v1
+        labelsFromPath:
+          namespace:
+          - metadata
+          - namespace
+          target_api_version:
+          - apiVersion
+          target_kind:
+          - spec
+          - targetRef
+          - kind
+          target_name:
+          - spec
+          - targetRef
+          - name
+          verticalpodautoscaler:
+          - metadata
+          - name
+        metrics:
+        - commonLabels:
+            resource: memory
+            unit: byte
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - target
+              - memory
+            type: Gauge
+          help: VPA container recommendations for memory.
+          name: vpa_containerrecommendations_target
+        - commonLabels:
+            resource: cpu
+            unit: core
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - target
+              - cpu
+            type: Gauge
+          help: VPA container recommendations for cpu.
+          name: vpa_containerrecommendations_target
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer-customresourcestate-config
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: metrics
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/name: kube-state-metrics
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -8665,6 +9036,88 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: ackstorm-mimir-sync-peer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-kube-state-metrics
+      app.kubernetes.io/name: kube-state-metrics
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/instance: ackstorm-kube-state-metrics
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kube-state-metrics
+        app.kubernetes.io/part-of: kube-state-metrics
+        app.kubernetes.io/version: 2.10.1
+        helm.sh/chart: kube-state-metrics-5.15.2
+    spec:
+      containers:
+      - args:
+        - --metric-labels-allowlist: nodes=[*]
+        - --port=8080
+        - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
+        - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
+        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: kube-state-metrics
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: metrics
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - mountPath: /etc/customresourcestate
+          name: customresourcestate-config
+          readOnly: true
+      hostNetwork: false
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: kube-state-metrics-peer
+      volumes:
+      - configMap:
+          name: kube-state-metrics-peer-customresourcestate-config
+        name: customresourcestate-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8807,6 +9260,61 @@ metadata:
   namespace: observability-peer
 spec:
   selfSigned: {}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+spec:
+  endpoints:
+  - metricRelabelings:
+    - regex: (.+)
+      sourceLabels:
+      - label_cloud_google_com_gke_nodepool
+      targetLabel: label_nodegroup
+    - regex: (.+)
+      sourceLabels:
+      - label_eks_amazonaws_com_nodegroup
+      targetLabel: label_nodegroup
+    port: http
+    relabelings:
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - job
+      targetLabel: job
+  - metricRelabelings:
+    - regex: (.+)
+      sourceLabels:
+      - label_cloud_google_com_gke_nodepool
+      targetLabel: label_nodegroup
+    - regex: (.+)
+      sourceLabels:
+      - label_eks_amazonaws_com_nodegroup
+      targetLabel: label_nodegroup
+    port: metrics
+    relabelings:
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - job
+      targetLabel: job
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-kube-state-metrics
+      app.kubernetes.io/name: kube-state-metrics
 ---
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector

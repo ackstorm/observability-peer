@@ -40854,14 +40854,17 @@ metadata:
   namespace: observability-peer
 ---
 apiVersion: v1
-automountServiceAccountToken: false
+imagePullSecrets: null
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
   namespace: observability-peer
 ---
@@ -40963,10 +40966,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
 rules:
 - apiGroups:
@@ -41308,10 +41314,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -41427,6 +41436,83 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.24.0
   name: blackbox-exporter-configuration
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    kind: CustomResourceStateMetrics
+    spec:
+      resources:
+      - groupVersionKind:
+          group: autoscaling.k8s.io
+          kind: VerticalPodAutoscaler
+          version: v1
+        labelsFromPath:
+          namespace:
+          - metadata
+          - namespace
+          target_api_version:
+          - apiVersion
+          target_kind:
+          - spec
+          - targetRef
+          - kind
+          target_name:
+          - spec
+          - targetRef
+          - name
+          verticalpodautoscaler:
+          - metadata
+          - name
+        metrics:
+        - commonLabels:
+            resource: memory
+            unit: byte
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - target
+              - memory
+            type: Gauge
+          help: VPA container recommendations for memory.
+          name: vpa_containerrecommendations_target
+        - commonLabels:
+            resource: cpu
+            unit: core
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - target
+              - cpu
+            type: Gauge
+          help: VPA container recommendations for cpu.
+          name: vpa_containerrecommendations_target
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
+  name: kube-state-metrics-peer-customresourcestate-config
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -41661,26 +41747,32 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/scrape: "true"
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
   namespace: observability-peer
 spec:
-  clusterIP: None
   ports:
-  - name: https-main
-    port: 8443
-    targetPort: https-main
-  - name: https-self
-    port: 9443
-    targetPort: https-self
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: metrics
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
   selector:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/name: kube-state-metrics
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -41930,104 +42022,84 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
   namespace: observability-peer
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: kube-state-metrics-peer
-      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/instance: ackstorm-kube-state-metrics
+      app.kubernetes.io/name: kube-state-metrics
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: kube-state-metrics
       labels:
-        app.kubernetes.io/component: exporter
-        app.kubernetes.io/name: kube-state-metrics-peer
-        app.kubernetes.io/part-of: kube-prometheus
-        app.kubernetes.io/version: 2.9.2
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/instance: ackstorm-kube-state-metrics
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kube-state-metrics
+        app.kubernetes.io/part-of: kube-state-metrics
+        app.kubernetes.io/version: 2.10.1
+        helm.sh/chart: kube-state-metrics-5.15.2
     spec:
-      automountServiceAccountToken: true
       containers:
       - args:
-        - --host=127.0.0.1
-        - --port=8081
-        - --telemetry-host=127.0.0.1
-        - --telemetry-port=8082
-        - --metric-labels-allowlist=nodes=[*]
-        - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments,verticalpodautoscalers,volumeattachments
-        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
+        - --metric-labels-allowlist: nodes=[*]
+        - --port=8080
+        - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
+        - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
+        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
         name: kube-state-metrics
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: metrics
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
         resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
             - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 65534
-          seccompProfile:
-            type: RuntimeDefault
-      - args:
-        - --secure-listen-address=:8443
-        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
-        - --upstream=http://127.0.0.1:8081/
-        image: quay.io/brancz/kube-rbac-proxy:v0.14.2
-        name: kube-rbac-proxy-main
-        ports:
-        - containerPort: 8443
-          name: https-main
-        resources:
-          limits:
-            cpu: 40m
-            memory: 40Mi
-          requests:
-            cpu: 20m
-            memory: 20Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsGroup: 65532
-          runAsNonRoot: true
-          runAsUser: 65532
-      - args:
-        - --secure-listen-address=:9443
-        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
-        - --upstream=http://127.0.0.1:8082/
-        image: quay.io/brancz/kube-rbac-proxy:v0.14.2
-        name: kube-rbac-proxy-self
-        ports:
-        - containerPort: 9443
-          name: https-self
-        resources:
-          limits:
-            cpu: 20m
-            memory: 40Mi
-          requests:
-            cpu: 10m
-            memory: 20Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsGroup: 65532
-          runAsNonRoot: true
-          runAsUser: 65532
-      nodeSelector:
-        kubernetes.io/os: linux
+        volumeMounts:
+        - mountPath: /etc/customresourcestate
+          name: customresourcestate-config
+          readOnly: true
+      hostNetwork: false
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: kube-state-metrics-peer
+      volumes:
+      - configMap:
+          name: kube-state-metrics-peer-customresourcestate-config
+        name: customresourcestate-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42539,22 +42611,18 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.2
   name: kube-state-metrics-peer
   namespace: observability-peer
 spec:
   endpoints:
-  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    honorLabels: true
-    interval: 30s
-    metricRelabelings:
-    - action: drop
-      regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
-      sourceLabels:
-      - __name__
+  - metricRelabelings:
     - regex: (.+)
       sourceLabels:
       - label_cloud_google_com_gke_nodepool
@@ -42563,35 +42631,36 @@ spec:
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
       targetLabel: label_nodegroup
-    port: https-main
+    port: http
     relabelings:
-    - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
       sourceLabels:
       - job
       targetLabel: job
-    scheme: https
-    scrapeTimeout: 30s
-    tlsConfig:
-      insecureSkipVerify: true
-  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    interval: 30s
-    port: https-self
+  - metricRelabelings:
+    - regex: (.+)
+      sourceLabels:
+      - label_cloud_google_com_gke_nodepool
+      targetLabel: label_nodegroup
+    - regex: (.+)
+      sourceLabels:
+      - label_eks_amazonaws_com_nodegroup
+      targetLabel: label_nodegroup
+    port: metrics
     relabelings:
-    - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
-    scheme: https
-    tlsConfig:
-      insecureSkipVerify: true
+    - action: replace
+      regex: (.+)
+      replacement: kube-state-metrics
+      sourceLabels:
+      - job
+      targetLabel: job
   jobLabel: app.kubernetes.io/name
   selector:
     matchLabels:
-      app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: kube-state-metrics-peer
-      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/instance: ackstorm-kube-state-metrics
+      app.kubernetes.io/name: kube-state-metrics
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -42818,38 +42887,6 @@ spec:
     matchLabels:
       app.kubernetes.io/component: exporter
       app.kubernetes.io/name: blackbox-exporter-peer
-      app.kubernetes.io/part-of: kube-prometheus
-  policyTypes:
-  - Egress
-  - Ingress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics-peer
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.9.2
-  name: kube-state-metrics-peer
-  namespace: observability-peer
-spec:
-  egress:
-  - {}
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-    ports:
-    - port: 8443
-      protocol: TCP
-    - port: 9443
-      protocol: TCP
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: kube-state-metrics-peer
       app.kubernetes.io/part-of: kube-prometheus
   policyTypes:
   - Egress
