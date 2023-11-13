@@ -1064,6 +1064,47 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-6.7.0
+  name: goldilocks-peer-controller-map[apiGroups:[batch] resources:[jobs cronjobs]
+    verbs:[list watch]]
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: map[apiGroups:[batch] resources:[jobs cronjobs] verbs:[list watch]]
+subjects:
+- kind: ServiceAccount
+  name: goldilocks-peer-controller
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-6.7.0
+  name: goldilocks-peer-controller-map[apiGroups:[monitoring.coreos.com] resources:[prometheuses]
+    verbs:[list watch]]
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: map[apiGroups:[monitoring.coreos.com] resources:[prometheuses] verbs:[list
+    watch]]
+subjects:
+- kind: ServiceAccount
+  name: goldilocks-peer-controller
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
   name: system:metrics-reader
 roleRef:
   apiGroup: rbac.authorization.k8s.io
