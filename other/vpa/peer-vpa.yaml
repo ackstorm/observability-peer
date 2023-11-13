@@ -1267,9 +1267,9 @@ spec:
     matchNames:
     - observability-peer
   podMetricsEndpoints:
-  - interval: 30s
+  - interval: 60s
     path: /metrics
-    port: metrics
+    port: prometheus
   selector:
     matchLabels:
       app: vpa-recommender
