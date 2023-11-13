@@ -1333,7 +1333,7 @@ spec:
       annotations:
         description: VPARecommender is not running
         summary: VPARecommender is not running
-      expr: absent(up{job="vpa-recommender-peer"}) > 0
+      expr: absent(up{job=~".*vpa-recommender-peer"}) > 0
       for: 5m
       labels:
         severity: major
