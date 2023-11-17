@@ -4127,7 +4127,7 @@ spec:
         description: TrivyOperator is not running
         summary: TrivyOperator is not running
       expr: absent(up{job="trivy-operator-peer"}) > 0
-      for: 5m
+      for: 15m
       labels:
         severity: major
 ---

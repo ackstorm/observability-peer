@@ -42556,6 +42556,26 @@ spec:
         severity: critical
 ---
 apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-state-metrics-peer
+  name: kube-state-metrics-peer
+  namespace: observability-peer
+spec:
+  groups:
+  - name: kube-state-metrics-peer
+    rules:
+    - alert: KubeStateMetricsNotRunning
+      annotations:
+        description: KubeStateMetrics is not running
+        summary: KubeStateMetrics is not running
+      expr: absent(up{job=~"kube-state-metrics"}) > 0
+      for: 15m
+      labels:
+        severity: major
+---
+apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:

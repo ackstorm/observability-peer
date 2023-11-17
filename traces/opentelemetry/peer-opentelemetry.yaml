@@ -8371,7 +8371,7 @@ spec:
         description: OpenTelemetryCollector is not running
         summary: OpenTelemetryCollector is not running
       expr: absent(up{app="opentelemetry-peer-collector"}) > 0
-      for: 5m
+      for: 15m
       labels:
         severity: major
 ---

@@ -259,7 +259,7 @@ spec:
         description: OpenCost is not running
         summary: OpenCost is not running
       expr: absent(up{job="opencost-peer"}) > 0
-      for: 5m
+      for: 15m
       labels:
         severity: major
 ---

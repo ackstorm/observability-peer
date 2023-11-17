@@ -260,7 +260,7 @@ spec:
         description: Promtail is not running
         summary: Promtail is not running
       expr: absent(up{job="promtail-peer-metrics"}) > 0
-      for: 10m
+      for: 15m
       labels:
         severity: critical
     - alert: PromtailRequestErrors
