@@ -262,7 +262,7 @@ spec:
       expr: absent(up{job="promtail-peer-metrics"}) > 0
       for: 15m
       labels:
-        severity: critical
+        severity: major
     - alert: PromtailRequestErrors
       annotations:
         description: |-

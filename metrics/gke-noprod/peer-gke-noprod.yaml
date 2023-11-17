@@ -42680,7 +42680,8 @@ metadata:
   namespace: observability-peer
 spec:
   endpoints:
-  - metricRelabelings:
+  - honorLabels: true
+    metricRelabelings:
     - regex: (.+)
       sourceLabels:
       - label_cloud_google_com_gke_nodepool
@@ -42689,15 +42690,22 @@ spec:
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
       targetLabel: label_nodegroup
+    - action: drop
+      regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
+      sourceLabels:
+      - __name__
     port: http
     relabelings:
+    - action: labeldrop
+      regex: (pod|service|endpoint|namespace)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
       sourceLabels:
       - job
       targetLabel: job
-  - metricRelabelings:
+  - honorLabels: true
+    metricRelabelings:
     - regex: (.+)
       sourceLabels:
       - label_cloud_google_com_gke_nodepool
@@ -42706,8 +42714,14 @@ spec:
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
       targetLabel: label_nodegroup
+    - action: drop
+      regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
+      sourceLabels:
+      - __name__
     port: metrics
     relabelings:
+    - action: labeldrop
+      regex: (pod|service|endpoint|namespace)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
