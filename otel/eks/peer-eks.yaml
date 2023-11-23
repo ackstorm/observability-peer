@@ -9021,7 +9021,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.2
+        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.3
         imagePullPolicy: Always
         name: mimir-sync
         resources:
