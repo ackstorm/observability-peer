@@ -44012,27 +44012,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app.kubernetes.io/name: coredns
-    app.kubernetes.io/part-of: kube-prometheus
-  name: coredns
-  namespace: observability-peer
-spec:
-  endpoints:
-  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    interval: 30s
-    targetPort: 9153
-  jobLabel: app.kubernetes.io/name
-  namespaceSelector:
-    matchNames:
-    - kube-system
-  selector:
-    matchLabels:
-      k8s-app: kube-dns
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
     app.kubernetes.io/name: apiserver
     app.kubernetes.io/part-of: kube-prometheus
   name: kube-apiserver
