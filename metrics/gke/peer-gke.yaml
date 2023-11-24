@@ -43684,7 +43684,7 @@ spec:
         - --no-collector.ipvs
         - --no-collector.sockstat
         - --no-collector.softnet
-        - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+        - --collector.filesystem.fs-types-exclude=^(tmpfs|autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
         image: quay.io/prometheus/node-exporter:v1.7.0
         name: node-exporter-peer
         resources:
@@ -43838,7 +43838,7 @@ spec:
     url: ${PEER_OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
     - action: labeldrop
-      regex: pod_template_hash|controller_revision_hash|k8s_replicaset_name|k8s_pod_uid|instance
+      regex: pod_template_hash|controller_revision_hash|k8s_replicaset_name|k8s_pod_uid
     - action: labeldrop
       regex: applications_argoproj_io_.*|kustomize.*
     - action: labeldrop
