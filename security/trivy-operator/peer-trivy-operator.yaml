@@ -778,6 +778,333 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
+  name: clustersbomreports.aquasecurity.github.io
+spec:
+  group: aquasecurity.github.io
+  names:
+    kind: ClusterSbomReport
+    listKind: ClusterSbomReportList
+    plural: clustersbomreports
+    shortNames:
+    - clustersbom
+    singular: clustersbomreport
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: The name of image repository
+      jsonPath: .report.artifact.repository
+      name: Repository
+      type: string
+    - description: The name of image tag
+      jsonPath: .report.artifact.tag
+      name: Tag
+      type: string
+    - description: The name of the sbom generation scanner
+      jsonPath: .report.scanner.name
+      name: Scanner
+      type: string
+    - description: The age of the report
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - description: The number of dependencies in bom
+      jsonPath: .report.summary.componentsCount
+      name: Components
+      priority: 1
+      type: integer
+    - description: The the number of components in bom
+      jsonPath: .report.summary.dependenciesCount
+      name: Dependencies
+      priority: 1
+      type: integer
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ClusterSbomReport summarizes components and dependencies found
+          in container image
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          report:
+            description: Report is the actual sbom report data.
+            properties:
+              artifact:
+                description: Artifact represents a standalone, executable package
+                  of software that includes everything needed to run an application.
+                properties:
+                  digest:
+                    description: Digest is a unique and immutable identifier of an
+                      Artifact.
+                    type: string
+                  mimeType:
+                    description: MimeType represents a type and format of an Artifact.
+                    type: string
+                  repository:
+                    description: Repository is the name of the repository in the Artifact
+                      registry.
+                    type: string
+                  tag:
+                    description: Tag is a mutable, human-readable string used to identify
+                      an Artifact.
+                    type: string
+                type: object
+              components:
+                description: Bom isartifact bill of materials.
+                properties:
+                  bomFormat:
+                    type: string
+                  components:
+                    items:
+                      properties:
+                        bom-ref:
+                          type: string
+                        group:
+                          type: string
+                        hashes:
+                          items:
+                            properties:
+                              alg:
+                                type: string
+                              content:
+                                type: string
+                            type: object
+                          type: array
+                        licenses:
+                          items:
+                            properties:
+                              expression:
+                                type: string
+                              license:
+                                properties:
+                                  id:
+                                    type: string
+                                  name:
+                                    type: string
+                                  url:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                        name:
+                          type: string
+                        properties:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                            type: object
+                          type: array
+                        purl:
+                          type: string
+                        supplier:
+                          properties:
+                            contact:
+                              items:
+                                properties:
+                                  email:
+                                    type: string
+                                  name:
+                                    type: string
+                                  phone:
+                                    type: string
+                                type: object
+                              type: array
+                            name:
+                              type: string
+                            url:
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                        type:
+                          type: string
+                        version:
+                          type: string
+                      type: object
+                    type: array
+                  dependencies:
+                    items:
+                      properties:
+                        dependsOn:
+                          items:
+                            type: string
+                          type: array
+                        ref:
+                          type: string
+                      type: object
+                    type: array
+                  metadata:
+                    properties:
+                      component:
+                        properties:
+                          bom-ref:
+                            type: string
+                          group:
+                            type: string
+                          hashes:
+                            items:
+                              properties:
+                                alg:
+                                  type: string
+                                content:
+                                  type: string
+                              type: object
+                            type: array
+                          licenses:
+                            items:
+                              properties:
+                                expression:
+                                  type: string
+                                license:
+                                  properties:
+                                    id:
+                                      type: string
+                                    name:
+                                      type: string
+                                    url:
+                                      type: string
+                                  type: object
+                              type: object
+                            type: array
+                          name:
+                            type: string
+                          properties:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                value:
+                                  type: string
+                              type: object
+                            type: array
+                          purl:
+                            type: string
+                          supplier:
+                            properties:
+                              contact:
+                                items:
+                                  properties:
+                                    email:
+                                      type: string
+                                    name:
+                                      type: string
+                                    phone:
+                                      type: string
+                                  type: object
+                                type: array
+                              name:
+                                type: string
+                              url:
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                          type:
+                            type: string
+                          version:
+                            type: string
+                        type: object
+                      timestamp:
+                        type: string
+                      tools:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            vendor:
+                              type: string
+                            version:
+                              type: string
+                          type: object
+                        type: array
+                    type: object
+                  serialNumber:
+                    type: string
+                  specVersion:
+                    type: string
+                  version:
+                    type: integer
+                required:
+                - bomFormat
+                - specVersion
+                type: object
+              registry:
+                description: Registry is the registry the Artifact was pulled from.
+                properties:
+                  server:
+                    description: Server the FQDN of registry server.
+                    type: string
+                type: object
+              scanner:
+                description: Scanner is the scanner that generated this report.
+                properties:
+                  name:
+                    description: Name the name of the scanner.
+                    type: string
+                  vendor:
+                    description: Vendor the name of the vendor providing the scanner.
+                    type: string
+                  version:
+                    description: Version the version of the scanner.
+                    type: string
+                required:
+                - name
+                - vendor
+                - version
+                type: object
+              summary:
+                description: Summary is a summary of sbom report.
+                properties:
+                  componentsCount:
+                    description: ComponentsCount is the number of components in bom.
+                    minimum: 0
+                    type: integer
+                  dependenciesCount:
+                    description: DependenciesCount is the number of dependencies in
+                      bom.
+                    minimum: 0
+                    type: integer
+                required:
+                - componentsCount
+                - dependenciesCount
+                type: object
+              updateTimestamp:
+                description: UpdateTimestamp is a timestamp representing the server
+                  time in UTC when this report was updated.
+                format: date-time
+                type: string
+            required:
+            - artifact
+            - components
+            - scanner
+            - summary
+            - updateTimestamp
+            type: object
+        required:
+        - report
+        type: object
+    served: true
+    storage: true
+    subresources: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
   name: configauditreports.aquasecurity.github.io
 spec:
   group: aquasecurity.github.io
@@ -1928,6 +2255,20 @@ spec:
                       an Artifact.
                     type: string
                 type: object
+              os:
+                description: OS information of the artifact
+                properties:
+                  eosl:
+                    description: Eosl is true if OS version has reached end of service
+                      life
+                    type: boolean
+                  family:
+                    description: Operating System Family
+                    type: string
+                  name:
+                    description: Name or version of the OS
+                    type: string
+                type: object
               registry:
                 description: Registry is the registry the Artifact was pulled from.
                 properties:
@@ -2030,6 +2371,10 @@ spec:
                       description: InstalledVersion indicates the installed version
                         of the Resource.
                       type: string
+                    lastModifiedDate:
+                      description: LastModifiedDate indicates the last date CVE has
+                        been modified.
+                      type: string
                     links:
                       items:
                         type: string
@@ -2039,6 +2384,9 @@ spec:
                     packageType:
                       type: string
                     primaryLink:
+                      type: string
+                    publishedDate:
+                      description: PublishedDate indicates the date of published CVE.
                       type: string
                     resource:
                       description: Resource is a vulnerable package, application,
@@ -2066,6 +2414,8 @@ spec:
                   required:
                   - fixedVersion
                   - installedVersion
+                  - lastModifiedDate
+                  - publishedDate
                   - resource
                   - severity
                   - title
@@ -2074,6 +2424,7 @@ spec:
                 type: array
             required:
             - artifact
+            - os
             - scanner
             - summary
             - updateTimestamp
@@ -2082,6 +2433,7 @@ spec:
         required:
         - report
         type: object
+        x-kubernetes-preserve-unknown-fields: true
     served: true
     storage: true
     subresources: {}
@@ -2093,8 +2445,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
   namespace: observability-peer
 ---
@@ -2105,8 +2457,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
   namespace: observability-peer
 rules:
@@ -2135,8 +2487,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer-leader-election
   namespace: observability-peer
 rules:
@@ -2162,8 +2514,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -2186,8 +2538,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -2210,8 +2562,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -2415,6 +2767,18 @@ rules:
 - apiGroups:
   - aquasecurity.github.io
   resources:
+  - clustersbomreports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - aquasecurity.github.io
+  resources:
   - configauditreports
   verbs:
   - create
@@ -2572,8 +2936,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
   namespace: observability-peer
 roleRef:
@@ -2592,8 +2956,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer-leader-election
   namespace: observability-peer
 roleRef:
@@ -2612,8 +2976,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -2628,7 +2992,7 @@ apiVersion: v1
 data:
   compliance.failEntriesLimit: "10"
   configAuditReports.scanner: Trivy
-  node.collector.imageRef: ghcr.io/aquasecurity/node-collector:0.0.6
+  node.collector.imageRef: ghcr.io/aquasecurity/node-collector:0.0.9
   nodeCollector.volumeMounts: '[{"mountPath":"/var/lib/etcd","name":"var-lib-etcd","readOnly":true},{"mountPath":"/var/lib/kubelet","name":"var-lib-kubelet","readOnly":true},{"mountPath":"/var/lib/kube-scheduler","name":"var-lib-kube-scheduler","readOnly":true},{"mountPath":"/var/lib/kube-controller-manager","name":"var-lib-kube-controller-manager","readOnly":true},{"mountPath":"/etc/systemd","name":"etc-systemd","readOnly":true},{"mountPath":"/lib/systemd/","name":"lib-systemd","readOnly":true},{"mountPath":"/etc/kubernetes","name":"etc-kubernetes","readOnly":true},{"mountPath":"/etc/cni/net.d/","name":"etc-cni-netd","readOnly":true}]'
   nodeCollector.volumes: '[{"hostPath":{"path":"/var/lib/etcd"},"name":"var-lib-etcd"},{"hostPath":{"path":"/var/lib/kubelet"},"name":"var-lib-kubelet"},{"hostPath":{"path":"/var/lib/kube-scheduler"},"name":"var-lib-kube-scheduler"},{"hostPath":{"path":"/var/lib/kube-controller-manager"},"name":"var-lib-kube-controller-manager"},{"hostPath":{"path":"/etc/systemd"},"name":"etc-systemd"},{"hostPath":{"path":"/lib/systemd"},"name":"lib-systemd"},{"hostPath":{"path":"/etc/kubernetes"},"name":"etc-kubernetes"},{"hostPath":{"path":"/etc/cni/net.d/"},"name":"etc-cni-netd"}]'
   report.recordFailedChecksOnly: "true"
@@ -2641,8 +3005,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator
   namespace: observability-peer
 ---
@@ -2654,8 +3018,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-policies-config
   namespace: observability-peer
 ---
@@ -2665,7 +3029,10 @@ data:
   trivy.command: image
   trivy.dbRepository: ghcr.io/aquasecurity/trivy-db
   trivy.dbRepositoryInsecure: "false"
+  trivy.filesystemScanCacheDir: /var/trivyoperator/trivy-db
   trivy.ignoreUnfixed: "true"
+  trivy.imagePullPolicy: IfNotPresent
+  trivy.imageScanCacheDir: /tmp/trivy/.cache
   trivy.javaDbRepository: ghcr.io/aquasecurity/trivy-java-db
   trivy.mode: Standalone
   trivy.repository: ghcr.io/aquasecurity/trivy
@@ -2674,9 +3041,10 @@ data:
   trivy.resources.requests.cpu: 100m
   trivy.resources.requests.memory: 100M
   trivy.severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+  trivy.skipJavaDBUpdate: "false"
   trivy.slow: "true"
   trivy.supportedConfigAuditKinds: Workload,Service,Role,ClusterRole,NetworkPolicy,Ingress,LimitRange,ResourceQuota
-  trivy.tag: 0.42.0
+  trivy.tag: 0.47.0
   trivy.timeout: 5m0s
   trivy.useBuiltinRegoPolicies: "true"
 kind: ConfigMap
@@ -2685,8 +3053,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-trivy-config
   namespace: observability-peer
 ---
@@ -2697,8 +3065,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator
   namespace: observability-peer
 ---
@@ -2710,8 +3078,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-trivy-config
   namespace: observability-peer
 ---
@@ -2722,8 +3090,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
   namespace: observability-peer
 spec:
@@ -2744,8 +3112,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
+    app.kubernetes.io/version: 0.17.1
+    helm.sh/chart: trivy-operator-0.19.1
   name: trivy-operator-peer
   namespace: observability-peer
 spec:
@@ -2807,6 +3175,10 @@ spec:
           value: "true"
         - name: OPERATOR_SCANNER_REPORT_TTL
           value: 24h
+        - name: OPERATOR_CACHE_REPORT_TTL
+          value: 120h
+        - name: CONTROLLER_CACHE_SYNC_TIMEOUT
+          value: 5m
         - name: OPERATOR_CONFIG_AUDIT_SCANNER_ENABLED
           value: "true"
         - name: OPERATOR_RBAC_ASSESSMENT_SCANNER_ENABLED
@@ -2824,6 +3196,10 @@ spec:
         - name: OPERATOR_METRICS_RBAC_ASSESSMENT_INFO_ENABLED
           value: "false"
         - name: OPERATOR_METRICS_INFRA_ASSESSMENT_INFO_ENABLED
+          value: "false"
+        - name: OPERATOR_METRICS_IMAGE_INFO_ENABLED
+          value: "false"
+        - name: OPERATOR_METRICS_CLUSTER_COMPLIANCE_INFO_ENABLED
           value: "false"
         - name: OPERATOR_WEBHOOK_BROADCAST_URL
           value: ""
@@ -2843,7 +3219,7 @@ spec:
           value: "false"
         - name: OPERATOR_CLUSTER_COMPLIANCE_ENABLED
           value: "true"
-        image: ghcr.io/aquasecurity/trivy-operator:0.15.1
+        image: ghcr.io/aquasecurity/trivy-operator:0.17.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -2867,7 +3243,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
           successThreshold: 1
-        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -2875,7 +3250,6 @@ spec:
             - ALL
           privileged: false
           readOnlyRootFilesystem: true
-      securityContext: {}
       serviceAccountName: trivy-operator-peer
 ---
 apiVersion: aquasecurity.github.io/v1alpha1
@@ -2885,7 +3259,7 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
+    app.kubernetes.io/version: 0.17.1
   name: cis
   namespace: observability-peer
 spec:
@@ -3692,7 +4066,7 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
+    app.kubernetes.io/version: 0.17.1
   name: nsa
   namespace: observability-peer
 spec:
@@ -3881,7 +4255,7 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
+    app.kubernetes.io/version: 0.17.1
   name: pss-baseline
   namespace: observability-peer
 spec:
@@ -3980,7 +4354,7 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
+    app.kubernetes.io/version: 0.17.1
   name: pss-restricted
   namespace: observability-peer
 spec:
@@ -4130,24 +4504,3 @@ spec:
       for: 15m
       labels:
         severity: major
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app.kubernetes.io/instance: ackstorm-trivy-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.15.1
-    helm.sh/chart: trivy-operator-0.15.1
-  name: trivy-operator-peer
-  namespace: observability-peer
-spec:
-  endpoints:
-  - honorLabels: true
-    port: metrics
-    scheme: http
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: ackstorm-trivy-operator
-      app.kubernetes.io/name: trivy-operator

@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
   namespace: observability-peer
 ---
@@ -87,13 +87,22 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
 rules:
 - apiGroups:
   - apps
   resources:
   - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
   verbs:
   - get
   - list
@@ -364,7 +373,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -457,11 +466,12 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
   namespace: observability-peer
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
@@ -479,7 +489,7 @@ spec:
         - /goldilocks
         - controller
         - -v2
-        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.8.3
+        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.10.0
         imagePullPolicy: Always
         name: goldilocks
         resources:
@@ -497,7 +507,9 @@ spec:
           readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: 10324
-      securityContext: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: goldilocks-peer-controller
 ---
 apiVersion: apps/v1

@@ -363,7 +363,7 @@ spec:
                     description: API version of the referent
                     type: string
                   kind:
-                    description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"'
+                    description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                     type: string
                   name:
                     description: 'Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names'
@@ -378,6 +378,39 @@ spec:
                   pods. If not specified, all fields in the `PodUpdatePolicy` are
                   set to their default values.
                 properties:
+                  evictionRequirements:
+                    description: EvictionRequirements is a list of EvictionRequirements
+                      that need to evaluate to true in order for a Pod to be evicted.
+                      If more than one EvictionRequirement is specified, all of them
+                      need to be fulfilled to allow eviction.
+                    items:
+                      description: EvictionRequirement defines a single condition
+                        which needs to be true in order to evict a Pod
+                      properties:
+                        changeRequirement:
+                          description: EvictionChangeRequirement refers to the relationship
+                            between the new target recommendation for a Pod and its
+                            current requests, what kind of change is necessary for
+                            the Pod to be evicted
+                          enum:
+                          - TargetHigherThanRequests
+                          - TargetLowerThanRequests
+                          type: string
+                        resource:
+                          description: Resources is a list of one or more resources
+                            that the condition applies to. If more than one resource
+                            is given, the EvictionRequirement is fulfilled if at least
+                            one resource meets `changeRequirement`.
+                          items:
+                            description: ResourceName is the name identifying various
+                              resources in a ResourceList.
+                            type: string
+                          type: array
+                      required:
+                      - changeRequirement
+                      - resource
+                      type: object
+                    type: array
                   minReplicas:
                     description: Minimal number of replicas which need to be alive
                       for Updater to attempt pod eviction (pending other checks like
@@ -512,7 +545,8 @@ spec:
         type: object
     served: true
     storage: true
-    subresources: {}
+    subresources:
+      status: {}
   - deprecated: true
     deprecationWarning: autoscaling.k8s.io/v1beta2 API is deprecated
     name: v1beta2
@@ -605,7 +639,7 @@ spec:
                     description: API version of the referent
                     type: string
                   kind:
-                    description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"'
+                    description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                     type: string
                   name:
                     description: 'Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names'
@@ -747,6 +781,8 @@ spec:
         type: object
     served: true
     storage: false
+    subresources:
+      status: {}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -756,7 +792,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
   namespace: observability-peer
 ---
@@ -786,13 +822,22 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
 rules:
 - apiGroups:
   - apps
   resources:
   - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
   verbs:
   - get
   - list
@@ -889,7 +934,6 @@ rules:
   - get
   - list
   - watch
-  - patch
 - apiGroups:
   - autoscaling.k8s.io
   resources:
@@ -898,7 +942,6 @@ rules:
   - get
   - list
   - watch
-  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -990,6 +1033,19 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: system:vpa-status-actor
+rules:
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers/status
+  verbs:
+  - get
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: system:vpa-status-reader
 rules:
 - apiGroups:
@@ -1050,7 +1106,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1069,7 +1125,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller-map[apiGroups:[batch] resources:[jobs cronjobs]
     verbs:[list watch]]
 roleRef:
@@ -1089,7 +1145,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller-map[apiGroups:[monitoring.coreos.com] resources:[prometheuses]
     verbs:[list watch]]
 roleRef:
@@ -1173,6 +1229,19 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  name: system:vpa-status-actor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:vpa-status-actor
+subjects:
+- kind: ServiceAccount
+  name: vpa-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
   name: system:vpa-status-reader-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1210,11 +1279,12 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-6.7.0
+    helm.sh/chart: goldilocks-8.0.0
   name: goldilocks-peer-controller
   namespace: observability-peer
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
@@ -1232,7 +1302,7 @@ spec:
         - /goldilocks
         - controller
         - -v2
-        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.8.3
+        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.10.0
         imagePullPolicy: Always
         name: goldilocks
         resources:
@@ -1250,7 +1320,9 @@ spec:
           readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: 10324
-      securityContext: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: goldilocks-peer-controller
 ---
 apiVersion: apps/v1
@@ -1280,7 +1352,7 @@ spec:
         - --metric-for-pod-labels=kube_pod_labels{job="kube-state-metrics"}[4d]
         - --pod-namespace-label=namespace
         - --pod-name-label=pod
-        image: registry.k8s.io/autoscaling/vpa-recommender:0.13.0
+        image: registry.k8s.io/autoscaling/vpa-recommender:1.0.0
         imagePullPolicy: Always
         name: recommender
         ports:
