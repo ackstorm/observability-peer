@@ -4504,3 +4504,21 @@ spec:
       for: 15m
       labels:
         severity: major
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-trivy-operator
+    app.kubernetes.io/name: trivy-operator
+  name: trivy-operator-peer
+  namespace: observability-peer
+spec:
+  endpoints:
+  - honorLabels: true
+    port: metrics
+    scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-trivy-operator
+      app.kubernetes.io/name: trivy-operator
