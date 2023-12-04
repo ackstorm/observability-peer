@@ -190,7 +190,7 @@ spec:
       - args: null
         env:
         - name: PROMETHEUS_SERVER_ENDPOINT
-          value: http://prometheus-operated.observability-peer.svc.cluster.local:80
+          value: http://prometheus-operated.observability-peer.svc.cluster.local:9090
         - name: CLOUD_PROVIDER_API_KEY
           valueFrom:
             secretKeyRef:
