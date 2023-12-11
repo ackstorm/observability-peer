@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/version: v1.6.2
+    helm.sh/chart: prometheus-pushgateway-2.4.2
+  name: prometheus-pushgateway-peer
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/version: v1.6.2
+    helm.sh/chart: prometheus-pushgateway-2.4.2
+  name: prometheus-pushgateway-peer
+  namespace: observability-peer
+spec:
+  ports:
+  - name: http
+    port: 9091
+    protocol: TCP
+    targetPort: 9091
+  selector:
+    app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+    app.kubernetes.io/name: prometheus-pushgateway
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/version: v1.6.2
+    helm.sh/chart: prometheus-pushgateway-2.4.2
+  name: prometheus-pushgateway-peer
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+      app.kubernetes.io/name: prometheus-pushgateway
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: prometheus-pushgateway
+        app.kubernetes.io/version: v1.6.2
+        helm.sh/chart: prometheus-pushgateway-2.4.2
+    spec:
+      containers:
+      - image: quay.io/prometheus/pushgateway:v1.6.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9091
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        name: pushgateway
+        ports:
+        - containerPort: 9091
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9091
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        volumeMounts:
+        - mountPath: /data
+          name: storage-volume
+          subPath: ""
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: prometheus-pushgateway-peer
+      volumes:
+      - emptyDir: {}
+        name: storage-volume
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: prometheus-pushgateway-peer
+  name: prometheus-pushgateway-peer
+  namespace: observability-peer
+spec:
+  groups:
+  - name: prometheus-pushgateway-peer
+    rules:
+    - alert: prometheus-pushgatewayNotRunning
+      annotations:
+        description: prometheus-pushgateway is not running
+        summary: prometheus-pushgateway is not running
+      expr: absent(up{job="prometheus-pushgateway-peer"}) > 0
+      for: 15m
+      labels:
+        severity: major
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/version: v1.6.2
+    helm.sh/chart: prometheus-pushgateway-2.4.2
+  name: prometheus-pushgateway-peer
+  namespace: observability-peer
+spec:
+  endpoints:
+  - honorLabels: true
+    path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - observability-peer
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-prometheus-pushgateway
+      app.kubernetes.io/name: prometheus-pushgateway

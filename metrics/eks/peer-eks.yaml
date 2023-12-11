@@ -2216,6 +2216,10 @@ spec:
                         description: PushoverConfig configures notifications via Pushover.
                           See https://prometheus.io/docs/alerting/latest/configuration/#pushover_config
                         properties:
+                          device:
+                            description: The name of a device to send the notification
+                              to
+                            type: string
                           expire:
                             description: How long your notification will continue
                               to be retried for, unless the user acknowledges the
@@ -13797,8 +13801,8 @@ spec:
                           type: string
                       type: object
                     trackTimestampsStaleness:
-                      description: "TrackTimestampsStaleness whether Prometheus tracks
-                        staleness of the metrics that have an explicit timestamps
+                      description: "`trackTimestampsStaleness` defines whether Prometheus
+                        tracks staleness of the metrics that have an explicit timestamp
                         present in scraped data. Has no effect if `honorTimestamps`
                         is false. \n It requires Prometheus >= v2.48.0."
                       type: boolean
@@ -18976,6 +18980,14 @@ spec:
                   when the field is set to the empty string (`\"\"`). \n Default:
                   \"prometheus\""
                 type: string
+              reloadStrategy:
+                description: Defines the strategy used to reload the Prometheus configuration.
+                  If not specified, the configuration is reloaded using the /-/reload
+                  HTTP endpoint.
+                enum:
+                - HTTP
+                - ProcessSignal
+                type: string
               remoteWrite:
                 description: Defines the list of remote write configurations.
                 items:
@@ -20820,9 +20832,14 @@ spec:
               topologySpreadConstraints:
                 description: Defines the pod's topology spread constraints if specified.
                 items:
-                  description: TopologySpreadConstraint specifies how to spread matching
-                    pods among the given topology.
                   properties:
+                    additionalLabelSelectors:
+                      description: Defines what Prometheus Operator managed labels
+                        should be added to labelSelector on the topologySpreadConstraint.
+                      enum:
+                      - OnResource
+                      - OnShard
+                      type: string
                     labelSelector:
                       description: LabelSelector is used to find matching pods. Pods
                         that match this label selector are counted to determine the
@@ -27972,6 +27989,14 @@ spec:
                   can be set to a standard I/O stream, e.g. `/dev/stdout`, to log
                   query information to the default Prometheus log stream."
                 type: string
+              reloadStrategy:
+                description: Defines the strategy used to reload the Prometheus configuration.
+                  If not specified, the configuration is reloaded using the /-/reload
+                  HTTP endpoint.
+                enum:
+                - HTTP
+                - ProcessSignal
+                type: string
               remoteRead:
                 description: Defines the list of remote read configurations.
                 items:
@@ -30717,9 +30742,14 @@ spec:
               topologySpreadConstraints:
                 description: Defines the pod's topology spread constraints if specified.
                 items:
-                  description: TopologySpreadConstraint specifies how to spread matching
-                    pods among the given topology.
                   properties:
+                    additionalLabelSelectors:
+                      description: Defines what Prometheus Operator managed labels
+                        should be added to labelSelector on the topologySpreadConstraint.
+                      enum:
+                      - OnResource
+                      - OnShard
+                      type: string
                     labelSelector:
                       description: LabelSelector is used to find matching pods. Pods
                         that match this label selector are counted to determine the
@@ -33440,9 +33470,10 @@ spec:
                       description: Namespaces are only supported in Consul Enterprise.
                       type: string
                     noProxy:
-                      description: Comma-separated string that can contain IPs, CIDR
-                        notation, domain names that should be excluded from proxying.
-                        IP and domain names can contain port numbers.
+                      description: "`noProxy` is a comma-separated string that can
+                        contain IPs, CIDR notation, domain names that should be excluded
+                        from proxying. IP and domain names can contain port numbers.
+                        \n It requires Prometheus >= v2.43.0."
                       type: string
                     nodeMeta:
                       additionalProperties:
@@ -33564,17 +33595,21 @@ spec:
                         - key
                         type: object
                         x-kubernetes-map-type: atomic
-                      description: Specifies headers to send to proxies during CONNECT
-                        requests.
+                      description: "ProxyConnectHeader optionally specifies headers
+                        to send to proxies during CONNECT requests. \n It requires
+                        Prometheus >= v2.43.0."
                       type: object
                       x-kubernetes-map-type: atomic
                     proxyFromEnvironment:
-                      description: Use proxy URL indicated by environment variables
-                        (HTTP_PROXY, https_proxy, HTTPs_PROXY, https_proxy, and no_proxy)
-                        If unset, Prometheus uses its default value.
+                      description: "Whether to use the proxy configuration defined
+                        by environment variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY).
+                        If unset, Prometheus uses its default value. \n It requires
+                        Prometheus >= v2.43.0."
                       type: boolean
                     proxyUrl:
-                      description: Optional proxy URL.
+                      description: "`proxyURL` defines the HTTP proxy server to use.
+                        \n It requires Prometheus >= v2.43.0."
+                      pattern: ^http(s)?://.+$
                       type: string
                     refreshInterval:
                       description: The time after which the provided names are refreshed.
@@ -34046,6 +34081,48 @@ spec:
                           type: object
                           x-kubernetes-map-type: atomic
                       type: object
+                    noProxy:
+                      description: "`noProxy` is a comma-separated string that can
+                        contain IPs, CIDR notation, domain names that should be excluded
+                        from proxying. IP and domain names can contain port numbers.
+                        \n It requires Prometheus >= v2.43.0."
+                      type: string
+                    proxyConnectHeader:
+                      additionalProperties:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      description: "ProxyConnectHeader optionally specifies headers
+                        to send to proxies during CONNECT requests. \n It requires
+                        Prometheus >= v2.43.0."
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    proxyFromEnvironment:
+                      description: "Whether to use the proxy configuration defined
+                        by environment variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY).
+                        If unset, Prometheus uses its default value. \n It requires
+                        Prometheus >= v2.43.0."
+                      type: boolean
+                    proxyUrl:
+                      description: "`proxyURL` defines the HTTP proxy server to use.
+                        \n It requires Prometheus >= v2.43.0."
+                      pattern: ^http(s)?://.+$
+                      type: string
                     refreshInterval:
                       description: RefreshInterval configures the refresh interval
                         at which Prometheus will re-query the endpoint to update the
@@ -34339,6 +34416,12 @@ spec:
                 description: MetricsPath HTTP path to scrape for metrics. If empty,
                   Prometheus uses the default value (e.g. /metrics).
                 type: string
+              noProxy:
+                description: "`noProxy` is a comma-separated string that can contain
+                  IPs, CIDR notation, domain names that should be excluded from proxying.
+                  IP and domain names can contain port numbers. \n It requires Prometheus
+                  >= v2.43.0."
+                type: string
               params:
                 additionalProperties:
                   items:
@@ -34347,6 +34430,40 @@ spec:
                 description: Optional HTTP URL parameters
                 type: object
                 x-kubernetes-map-type: atomic
+              proxyConnectHeader:
+                additionalProperties:
+                  description: SecretKeySelector selects a key of a Secret.
+                  properties:
+                    key:
+                      description: The key of the secret to select from.  Must be
+                        a valid secret key.
+                      type: string
+                    name:
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        TODO: Add other useful fields. apiVersion, kind, uid?'
+                      type: string
+                    optional:
+                      description: Specify whether the Secret or its key must be defined
+                      type: boolean
+                  required:
+                  - key
+                  type: object
+                  x-kubernetes-map-type: atomic
+                description: "ProxyConnectHeader optionally specifies headers to send
+                  to proxies during CONNECT requests. \n It requires Prometheus >=
+                  v2.43.0."
+                type: object
+                x-kubernetes-map-type: atomic
+              proxyFromEnvironment:
+                description: "Whether to use the proxy configuration defined by environment
+                  variables (HTTP_PROXY, HTTPS_PROXY, and NO_PROXY). If unset, Prometheus
+                  uses its default value. \n It requires Prometheus >= v2.43.0."
+                type: boolean
+              proxyUrl:
+                description: "`proxyURL` defines the HTTP proxy server to use. \n
+                  It requires Prometheus >= v2.43.0."
+                pattern: ^http(s)?://.+$
+                type: string
               relabelings:
                 description: 'RelabelConfigs defines how to rewrite the target''s
                   labels before scraping. Prometheus Operator automatically adds relabelings
@@ -35211,7 +35328,8 @@ spec:
                     trackTimestampsStaleness:
                       description: "`trackTimestampsStaleness` defines whether Prometheus
                         tracks staleness of the metrics that have an explicit timestamp
-                        present in scraped data. \n It requires Prometheus >= v2.48.0."
+                        present in scraped data. Has no effect if `honorTimestamps`
+                        is false. \n It requires Prometheus >= v2.48.0."
                       type: boolean
                   type: object
                 type: array
@@ -42304,7 +42422,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
   namespace: observability-peer
 ---
@@ -42643,7 +42761,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
 rules:
 - apiGroups:
@@ -42879,7 +42997,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -43244,7 +43362,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
   namespace: observability-peer
 spec:
@@ -43563,7 +43681,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
   namespace: observability-peer
 spec:
@@ -43581,17 +43699,17 @@ spec:
         app.kubernetes.io/component: controller
         app.kubernetes.io/name: prometheus-operator-peer
         app.kubernetes.io/part-of: kube-prometheus
-        app.kubernetes.io/version: 0.69.1
+        app.kubernetes.io/version: 0.70.0
     spec:
       automountServiceAccountToken: true
       containers:
       - args:
         - --kubelet-service=kube-system/kubelet
-        - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.69.1
+        - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.70.0
         env:
         - name: GOGC
           value: "30"
-        image: quay.io/prometheus-operator/prometheus-operator:v0.69.1
+        image: quay.io/prometheus-operator/prometheus-operator:v0.70.0
         name: prometheus-operator-peer
         ports:
         - containerPort: 8080
@@ -44304,7 +44422,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator
   namespace: observability-peer
 spec:
@@ -44320,7 +44438,7 @@ spec:
       app.kubernetes.io/component: controller
       app.kubernetes.io/name: prometheus-operator-peer
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 0.69.1
+      app.kubernetes.io/version: 0.70.0
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -44415,7 +44533,7 @@ metadata:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator-peer
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.69.1
+    app.kubernetes.io/version: 0.70.0
   name: prometheus-operator-peer
   namespace: observability-peer
 spec:
