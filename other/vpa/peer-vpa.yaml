@@ -1361,10 +1361,10 @@ spec:
         resources:
           limits:
             cpu: 100m
-            memory: 1Gi
+            memory: 100Mi
           requests:
             cpu: 10m
-            memory: 60Mi
+            memory: 100Mi
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
