@@ -43515,7 +43515,7 @@ spec:
         resources:
           limits:
             cpu: 20m
-            memory: 40Mi
+            memory: 100Mi
           requests:
             cpu: 20m
             memory: 100Mi
@@ -43539,7 +43539,7 @@ spec:
         resources:
           limits:
             cpu: 20m
-            memory: 40Mi
+            memory: 100Mi
           requests:
             cpu: 20m
             memory: 100Mi
@@ -43569,7 +43569,7 @@ spec:
         resources:
           limits:
             cpu: 20m
-            memory: 40Mi
+            memory: 100Mi
           requests:
             cpu: 20m
             memory: 100Mi
@@ -43837,8 +43837,8 @@ spec:
         name: node-exporter-peer
         resources:
           limits:
-            cpu: 250m
-            memory: 180Mi
+            cpu: ""
+            memory: 100Mi
           requests:
             cpu: 10m
             memory: 100Mi
@@ -43951,6 +43951,7 @@ spec:
   enableAdminAPI: false
   enableFeatures:
   - memory-snapshot-on-shutdown
+  - new-service-discovery-manager
   - remote-write-receiver
   - exemplar-storage
   externalLabels:
@@ -43981,7 +43982,9 @@ spec:
     headers:
       X-Scope-OrgID: ${PEER_ID}
     queueConfig:
+      capacity: 1000
       maxSamplesPerSend: 5000
+      maxShards: 200
     sendExemplars: true
     url: ${PEER_OBSERVER_URL}/api/v1/push
     writeRelabelConfigs:
