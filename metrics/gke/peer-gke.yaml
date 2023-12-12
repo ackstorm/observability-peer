@@ -43501,8 +43501,8 @@ spec:
             cpu: 20m
             memory: 40Mi
           requests:
-            cpu: 10m
-            memory: 20Mi
+            cpu: 20m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -43525,8 +43525,8 @@ spec:
             cpu: 20m
             memory: 40Mi
           requests:
-            cpu: 10m
-            memory: 20Mi
+            cpu: 20m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -43555,8 +43555,8 @@ spec:
             cpu: 20m
             memory: 40Mi
           requests:
-            cpu: 10m
-            memory: 20Mi
+            cpu: 20m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -43824,8 +43824,8 @@ spec:
             cpu: 250m
             memory: 180Mi
           requests:
-            cpu: 20m
-            memory: 80Mi
+            cpu: 10m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -43980,6 +43980,7 @@ spec:
   replicas: 1
   resources:
     requests:
+      cpu: "100"
       memory: 100Mi
   retention: 4d
   ruleNamespaceSelector: {}
