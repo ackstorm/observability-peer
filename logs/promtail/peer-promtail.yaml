@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
   namespace: observability-peer
 ---
@@ -17,8 +17,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
 rules:
 - apiGroups:
@@ -41,8 +41,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -105,8 +105,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
   namespace: observability-peer
 ---
@@ -117,8 +117,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer-metrics
   namespace: observability-peer
 spec:
@@ -141,8 +141,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
   namespace: observability-peer
 spec:
@@ -153,7 +153,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3c241bc876bf0f96c0793d04aee809a129b2e8e01b1a35e580b7448fca85947b
+        checksum/config: 0121209b3e89d727dbe3cb20853cfdb626f61d58dd84985d5c6a51863f033b12
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
@@ -173,7 +173,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: docker.io/grafana/promtail:2.9.2
+        image: docker.io/grafana/promtail:2.9.3
         imagePullPolicy: IfNotPresent
         name: promtail
         ports:
@@ -247,8 +247,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
   namespace: observability-peer
 spec:
@@ -273,7 +273,7 @@ spec:
       expr: 100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|failed"}[1m]))
         by (namespace, job, route, instance) / sum(rate(promtail_request_duration_seconds_count[1m]))
         by (namespace, job, route, instance) > 10
-      for: 10m
+      for: 15m
       labels:
         severity: major
     - alert: PromtailRequestLatency
@@ -284,8 +284,8 @@ spec:
             LABELS = {{ $labels }}
         summary: Promtail request latency (instance {{ $labels.instance }})
       expr: histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m]))
-        by (le)) > 3
-      for: 10m
+        by (le)) > 5
+      for: 30m
       labels:
         severity: major
     - alert: PromtailRateLimitExceeded
@@ -293,7 +293,7 @@ spec:
         description: Promtail application log rate near limit
         summary: Promtail application log rate near limit
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.8
-      for: 10m
+      for: 15m
       labels:
         severity: warning
     - alert: PromtailRateLimitExceeded
@@ -302,7 +302,7 @@ spec:
           logs)
         summary: Promtail application log rate near limit or exceeded (will drop logs)
       expr: sum(increase(promtail_custom_line_count_total[5m])/300) by (app) > ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}*0.9
-      for: 10m
+      for: 15m
       labels:
         severity: major
     - alert: PromtailIsNotSendingLogs
@@ -310,7 +310,7 @@ spec:
         description: No metrics with status_code == 204
         summary: Promtail is not sending logs
       expr: absent(promtail_request_duration_seconds_count{status_code="204"}) > 0
-      for: 10m
+      for: 15m
       labels:
         severity: major
 ---
@@ -321,8 +321,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.2
-    helm.sh/chart: promtail-6.15.3
+    app.kubernetes.io/version: 2.9.3
+    helm.sh/chart: promtail-6.15.5
   name: promtail-peer
   namespace: observability-peer
 spec:

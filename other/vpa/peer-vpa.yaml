@@ -792,7 +792,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
   namespace: observability-peer
 ---
@@ -822,7 +822,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
 rules:
 - apiGroups:
@@ -1106,7 +1106,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1125,7 +1125,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller-map[apiGroups:[batch] resources:[jobs cronjobs]
     verbs:[list watch]]
 roleRef:
@@ -1145,7 +1145,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller-map[apiGroups:[monitoring.coreos.com] resources:[prometheuses]
     verbs:[list watch]]
 roleRef:
@@ -1279,7 +1279,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
   namespace: observability-peer
 spec:

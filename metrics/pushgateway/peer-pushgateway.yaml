@@ -104,7 +104,7 @@ spec:
   groups:
   - name: prometheus-pushgateway-peer
     rules:
-    - alert: prometheus-pushgatewayNotRunning
+    - alert: pushgatewayNotRunning
       annotations:
         description: prometheus-pushgateway is not running
         summary: prometheus-pushgateway is not running
