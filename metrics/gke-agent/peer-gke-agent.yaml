@@ -43420,7 +43420,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.3
+        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.4
         imagePullPolicy: Always
         name: mimir-sync
         resources:
