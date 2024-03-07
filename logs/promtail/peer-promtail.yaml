@@ -56,7 +56,7 @@ subjects:
 apiVersion: v1
 data:
   promtail.yaml: "server:\n  log_level: info\n  log_format: logfmt\n  http_listen_port:
-    3101\n  \n\nclients:\n  - basic_auth:\n      password: $PEER_PASSWORD\n      username:
+    3101\n  \n\nclients:\n  - basic_auth:\n      password: ${PEER_PASSWORD}\n      username:
     ${PEER_ID}\n    external_labels:\n      cluster: ${PEER_ID}\n    tenant_id: ${PEER_ID}\n
     \   url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n  filename: /run/promtail/positions.yaml\n\nscrape_configs:\n
     \ # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
@@ -154,7 +154,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: a7b2f39152396cebb023d4863b2d9ec0d3b2542d30cf482e82ece34564963203
+        checksum/config: 6e8312fe6eb560f5842978f292943b20d782d8ad1f66cfdaf61dedb184674d16
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail

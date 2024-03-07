@@ -130,7 +130,7 @@ data:
     sinks:
       loki_journal:
         auth:
-          password: $PEER_PASSWORD
+          password: ${PEER_PASSWORD}
           strategy: basic
           user: ${PEER_ID}
         batch:
@@ -149,7 +149,7 @@ data:
         type: loki
       loki_kubernetes:
         auth:
-          password: $PEER_PASSWORD
+          password: ${PEER_PASSWORD}
           strategy: basic
           user: ${PEER_ID}
         batch:
@@ -334,7 +334,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 87fe784e1b71c97314464bfaa2f9fb4eb3386c6c097dccfb078abb60f93e1c14
+        checksum/config: 771a201eea944416abee7bda6ec445caae93234f824dafd4809bedf29c248bd2
       labels:
         app.kubernetes.io/component: Aggregator
         app.kubernetes.io/instance: ackstorm-vector-aggretator-peer
