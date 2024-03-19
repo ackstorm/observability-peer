@@ -43610,7 +43610,7 @@ spec:
     spec:
       containers:
       - args:
-        - --metric-labels-allowlist=nodes=[*]
+        - --metric-labels-allowlist=nodes=[*],*=[app,app.kubernetes.io/name,team,owner]
         - --port=8080
         - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
         - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
@@ -44028,6 +44028,22 @@ spec:
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
       targetLabel: label_nodegroup
+    - regex: (.+)
+      sourceLabels:
+      - label_app_kubernetes_io_name
+      targetLabel: app
+    - regex: (.+)
+      sourceLabels:
+      - label_app
+      targetLabel: app
+    - regex: (.+)
+      sourceLabels:
+      - label_team
+      targetLabel: team
+    - regex: (.+)
+      sourceLabels:
+      - label_owner
+      targetLabel: owner
     - action: drop
       regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
       sourceLabels:
@@ -44052,6 +44068,22 @@ spec:
       sourceLabels:
       - label_eks_amazonaws_com_nodegroup
       targetLabel: label_nodegroup
+    - regex: (.+)
+      sourceLabels:
+      - label_app_kubernetes_io_name
+      targetLabel: app
+    - regex: (.+)
+      sourceLabels:
+      - label_app
+      targetLabel: app
+    - regex: (.+)
+      sourceLabels:
+      - label_team
+      targetLabel: team
+    - regex: (.+)
+      sourceLabels:
+      - label_owner
+      targetLabel: owner
     - action: drop
       regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
       sourceLabels:
