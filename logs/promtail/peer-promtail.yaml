@@ -55,6 +55,27 @@ subjects:
 ---
 apiVersion: v1
 data:
+  rules.yaml: |
+    # Always firing rule (heartbeat for loki)
+    groups:
+    - name: watchdog
+      rules:
+        - alert: Watchdog
+          expr: vector(1)
+          for: 1m
+          labels:
+              severity: critical
+kind: ConfigMap
+metadata:
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+  labels:
+    loki-rules: "true"
+  name: loki-rule-watchdog
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
   promtail.yaml: "server:\n  log_level: info\n  log_format: logfmt\n  http_listen_port:
     3101\n  \n\nclients:\n  - basic_auth:\n      password: ${PEER_PASSWORD}\n      username:
     ${PEER_ID}\n    external_labels:\n      cluster: ${PEER_ID}\n    tenant_id: ${PEER_ID}\n
