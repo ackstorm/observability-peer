@@ -43422,7 +43422,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.5
+        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.6
         imagePullPolicy: Always
         name: mimir-sync
         resources:
@@ -44051,7 +44051,7 @@ spec:
     port: http
     relabelings:
     - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
+      regex: (pod|service|endpoint|namespace|label_team|label_app|label_owner)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
@@ -44091,7 +44091,7 @@ spec:
     port: metrics
     relabelings:
     - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
+      regex: (pod|service|endpoint|namespace|label_team|label_app|label_owner)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics

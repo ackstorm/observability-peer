@@ -7830,27 +7830,6 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
----
-apiVersion: v1
-imagePullSecrets: null
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-  namespace: observability-peer
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
   labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
@@ -7859,6 +7838,18 @@ metadata:
     app.kubernetes.io/version: 0.83.0
     helm.sh/chart: opentelemetry-operator-0.37.1
   name: opentelemetry-operator
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opentelemetry-peer-collector
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opentelemetry-peer-targetallocator
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -7901,549 +7892,6 @@ rules:
   verbs:
   - create
   - patch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ackstorm-mimir-sync-peer
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - get
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - prometheusrules
-  verbs:
-  - list
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ackstorm-opentelemetry-collector-cluster-stats
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - events
-  - namespaces
-  - namespaces/status
-  - nodes
-  - nodes/stats
-  - nodes/spec
-  - nodes/proxy
-  - nodes/metrics
-  - services
-  - resourcequotas
-  - replicationcontrollers
-  - replicationcontrollers/status
-  - endpoints
-  - persistentvolumes
-  - persistentvolumeclaims
-  - pods
-  - pods/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  - podmonitors
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - discovery.k8s.io
-  resources:
-  - endpointslices
-  verbs:
-  - get
-  - list
-  - watch
-- nonResourceURLs:
-  - /metrics
-  - /metrics/cadvisor
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ackstorm-opentelemetry-collector-daemon
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - events
-  - namespaces
-  - namespaces/status
-  - nodes
-  - nodes/stats
-  - nodes/spec
-  - nodes/proxy
-  - nodes/metrics
-  - services
-  - resourcequotas
-  - replicationcontrollers
-  - replicationcontrollers/status
-  - endpoints
-  - persistentvolumes
-  - persistentvolumeclaims
-  - pods
-  - pods/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  - podmonitors
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - discovery.k8s.io
-  resources:
-  - endpointslices
-  verbs:
-  - get
-  - list
-  - watch
-- nonResourceURLs:
-  - /metrics
-  - /metrics/cadvisor
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ackstorm-opentelemetry-collector-traces
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - events
-  - namespaces
-  - namespaces/status
-  - nodes
-  - nodes/stats
-  - nodes/spec
-  - nodes/proxy
-  - nodes/metrics
-  - services
-  - resourcequotas
-  - replicationcontrollers
-  - replicationcontrollers/status
-  - endpoints
-  - persistentvolumes
-  - persistentvolumeclaims
-  - pods
-  - pods/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  - podmonitors
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - discovery.k8s.io
-  resources:
-  - endpointslices
-  verbs:
-  - get
-  - list
-  - watch
-- nonResourceURLs:
-  - /metrics
-  - /metrics/cadvisor
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-rules:
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  - apps
-  resources:
-  - daemonsets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  - apps
-  resources:
-  - deployments
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - jobs
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - limitranges
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - networkpolicies
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumes
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  - apps
-  resources:
-  - replicasets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - replicationcontrollers
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - resourcequotas
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - statefulsets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - storageclasses
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - validatingwebhookconfigurations
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - volumeattachments
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - autoscaling.k8s.io
-  resources:
-  - verticalpodautoscalers
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - list
-  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -8697,6 +8145,156 @@ rules:
   - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opentelemetry-peer-collector-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  - /metrics/cadvisor
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opentelemetry-peer-targetallocator-role
+rules:
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  - podmonitors
+  - probes
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - namespaces
+  - events
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - watch
+  - list
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
@@ -8720,79 +8318,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ackstorm-mimir-sync-peer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ackstorm-mimir-sync-peer
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ackstorm-opentelemetry-collector-cluster-stats
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ackstorm-opentelemetry-collector-cluster-stats
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-opentelemetry-collector-cluster-stats-collector
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ackstorm-opentelemetry-collector-daemon
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ackstorm-opentelemetry-collector-daemon
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-opentelemetry-collector-daemon-collector
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ackstorm-opentelemetry-collector-traces
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ackstorm-opentelemetry-collector-traces
-subjects:
-- kind: ServiceAccount
-  name: ackstorm-opentelemetry-collector-traces-collector
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: kube-state-metrics-peer
-subjects:
-- kind: ServiceAccount
-  name: kube-state-metrics-peer
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
   labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
@@ -8828,112 +8353,53 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: opentelemetry-operator
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: opentelemetry-peer-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opentelemetry-peer-collector-role
+subjects:
+- kind: ServiceAccount
+  name: opentelemetry-peer-collector
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: opentelemetry-peer-targetallocator-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: opentelemetry-peer-targetallocator-role
+subjects:
+- kind: ServiceAccount
+  name: opentelemetry-peer-targetallocator
   namespace: observability-peer
 ---
 apiVersion: v1
 data:
-  config.yaml: |
-    kind: CustomResourceStateMetrics
-    spec:
-      resources:
-      - groupVersionKind:
-          group: autoscaling.k8s.io
-          kind: VerticalPodAutoscaler
-          version: v1
-        labelsFromPath:
-          namespace:
-          - metadata
-          - namespace
-          target_api_version:
-          - apiVersion
-          target_kind:
-          - spec
-          - targetRef
-          - kind
-          target_name:
-          - spec
-          - targetRef
-          - name
-          verticalpodautoscaler:
-          - metadata
-          - name
-        metrics:
-        - commonLabels:
-            resource: memory
-            unit: byte
-          each:
-            gauge:
-              labelsFromPath:
-                container:
-                - containerName
-              path:
-              - status
-              - recommendation
-              - containerRecommendations
-              valueFrom:
-              - target
-              - memory
-            type: Gauge
-          help: VPA container recommendations for memory.
-          name: vpa_containerrecommendations_target
-        - commonLabels:
-            resource: cpu
-            unit: core
-          each:
-            gauge:
-              labelsFromPath:
-                container:
-                - containerName
-              path:
-              - status
-              - recommendation
-              - containerRecommendations
-              valueFrom:
-              - target
-              - cpu
-            type: Gauge
-          help: VPA container recommendations for cpu.
-          name: vpa_containerrecommendations_target
-kind: ConfigMap
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR2akNDQXFhZ0F3SUJBZ0lRQVJWTnk0UE1TOURRZlFOdm5hYVA2REFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93SmpFa01DSUdBMVVFQXhNYmIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxd1pXVnlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUIKQ2dLQ0FRRUFtdEY5VWcvdk1UVjY1QXdPU0JEaGloWlN3V3pGdWZvZnA1SEtRWG1CdlFFNlBwc2liM09xZnQ5RApzL3ZXL2FRSmZ4MUpFRGkyZXR1QVF2RklLWUE3VzFBMFliOExvbEt4U1RDRmlQWkFlR1ZweVg0RDgwZHl5R2ZsCnp4VmFKZkt5Q25mVTlhYWY1NitmMkpSS2lwS1lKYnc0aS9pdGFjL2pmYmQyRWxiWExMN2loaXVXbVpQRW1hT2gKNWcrbTJKMVM1OGJqTm1YaFFJemluMTAyRUdPZUhoQjVmUVNwb0llb0thWjBGbHNsUkp0d0UybnhQOVdzbDE5ZAo4WHZkQ0VTMU0rV3NRUlU0M3NJa0p3RXFqV1JUSmFjY0pDdEkxSUUvTHZWQUQ4TTM4Yng4OXo2aEJJZEtoelBFCmR1UVl1Z011N1BEZDFOWXJNRzFzVlErZ09KdEIyUUlEQVFBQm80SGdNSUhkTUE0R0ExVWREd0VCL3dRRUF3SUYKb0RBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEQVlEVlIwVEFRSC9CQUl3QURBZgpCZ05WSFNNRUdEQVdnQlFTaFRFSThmOFZGcTVxYXE1QUFzMmlScW1QdmpCOUJnTlZIUkVFZGpCMGdqWnZjR1Z1CmRHVnNaVzFsZEhKNUxXOXdaWEpoZEc5eUxYQmxaWEl0ZDJWaWFHOXZheTV2WW5ObGNuWmhZbWxzYVhSNUxYQmwKWlhLQ09tOXdaVzUwWld4bGJXVjBjbmt0YjNCbGNtRjBiM0l0Y0dWbGNpMTNaV0pvYjI5ckxtOWljMlZ5ZG1GaQphV3hwZEhrdGNHVmxjaTV6ZG1Nd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFENUhjYXR4NjNKcUhua0llc0VVCmQ5dmFRaUM4SXE4SjVMM3k1RFBvUnpkMnBVZEFuWU1RNjQySkFqL3JiWEw5aEpucHh4U1AxSjBMNFFjNjNKM3MKL05hd25hbVpNNTBhNGF6aFFsV0kzc3QvTkNSckd0KzMwYjlsY0FHR3lqcmc5dW01Si82ZldWajVMNXVxa0dwLwozeWV6VFBRdEpYcDB6clRrWHdDREhZd2dNSFBVbUN2dEVUaTF2c1pQYlppdWtDSTMvTi9UaGlsM2FHZVY2N0NxCkRkS0t0OE95aUZCUForTU1RQVBjVFhBMlUrditPTU5GR2pDNit1NmFWbDZjUmN1NFhWalZYc0duRXF6R3doUVcKOTZFcVlkRURTL3BOL3ZhWkRZUkppNHZCV2tKcXZuZlZYSkJHeHJWNjdEcDlWQ2VhMVpXU244aDFBaTFxQktuWApsOFE9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBbXRGOVVnL3ZNVFY2NUF3T1NCRGhpaFpTd1d6RnVmb2ZwNUhLUVhtQnZRRTZQcHNpCmIzT3FmdDlEcy92Vy9hUUpmeDFKRURpMmV0dUFRdkZJS1lBN1cxQTBZYjhMb2xLeFNUQ0ZpUFpBZUdWcHlYNEQKODBkeXlHZmx6eFZhSmZLeUNuZlU5YWFmNTYrZjJKUktpcEtZSmJ3NGkvaXRhYy9qZmJkMkVsYlhMTDdpaGl1VwptWlBFbWFPaDVnK20ySjFTNThiak5tWGhRSXppbjEwMkVHT2VIaEI1ZlFTcG9JZW9LYVowRmxzbFJKdHdFMm54ClA5V3NsMTlkOFh2ZENFUzFNK1dzUVJVNDNzSWtKd0VxaldSVEphY2NKQ3RJMUlFL0x2VkFEOE0zOGJ4ODl6NmgKQklkS2h6UEVkdVFZdWdNdTdQRGQxTllyTUcxc1ZRK2dPSnRCMlFJREFRQUJBb0lCQUdxeXZFc0ZQbFZNeFdCTAp5ci95R202ZnlmTVNzd2Jra2xKYmtPZ2xCTHd0RDJZOFpyUW5KRGNDU2xmTjFqTENqZVQwV3ZsNkRKR0ptOUVICkZ6TzY4NjJRRGpuYmYvb2tRWmp1ZnVtUXhZZjBaTDhBUVZxMlFDNU1KTDdldVYxejhTNXp2ZXA3SnJOM2Y1TzEKUjlaUEI5cmg2SnJYRFRUaW1LZDQvRC9SWjhTbXkyeGh4bnI2N2Y1dWZvbXVvMXJYcEZydTUxaElaR2V0VGNLVwowUnA5RmgzKzlnSldjWm54MU5ySFJhUzRLaWN6eXZsZXpma3JEdjlnSEtsYmxBekErNWZZcWlrZlZkd0xqMlRsCnhjVDRvRTNjOWFrYjVDYkFuTndVQlo3Uldta3R4TnVJbGhrV2dwcjZOYUt1L0NnazhvUmgvS1hHaGEvQUlaK3oKSGVIUHQvRUNnWUVBeVRIU0ZVcFd0ZC9pQmJWRklMbTcyR3BrbjRZQTZpdk5yQ05KQm96bDZJNzh2ZFRmb3BPZApmaEJNblE5c3pvRXljRlpFNWt4aURiSm9XeXZERTAxczQwZjVhdWs0ZlhZTDUxVEo2eUdlN3ZhMytiQjNsMVE2Cng5UWVjb3B0cWhoSW9JRlZQNXM2WDR4UUtvN05FWWxrdUp6M2RPWXdHdFNZaFF2RmpVYXZGQ1VDZ1lFQXhQMmwKdDBOaWU0WVJmNnMvOGRSdSt5UWk1dUh0WVlBVE9DUHE4ckloZVFnS1BVWDJwMHVtVlN2WUxJNFg2MFUzTmlldAp6OVJxRHQyM0Qyb29BWW9TS3ltMDZnM0U2K2dlQUk3VWFkL3FISiszbnVJM1g0ZG1yY2oxNHhVUFQ2TFRKSzIrClFBN1BTVFNTWm1pNVhLMXNzR0N4Q3VSOE9oS1UwaEVaaG9rZ1RxVUNnWUFlRXJoWVBsaGZyeXRWdHhheUlaRVcKZERDK040V0RlekN1L2tjNEYyOTJKNGxYeHEzMjJ5RzdhaXhKZmJqQjFVWDR6S3hYMENzSDZSYjRLYjVxOERQSwpkVU91MjFWNlMxN1VJVFJkVlJVd211ZzlCa2VaOHhrbUxXcXZyRWxnRjJranRMRk5aS0tCRGJRZDZHSjJzSmJCCmtaVGJnRnpJWmVhMlhHQVhFZTJ4a1FLQmdGTGxscVlQWWxNdThSQXp4WjREMG93M0FjVDlVRUxXZmNBRFJXeksKVDFHNmMyeWprNCtGUTBMV1I0dEFaSXBxUHppMzYrbm9ycFVBOG5jM0tneXp5TCtITm8zRUs1bEd2ZEZvU2JVZwpPRW5CWUtrbzh6cHRKV1YraXhMN21zemRiVk1qRmt1b3I4eFRwa1FZVCtEVFRrak85OUhvb3VwaFJXVTlNdXV0CnF2M05Bb0dBWVlzOTV4WkFwcyt3Ti9UYU5wVlgrY3o3UHNQbWNONFNvZDRkOU9qSzhLeWp0UGRBbGd2cVhBM2wKdEc3U2pvenptZUJkbkRsV3RjWmlwdk1tQlRNMXZlSGFEQm9ROWF1TUVxY2RsaUYxN3ZEak1KZWt2dmUybEh6Vwppc3ZXSk1SUzNYVm41RWFFK2lRNnVMSUFST3JKYWtSb0NGbi85WDNrRkt3ZHo2cG51Q0U9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+kind: Secret
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
   labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer-customresourcestate-config
+    app.kubernetes.io/name: opentelemetry-operator
+    app.kubernetes.io/version: 0.83.0
+    helm.sh/chart: opentelemetry-operator-0.37.1
+  name: opentelemetry-operator-peer-controller-manager-service-cert
   namespace: observability-peer
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-  namespace: observability-peer
-spec:
-  ports:
-  - name: http
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-  - name: metrics
-    port: 8081
-    protocol: TCP
-    targetPort: 8081
-  selector:
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/name: kube-state-metrics
-  type: ClusterIP
+type: kubernetes.io/tls
 ---
 apiVersion: v1
 kind: Service
@@ -8986,156 +8452,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: ackstorm-mimir-sync-peer
-  name: ackstorm-mimir-sync-peer
-  namespace: observability-peer
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: ackstorm-mimir-sync-peer
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      annotations:
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
-      labels:
-        app.kubernetes.io/name: ackstorm-mimir-sync-peer
-    spec:
-      automountServiceAccountToken: true
-      containers:
-      - env:
-        - name: FOR_GOD_SHAKE_THIS
-          value: "2"
-        - name: ROLE
-          value: peer
-        - name: MIMIR_URL
-          value: ${PEER_OBSERVER_URL}
-        - name: LOKI_URL
-          value: ${PEER_OBSERVER_URL}
-        - name: PEER_ID
-          value: ${PEER_ID}
-        - name: PEER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: observability-peer-auth
-        image: public.ecr.aws/ackstorm/mimir-sync:v1.0.5
-        imagePullPolicy: Always
-        name: mimir-sync
-        resources:
-          limits:
-            cpu: 100m
-            memory: 200Mi
-          requests:
-            cpu: 10m
-            memory: 60Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-      securityContext:
-        fsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: ackstorm-mimir-sync-peer
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-  namespace: observability-peer
-spec:
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: ackstorm-kube-state-metrics
-      app.kubernetes.io/name: kube-state-metrics
-  strategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: metrics
-        app.kubernetes.io/instance: ackstorm-kube-state-metrics
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: kube-state-metrics
-        app.kubernetes.io/part-of: kube-state-metrics
-        app.kubernetes.io/version: 2.10.1
-        helm.sh/chart: kube-state-metrics-5.15.2
-    spec:
-      containers:
-      - args:
-        - --metric-labels-allowlist=nodes=[*],*=[app,app.kubernetes.io/name,team,owner]
-        - --port=8080
-        - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
-        - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
-        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-        name: kube-state-metrics
-        ports:
-        - containerPort: 8080
-          name: http
-        - containerPort: 8081
-          name: metrics
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-        resources:
-          limits:
-            memory: 128Mi
-          requests:
-            cpu: 10m
-            memory: 128Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-        volumeMounts:
-        - mountPath: /etc/customresourcestate
-          name: customresourcestate-config
-          readOnly: true
-      hostNetwork: false
-      securityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: kube-state-metrics-peer
-      volumes:
-      - configMap:
-          name: kube-state-metrics-peer-customresourcestate-config
-        name: customresourcestate-config
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
     app.kubernetes.io/managed-by: Helm
@@ -9164,14 +8480,14 @@ spec:
         - --enable-leader-election
         - --health-probe-addr=:8081
         - --webhook-port=9443
-        - --collector-image=otel/opentelemetry-collector-contrib:0.83.0
-        - --target-allocator-image=ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.84.0
+        - --collector-image=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.96.0
+        - --target-allocator-image=ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.96.0
         command:
         - /manager
         env:
         - name: ENABLE_WEBHOOKS
           value: "true"
-        image: ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:v0.83.0
+        image: ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.96.0
         livenessProbe:
           httpGet:
             path: /healthz
@@ -9235,885 +8551,272 @@ spec:
           defaultMode: 420
           secretName: opentelemetry-operator-peer-controller-manager-service-cert
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
 metadata:
-  labels:
-    app.kubernetes.io/component: webhook
-    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: opentelemetry-operator
-    app.kubernetes.io/version: 0.83.0
-    helm.sh/chart: opentelemetry-operator-0.37.1
-  name: opentelemetry-operator-peer-serving-cert
+  name: opentelemetry-peer
   namespace: observability-peer
 spec:
-  dnsNames:
-  - opentelemetry-operator-peer-webhook.observability-peer.svc
-  - opentelemetry-operator-peer-webhook.observability-peer.svc.cluster.local
-  issuerRef:
-    kind: Issuer
-    name: opentelemetry-operator-peer-selfsigned-issuer
-  secretName: opentelemetry-operator-peer-controller-manager-service-cert
-  subject:
-    organizationalUnits:
-    - opentelemetry-operator-peer
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  labels:
-    app.kubernetes.io/component: webhook
-    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: opentelemetry-operator
-    app.kubernetes.io/version: 0.83.0
-    helm.sh/chart: opentelemetry-operator-0.37.1
-  name: opentelemetry-operator-peer-selfsigned-issuer
-  namespace: observability-peer
-spec:
-  selfSigned: {}
+  namespaceSelector:
+    matchNames:
+    - observability-peer
+  podMetricsEndpoints:
+  - port: metrics
+    relabelings:
+    - action: keep
+      regex: Running
+      sourceLabels:
+      - __meta_kubernetes_pod_phase
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-peer-collector
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   labels:
-    app.kubernetes.io/name: kube-state-metrics-peer
-  name: kube-state-metrics-peer
+    app.kubernetes.io/name: opentelemetry-peer-collector
+  name: opentelemetry-peer-collector
   namespace: observability-peer
 spec:
   groups:
-  - name: kube-state-metrics-peer
+  - name: opentelemetry-peer-collector
     rules:
-    - alert: KubeStateMetricsNotRunning
+    - alert: OpenTelemetryCollectorNotRunning
       annotations:
-        description: KubeStateMetrics is not running
-        summary: KubeStateMetrics is not running
-      expr: absent(up{job=~"kube-state-metrics"}) > 0
+        description: OpenTelemetryCollector is not running
+        summary: OpenTelemetryCollector is not running
+      expr: absent(up{app="opentelemetry-peer-collector"}) > 0
       for: 15m
       labels:
         severity: major
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: ackstorm-kube-state-metrics
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.10.1
-    helm.sh/chart: kube-state-metrics-5.15.2
-  name: kube-state-metrics-peer
-  namespace: observability-peer
-spec:
-  endpoints:
-  - honorLabels: true
-    metricRelabelings:
-    - regex: (.+)
-      sourceLabels:
-      - label_cloud_google_com_gke_nodepool
-      targetLabel: label_nodegroup
-    - regex: (.+)
-      sourceLabels:
-      - label_eks_amazonaws_com_nodegroup
-      targetLabel: label_nodegroup
-    - regex: (.+)
-      sourceLabels:
-      - label_app_kubernetes_io_name
-      targetLabel: app
-    - regex: (.+)
-      sourceLabels:
-      - label_app
-      targetLabel: app
-    - regex: (.+)
-      sourceLabels:
-      - label_team
-      targetLabel: team
-    - regex: (.+)
-      sourceLabels:
-      - label_owner
-      targetLabel: owner
-    - action: drop
-      regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
-      sourceLabels:
-      - __name__
-    port: http
-    relabelings:
-    - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - job
-      targetLabel: job
-  - honorLabels: true
-    metricRelabelings:
-    - regex: (.+)
-      sourceLabels:
-      - label_cloud_google_com_gke_nodepool
-      targetLabel: label_nodegroup
-    - regex: (.+)
-      sourceLabels:
-      - label_eks_amazonaws_com_nodegroup
-      targetLabel: label_nodegroup
-    - regex: (.+)
-      sourceLabels:
-      - label_app_kubernetes_io_name
-      targetLabel: app
-    - regex: (.+)
-      sourceLabels:
-      - label_app
-      targetLabel: app
-    - regex: (.+)
-      sourceLabels:
-      - label_team
-      targetLabel: team
-    - regex: (.+)
-      sourceLabels:
-      - label_owner
-      targetLabel: owner
-    - action: drop
-      regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
-      sourceLabels:
-      - __name__
-    port: metrics
-    relabelings:
-    - action: labeldrop
-      regex: (pod|service|endpoint|namespace)
-    - action: replace
-      regex: (.+)
-      replacement: kube-state-metrics
-      sourceLabels:
-      - job
-      targetLabel: job
-  jobLabel: app.kubernetes.io/name
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: ackstorm-kube-state-metrics
-      app.kubernetes.io/name: kube-state-metrics
----
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  labels:
-    app: ackstorm-opentelemetry-collector-cluster-stats
-    app.kubernetes.io/instance: ackstorm-opentelemetry-collector
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/part-of: otel-cloud-stack
-    app.kubernetes.io/version: 0.1.3
-    chart: otel-cloud-stack-0.1.3
-    environment: observability-peer
-    heritage: Helm
-    release: ackstorm-opentelemetry-collector
-  name: ackstorm-opentelemetry-collector-cluster-stats
+  name: opentelemetry-peer
   namespace: observability-peer
 spec:
-  config: |
-    exporters:
-      logging:
-        sampling_initial: 5
-        sampling_thereafter: 200
-        verbosity: normal
-      otlp:
-        endpoint: ingest.lightstep.com:443
-        headers:
-          lightstep-access-token: ${LS_TOKEN}
-    receivers:
-      k8s_cluster:
-        allocatable_types_to_report:
-        - cpu
-        - memory
-        - storage
-        auth_type: serviceAccount
-        collection_interval: 10s
-        node_conditions_to_report:
-        - Ready
-        - MemoryPressure
-        - DiskPressure
-        - NetworkUnavailable
-      k8s_events:
-        auth_type: serviceAccount
-    processors:
-      batch:
-        send_batch_max_size: 1500
-        send_batch_size: 1000
-        timeout: 1s
-      k8sattributes:
-        extract:
-          labels:
-          - from: pod
-            key: app.kubernetes.io/name
-            tag_name: service.name
-          - from: pod
-            key: k8s-app
-            tag_name: service.name
-          - from: pod
-            key: app.kubernetes.io/instance
-            tag_name: k8s.app.instance
-          - from: pod
-            key: app.kubernetes.io/version
-            tag_name: service.version
-          - from: pod
-            key: app.kubernetes.io/component
-            tag_name: k8s.app.component
-          metadata:
-          - k8s.namespace.name
-          - k8s.pod.name
-          - k8s.pod.uid
-          - k8s.node.name
-          - k8s.pod.start_time
-          - k8s.deployment.name
-          - k8s.replicaset.name
-          - k8s.replicaset.uid
-          - k8s.daemonset.name
-          - k8s.daemonset.uid
-          - k8s.job.name
-          - k8s.job.uid
-          - k8s.container.name
-          - k8s.cronjob.name
-          - k8s.statefulset.name
-          - k8s.statefulset.uid
-          - container.image.tag
-          - container.image.name
-          - k8s.cluster.uid
-        passthrough: false
-        pod_association:
-        - sources:
-          - from: resource_attribute
-            name: k8s.pod.uid
-        - sources:
-          - from: resource_attribute
-            name: k8s.pod.name
-          - from: resource_attribute
-            name: k8s.namespace.name
-          - from: resource_attribute
-            name: k8s.node.name
-        - sources:
-          - from: resource_attribute
-            name: k8s.pod.ip
-        - sources:
-          - from: resource_attribute
-            name: k8s.pod.name
-          - from: resource_attribute
-            name: k8s.namespace.name
-        - sources:
-          - from: connection
-      memory_limiter:
-        check_interval: 1s
-        limit_percentage: 75
-        spike_limit_percentage: 30
-      resourcedetection/env:
-        detectors:
-        - env
-        override: false
-        timeout: 2s
-    service:
-      pipelines:
-        metrics/k8s_cluster:
-          exporters:
-          - otlp
-          - logging
-          processors:
-          - memory_limiter
-          - resourcedetection/env
-          - k8sattributes
-          - batch
-          receivers:
-          - k8s_cluster
+  config: "receivers:\n  filelog:\n    include:\n    - /var/log/pods/*/*/*.log\n    include_file_name:
+    false\n    include_file_path: true\n    operators:\n    - id: get-format\n      routes:\n
+    \     - expr: body matches \"^\\\\{\"\n        output: parser-docker\n      -
+    expr: body matches \"^[^ Z]+ \"\n        output: parser-crio\n      - expr: body
+    matches \"^[^ Z]+Z\"\n        output: parser-containerd\n      type: router\n
+    \   - id: parser-crio\n      regex: ^(?P<time>[^ Z]+) (?P<stream>stdout|stderr)
+    (?P<logtag>[^ ]*) ?(?P<log>.*)$\n      timestamp:\n        layout: 2006-01-02T15:04:05.999999999Z07:00\n
+    \       layout_type: gotime\n        parse_from: attributes.time\n      type:
+    regex_parser\n    - combine_field: attributes.log\n      combine_with: \"\"\n
+    \     id: crio-recombine\n      is_last_entry: attributes.logtag == 'F'\n      max_log_size:
+    102400\n      output: extract_metadata_from_filepath\n      source_identifier:
+    attributes[\"log.file.path\"]\n      type: recombine\n    - id: parser-containerd\n
+    \     regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$\n
+    \     timestamp:\n        layout: '%Y-%m-%dT%H:%M:%S.%LZ'\n        parse_from:
+    attributes.time\n      type: regex_parser\n    - combine_field: attributes.log\n
+    \     combine_with: \"\"\n      id: containerd-recombine\n      is_last_entry:
+    attributes.logtag == 'F'\n      max_log_size: 102400\n      output: extract_metadata_from_filepath\n
+    \     source_identifier: attributes[\"log.file.path\"]\n      type: recombine\n
+    \   - id: parser-docker\n      output: extract_metadata_from_filepath\n      timestamp:\n
+    \       layout: '%Y-%m-%dT%H:%M:%S.%LZ'\n        parse_from: attributes.time\n
+    \     type: json_parser\n    - id: extract_metadata_from_filepath\n      parse_from:
+    attributes[\"log.file.path\"]\n      regex: ^.*\\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\\-]+)\\/(?P<container_name>[^\\._]+)\\/(?P<restart_count>\\d+)\\.log$\n
+    \     type: regex_parser\n    - from: attributes.stream\n      to: attributes[\"log.iostream\"]\n
+    \     type: move\n    - from: attributes.container_name\n      to: resource[\"k8s.container.name\"]\n
+    \     type: move\n    - from: attributes.namespace\n      to: resource[\"k8s.namespace.name\"]\n
+    \     type: move\n    - from: attributes.pod_name\n      to: resource[\"k8s.pod.name\"]\n
+    \     type: move\n    - from: attributes.restart_count\n      to: resource[\"k8s.container.restart_count\"]\n
+    \     type: move\n    - from: attributes.uid\n      to: resource[\"k8s.pod.uid\"]\n
+    \     type: move\n    - from: attributes.log\n      to: body\n      type: move\n
+    \   start_at: end\n\n  k8sobjects:\n    objects:\n    #- mode: pull\n    #  name:
+    pods\n    - mode: watch\n      name: events\n\n  jaeger:\n    protocols:\n      grpc:\n
+    \       endpoint: ${POD_IP}:14250\n      thrift_compact:\n        endpoint: ${POD_IP}:6831\n
+    \     thrift_http:\n        endpoint: ${POD_IP}:14268\n\n  otlp:\n    protocols:\n
+    \     grpc:\n        endpoint: ${POD_IP}:4317\n      http:\n        cors:\n          allowed_origins:\n
+    \         - http://*\n          - https://*\n        endpoint: ${POD_IP}:4318\n\n
+    \ otlp/spanmetrics:\n    protocols:\n      grpc:\n        endpoint: localhost:12345\n\n
+    \ prometheus:\n    config:\n      global:\n        evaluation_interval: 60s\n
+    \       scrape_interval: 60s\n        scrape_timeout: 30s\n      #scrape_configs:
+    \         \n      #- job_name: none\n\n      scrape_configs:\n        - job_name:
+    'kubernetes-scrape-services'\n          scrape_interval: 1m\n          scrape_timeout:
+    30s\n          kubernetes_sd_configs:\n          - role: endpoints\n          relabel_configs:\n
+    \         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]\n
+    \           regex: \"true\"\n            replacement: $1\n            action:
+    keep\n          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]\n
+    \           regex: (https?)\n            target_label: __scheme__\n            replacement:
+    $1\n            action: replace\n          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]\n
+    \           regex: (.+)\n            target_label: __metrics_path__\n            replacement:
+    $1\n            action: replace\n          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]\n
+    \           regex: ([^:]+)(?::\\d+)?;(\\d+)\n            target_label: __address__\n
+    \           replacement: $1:$2\n            action: replace\n          - action:
+    labelmap\n            regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)\n
+    \           replacement: __param_$1\n          #- action: labelmap\n          #
+    \ regex: __meta_kubernetes_service_label_(.+)\n          #  replacement: $1\n
+    \         - source_labels: [__meta_kubernetes_namespace]\n            regex: (.*)\n
+    \           target_label: namespace\n            replacement: $1\n            action:
+    replace\n          - source_labels: [__meta_kubernetes_service_name]\n            regex:
+    (.*)\n            target_label: service\n            replacement: $1\n            action:
+    replace\n          - source_labels: [__meta_kubernetes_pod_node_name]\n            regex:
+    (.*)\n            target_label: node\n            replacement: $1\n            action:
+    replace\n\n        # Auto-scrape pods\n        - job_name: 'kubernetes-scrape-pods'\n
+    \         scrape_interval: 1m\n          scrape_timeout: 30s\n          kubernetes_sd_configs:\n
+    \         - role: pod\n            selectors:\n            - role: pod\n              field:
+    spec.nodeName=${NODE_NAME}\n              # only scrape data from pods running
+    on the same node as collector\n          relabel_configs:\n          - source_labels:
+    [__meta_kubernetes_pod_annotation_prometheus_io_scrape]\n            regex: \"true\"\n
+    \           replacement: $1\n            action: keep\n          - source_labels:
+    [__meta_kubernetes_pod_annotation_prometheus_io_scheme]\n            regex: (https?)\n
+    \           target_label: __scheme__\n            replacement: $1\n            action:
+    replace\n          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]\n
+    \           regex: (.+)\n            target_label: __metrics_path__\n            replacement:
+    $1\n            action: replace\n          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]\n
+    \           regex: ([^:]+)(?::\\d+)?;(\\d+)\n            target_label: __address__\n
+    \           replacement: $1:$2\n            action: replace\n          - action:
+    labelmap\n            regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)\n
+    \           replacement: __param_$1\n          - action: labelmap\n            regex:
+    __meta_kubernetes_pod_label_(.+)\n            replacement: $1\n          - source_labels:
+    [__meta_kubernetes_namespace]\n            regex: (.*)\n            target_label:
+    namespace\n            replacement: $1\n            action: replace\n          -
+    source_labels: [__meta_kubernetes_pod_name]\n            regex: (.*)\n            target_label:
+    pod\n            replacement: $1\n            action: replace\n          - source_labels:
+    [__meta_kubernetes_pod_phase]\n            regex: Pending|Succeeded|Failed|Completed\n
+    \           replacement: $1\n            action: drop\n          # Reduce cardinality\n
+    \         - action: labeldrop\n            regex: \"instance|kustomize.*|applications_argoproj.*|linkerd_io.*|filebeat.*\"\n
+    \         - action: labeldrop\n            regex: \"app_kubernetes_io_component|app_kubernetes_io_instance|app_kubernetes_io_managed_by|app_kubernetes_io_part_of|app_kubernetes_io_version|applications_argoproj.*|helm_sh_chart|pod_template_hash|controller_revision_hash|k8s_replicaset_name|k8s_pod_uid\"\n\n
+    \       # Auto-scrape ingresses\n        - job_name: 'kubernetes-scrape-ingresses'\n
+    \         scrape_interval: 1m\n          scrape_timeout: 30s\n          metrics_path:
+    /probe\n          params:\n            module: [http_2xx]\n          kubernetes_sd_configs:\n
+    \         - role: ingress\n          relabel_configs:\n          - source_labels:
+    [__meta_kubernetes_ingress_annotation_prometheus_io_scrape]\n            action:
+    keep\n            regex: true\n          - source_labels: [__meta_kubernetes_ingress_annotation_prometheus_io_scheme]\n
+    \           action: replace\n            target_label: __meta_kubernetes_ingress_scheme\n
+    \           regex: (.+)\n          - source_labels: [__meta_kubernetes_ingress_annotation_prometheus_io_path]\n
+    \           action: replace\n            target_label: __meta_kubernetes_ingress_path\n
+    \           regex: (.+)\n          - source_labels: [__meta_kubernetes_ingress_annotation_prometheus_io_host]\n
+    \           action: replace\n            target_label: __address__\n            regex:
+    (.+)\n          - source_labels: [__meta_kubernetes_ingress_scheme,__address__,__meta_kubernetes_ingress_path]\n
+    \           regex: (.+);(.+);(.+)\n            replacement: ${1}://${2}${3}\n
+    \           target_label: __param_target\n          - target_label: __address__\n
+    \           replacement: blackbox-exporter:19115\n          - source_labels: [__param_target]\n
+    \           target_label: instance\n          #- action: labelmap\n          #
+    \ regex: __meta_kubernetes_ingress_label_(.+)\n          #  replacement: $1\n
+    \         - source_labels: [__meta_kubernetes_namespace]\n            target_label:
+    namespace\n          - source_labels: [__meta_kubernetes_ingress_name]\n            target_label:
+    ingress\n    target_allocator:\n      collector_id: ${NODE_NAME}\n      interval:
+    30s\n      \n  zipkin:\n    endpoint: ${POD_IP}:9411\n\nexporters:\n  logging:\n
+    \   loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
+    \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ID}\"\n    tls:\n      insecure: true\n  otlp/spanmetrics:\n    endpoint:
+    ${POD_IP}:4317\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
+    ${PEER_OBSERVER_URL}/api/v1/push\n    tls:\n      insecure: true\n    auth:\n
+    \     authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ID}\"\n    timeout: 15s\n    retry_on_failure:\n      enabled: true\n
+    \     initial_interval: 5s\n      max_interval: 10s\n      max_elapsed_time: 30s\n
+    \   external_labels:\n      cluster: ${PEER_ID}\n      env: ${PEER_ENVIRONMENT}\n
+    \   resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
+    ${PEER_OBSERVER_URL}/loki/api/v1/push\n    tls:\n      insecure: true\n    auth:\n
+    \     authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ID}\"        \n    default_labels_enabled:\n      exporter: true\n      job:
+    true         \n\nextensions:\n  health_check: {}\n  memory_ballast:\n    size_in_percentage:
+    40\n  basicauth/observer:\n    client_auth:\n      username: ${PEER_ID}\n      password:
+    ${PEER_PASSWORD}\n\nprocessors:\n  attributes/cluster:\n    actions:\n    - action:
+    insert\n      key: environment\n      value: ${PEER_ENVIRONMENT}\n    - action:
+    insert\n      key: cluster\n      value: ${PEER_ID}\n  batch:\n    send_batch_size:
+    1000\n    timeout: 10s\n  groupbytrace:\n    num_traces: 1000\n    wait_duration:
+    30s\n  k8sattributes:\n    auth_type: serviceAccount\n    extract:\n      labels:\n
+    \     - from: pod\n        key_regex: (.*)\n        tag_name: $$1\n      metadata:\n
+    \     - k8s.namespace.name\n      - k8s.pod.name\n      - k8s.pod.uid\n      -
+    k8s.node.name\n      - k8s.pod.start_time\n      - k8s.deployment.name\n      -
+    k8s.replicaset.name\n      - k8s.replicaset.uid\n      - k8s.daemonset.name\n
+    \     - k8s.daemonset.uid\n      - k8s.job.name\n      - k8s.job.uid\n      -
+    k8s.cronjob.name\n      - k8s.statefulset.name\n      - k8s.statefulset.uid\n
+    \     - container.image.tag\n      - container.image.name\n    filter:\n      node_from_env_var:
+    <NODE_NAME>\n    passthrough: false\n    pod_association:\n    - sources:\n      -
+    from: resource_attribute\n        name: k8s.pod.ip\n    - sources:\n      - from:
+    resource_attribute\n        name: k8s.pod.uid\n    - sources:\n      - from: connection\n
+    \ memory_limiter:\n    check_interval: 5s\n    limit_percentage: 80\n    spike_limit_percentage:
+    25\n  resource:\n    attributes:\n    - action: insert\n      from_attribute:
+    k8s.pod.name\n      key: pod_name\n    - action: insert\n      key: loki.resource.labels\n
+    \     value: pod_name,app\n    - action: insert\n      key: cluster\n      value:
+    ${PERR_ID}\n    - action: insert\n      key: env\n      value: ${PEER_ENVIRONMENT}\n
+    \ metricstransform:\n    transforms:\n    - action: update\n      include: calls_total\n
+    \     new_name: traces_spanmetrics_calls_total\n      operations:\n      - action:
+    update_label\n        label: operation\n        new_label: span.name\n    - action:
+    update\n      include: latency\n      new_name: traces_spanmetrics_latency\n  #servicegraph:\n
+    \ #  dimensions:\n  #  - k8s.namespace.name\n  #  latency_histogram_buckets:\n
+    \ #  - 100us\n  #  - 1ms\n  #  - 2ms\n  #  - 6ms\n  #  - 10ms\n  #  - 100ms\n
+    \ #  - 250ms\n  #  metrics_exporter: otlp/spanmetrics\n  #  store:\n  #    max_items:
+    200\n  #    ttl: 2s\n  #spanmetrics:\n  #  aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE\n
+    \ #  dimensions:\n  #  - default: GET\n  #    name: http.method\n  #  - name:
+    http.status_code\n  #  dimensions_cache_size: 1500\n  #  latency_histogram_buckets:\n
+    \ #  - 100us\n  #  - 1ms\n  #  - 2ms\n  #  - 6ms\n  #  - 10ms\n  #  - 100ms\n
+    \ #  - 250ms\n  #  metrics_exporter: otlp/spanmetrics\n  #  metrics_flush_interval:
+    30s\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n  - basicauth/observer\n
+    \ pipelines:\n    logs:\n      exporters:\n      - logging\n      - loki\n      processors:\n
+    \     #- memory_limiter\n      #- k8sattributes\n      #- resource\n      - batch\n
+    \     receivers:\n      #- otlp\n      - filelog\n      - k8sobjects\n    metrics:\n
+    \     exporters:\n      - logging\n      - prometheusremotewrite\n      processors:\n
+    \     - memory_limiter\n      - k8sattributes\n      - metricstransform\n      -
+    batch\n      receivers:\n      - otlp\n      - prometheus\n    metrics/spanmetrics:\n
+    \     exporters:\n      - logging\n      - otlp/spanmetrics\n      receivers:\n
+    \     - otlp/spanmetrics\n    traces:\n      exporters:\n      - logging\n      -
+    otlphttp/observer\n      processors:\n      - memory_limiter\n      - k8sattributes\n
+    \     - groupbytrace\n      #- spanmetrics\n      - attributes/cluster\n      -
+    batch\n      receivers:\n      - otlp\n      - jaeger\n      - zipkin\n    #traces/servicegraph:\n
+    \   #  exporters:\n    #  - logging\n    #  processors:\n    #  - servicegraph\n
+    \   #  receivers:\n    #  - otlp\n    #  - jaeger\n    #  - zipkin\n  telemetry:\n
+    \   #logs:\n    #  level: \"debug\"\n    metrics:\n      address: ${POD_IP}:8888\n"
   env:
-  - name: LS_TOKEN
-    valueFrom:
-      secretKeyRef:
-        key: LS_TOKEN
-        name: otel-collector-secret
-  - name: K8S_NODE_NAME
+  - name: NODE_NAME
     valueFrom:
       fieldRef:
+        apiVersion: v1
         fieldPath: spec.nodeName
-  - name: K8S_NODE_IP
+  - name: POD_IP
     valueFrom:
       fieldRef:
-        fieldPath: status.hostIP
-  - name: K8S_NAMESPACE
+        fieldPath: status.podIP
+  - name: POD_NAME
     valueFrom:
       fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.namespace
-  - name: K8S_POD_NAME
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
         fieldPath: metadata.name
-  - name: K8S_POD_UID
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.uid
-  - name: K8S_POD_IP
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: status.podIP
-  - name: OTEL_RESOURCE_ATTRIBUTES
-    value: k8s.cluster.name=unknown
-  image: otel/opentelemetry-collector-contrib:0.83.0
-  mode: null
-  replicas: 1
-  resources:
-    limits:
-      cpu: 250m
-      memory: 500Mi
-    requests:
-      cpu: 250m
-      memory: 500Mi
-  volumeMounts:
-  - mountPath: /hostfs
-    mountPropagation: HostToContainer
-    name: hostfs
-    readOnly: true
-  volumes:
-  - hostPath:
-      path: /
-    name: hostfs
----
-apiVersion: opentelemetry.io/v1alpha1
-kind: OpenTelemetryCollector
-metadata:
-  labels:
-    app: ackstorm-opentelemetry-collector-daemon
-    app.kubernetes.io/instance: ackstorm-opentelemetry-collector
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/part-of: otel-cloud-stack
-    app.kubernetes.io/version: 0.1.3
-    chart: otel-cloud-stack-0.1.3
-    environment: observability-peer
-    heritage: Helm
-    release: ackstorm-opentelemetry-collector
-  name: ackstorm-opentelemetry-collector-daemon
-  namespace: observability-peer
-spec:
-  config: "exporters:\n  logging:\n    sampling_initial: 5\n    sampling_thereafter:
-    200\n    verbosity: detailed\n  loki:\n    auth:\n      authenticator: basicauth/observer\n
-    \   endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n    headers:\n      X-Scope-OrgID:
-    ${PEER_ID}\n  otlp:\n    endpoint: ingest.lightstep.com:443\n    headers:\n      lightstep-access-token:
-    ${LS_TOKEN}\nreceivers:\n  prometheus/file:\n    config:\n      scrape_configs:\n
-    \     \n      # Collect node metrics\n      - job_name: kubernetes-pods\n        scrape_interval:
-    30s\n        kubernetes_sd_configs:\n        - role: pod\n          selectors:\n
-    \         - role: pod\n            # only scrape data from pods running on the
-    same node as collector\n            field: \"spec.nodeName=$K8S_NODE_NAME\"\n
-    \       relabel_configs:\n          - source_labels: [ __meta_kubernetes_pod_annotation_prometheus_io_scrape
-    ]\n            action: keep\n            regex: true\n          - source_labels:
-    [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]\n            action:
-    drop\n            regex: true\n          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]\n
-    \           action: replace\n            regex: (https?)\n            target_label:
-    __scheme__\n          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]\n
-    \           action: replace\n            target_label: __metrics_path__\n            regex:
-    (.+)\n          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]\n
-    \           action: replace\n            regex: ([^:]+)(?::\\d+)?;(\\d+)\n            #
-    NOTE: otel collector uses env var replacement. $$ is used as a literal $.\n            replacement:
-    $$1:$$2\n            target_label: __address__\n          - action: labelmap\n
-    \           regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)\n
-    \           replacement: __param_$$1\n          - action: labelmap\n            regex:
-    __meta_kubernetes_pod_label_(.+)\n          - source_labels: [__meta_kubernetes_namespace]\n
-    \           action: replace\n            target_label: namespace\n          -
-    source_labels: [__meta_kubernetes_pod_name]\n            action: replace\n            target_label:
-    pod\n          - source_labels: [__meta_kubernetes_pod_phase]\n            regex:
-    Pending|Succeeded|Failed|Completed\n            action: drop\n      - job_name:
-    node-exporter\n        scrape_interval: 30s\n        relabel_configs:\n        -
-    action: labelmap\n          regex: __meta_kubernetes_node_label_(.+)\n        -
-    action: replace\n          regex: \"(.*)\"\n          replacement: \"$1\"\n          separator:
-    \";\"\n          source_labels:\n          - job\n          target_label: __tmp_prometheus_job_name\n
-    \       static_configs:\n          - targets:\n            - ${K8S_NODE_NAME}:9100\n
-    \     # We still need to scrape kubelet's CAdvisor which isn't supported\n      -
-    authorization:\n          credentials_file: \"/var/run/secrets/kubernetes.io/serviceaccount/token\"\n
-    \         type: Bearer\n        follow_redirects: true\n        honor_labels:
-    true\n        honor_timestamps: true\n        job_name: kubelet\n        kubernetes_sd_configs:\n
-    \       - follow_redirects: true\n          role: node\n          # selectors:\n
-    \         # - role: node\n          #   # only scrape data from pods running on
-    the same node as collector\n          #   field: \"metadata.name=$K8S_NODE_NAME\"\n
-    \       metric_relabel_configs:\n        - action: drop\n          regex: container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)\n
-    \         replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __name__\n        - action: drop\n          regex: container_fs_(io_current|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)\n
-    \         replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __name__\n        - action: drop\n          regex: container_memory_(mapped_file|swap)\n
-    \         replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __name__\n        - action: drop\n          regex: container_(file_descriptors|tasks_state|threads_max)\n
-    \         replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __name__\n        - action: drop\n          regex: container_spec.*\n
-    \         replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __name__\n        - action: drop\n          regex: \".+;\"\n          replacement:
-    \"$1\"\n          separator: \";\"\n          source_labels:\n          - id\n
-    \         - pod\n        metrics_path: \"/metrics/cadvisor\"\n        relabel_configs:\n
-    \       - action: replace\n          regex: \"(.*)\"\n          replacement: \"$1\"\n
-    \         separator: \";\"\n          source_labels:\n          - job\n          target_label:
-    __tmp_prometheus_job_name\n        - action: replace\n          replacement: \"kubelet\"\n
-    \         target_label: job\n        - action: replace\n          regex: \"(.*)\"\n
-    \         replacement: \"${1}\"\n          separator: \";\"\n          source_labels:\n
-    \         - __meta_kubernetes_node_name\n          target_label: node\n        -
-    action: replace\n          regex: \"(.*)\"\n          replacement: https-metrics\n
-    \         separator: \";\"\n          target_label: endpoint\n        - action:
-    replace\n          regex: \"(.*)\"\n          replacement: \"$1\"\n          separator:
-    \";\"\n          source_labels:\n          - __metrics_path__\n          target_label:
-    metrics_path\n        - action: hashmod\n          modulus: 1\n          regex:
-    \"(.*)\"\n          replacement: \"$1\"\n          separator: \";\"\n          source_labels:\n
-    \         - __address__\n          target_label: __tmp_hash\n        - action:
-    keep\n          regex: \"$(SHARD)\"\n          replacement: \"$1\"\n          separator:
-    \";\"\n          source_labels:\n          - __tmp_hash\n        scheme: https\n
-    \       scrape_interval: 15s\n        scrape_timeout: 10s\n        tls_config:\n
-    \         ca_file: \"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\"\n
-    \         insecure_skip_verify: true\n      \n  hostmetrics:\n    collection_interval:
-    30s\n    root_path: /hostfs\n    scrapers:\n      filesystem:\n        exclude_fs_types:\n
-    \         fs_types:\n          - autofs\n          - binfmt_misc\n          -
-    bpf\n          - cgroup2\n          - configfs\n          - debugfs\n          -
-    devpts\n          - devtmpfs\n          - fusectl\n          - hugetlbfs\n          -
-    iso9660\n          - mqueue\n          - nsfs\n          - overlay\n          -
-    proc\n          - procfs\n          - pstore\n          - rpc_pipefs\n          -
-    securityfs\n          - selinuxfs\n          - squashfs\n          - sysfs\n          -
-    tracefs\n          match_type: strict\n        exclude_mount_points:\n          match_type:
-    regexp\n          mount_points:\n          - /dev/.*\n          - /proc/.*\n          -
-    /sys/.*\n          - /run/k3s/containerd/.*\n          - /var/lib/docker/.*\n
-    \         - /var/lib/kubelet/.*\n          - /snap/.*\n  kubeletstats:\n    auth_type:
-    serviceAccount\n    collection_interval: 15s\n    endpoint: https://${env:K8S_NODE_IP}:10250\n
-    \   extra_metadata_labels:\n    - container.id\n    - k8s.volume.type\n    insecure_skip_verify:
-    true\n    k8s_api_config:\n      auth_type: serviceAccount\n    metric_groups:\n
-    \   - node\n    - pod\n    - volume\n    - container\n  otlp:\n    protocols:\n
-    \     grpc:\n        endpoint: 0.0.0.0:4317\nprocessors:\n  batch:\n    send_batch_max_size:
-    1500\n    send_batch_size: 1000\n    timeout: 1s\n  k8sattributes:\n    extract:\n
-    \     labels:\n      - from: pod\n        key: app.kubernetes.io/name\n        tag_name:
-    service.name\n      - from: pod\n        key: k8s-app\n        tag_name: service.name\n
-    \     - from: pod\n        key: app.kubernetes.io/instance\n        tag_name:
-    k8s.app.instance\n      - from: pod\n        key: app.kubernetes.io/version\n
-    \       tag_name: service.version\n      - from: pod\n        key: app.kubernetes.io/component\n
-    \       tag_name: k8s.app.component\n      metadata:\n      - k8s.namespace.name\n
-    \     - k8s.pod.name\n      - k8s.pod.uid\n      - k8s.node.name\n      - k8s.pod.start_time\n
-    \     - k8s.deployment.name\n      - k8s.replicaset.name\n      - k8s.replicaset.uid\n
-    \     - k8s.daemonset.name\n      - k8s.daemonset.uid\n      - k8s.job.name\n
-    \     - k8s.job.uid\n      - k8s.container.name\n      - k8s.cronjob.name\n      -
-    k8s.statefulset.name\n      - k8s.statefulset.uid\n      - container.image.tag\n
-    \     - container.image.name\n      - k8s.cluster.uid\n    filter:\n      node_from_env_var:
-    K8S_NODE_NAME\n    passthrough: false\n    pod_association:\n    - sources:\n
-    \     - from: resource_attribute\n        name: k8s.pod.uid\n    - sources:\n
-    \     - from: resource_attribute\n        name: k8s.pod.name\n      - from: resource_attribute\n
-    \       name: k8s.namespace.name\n      - from: resource_attribute\n        name:
-    k8s.node.name\n    - sources:\n      - from: resource_attribute\n        name:
-    k8s.pod.ip\n    - sources:\n      - from: resource_attribute\n        name: k8s.pod.name\n
-    \     - from: resource_attribute\n        name: k8s.namespace.name\n    - sources:\n
-    \     - from: connection\n  memory_limiter:\n    check_interval: 1s\n    limit_percentage:
-    85\n    spike_limit_percentage: 10\n  resourcedetection/env:\n    detectors:\n
-    \   - env\n    override: false\n    timeout: 2s\nservice:\n  pipelines:\n    logs:\n
-    \     exporters:\n      - loki\n      processors:\n      - memory_limiter\n      -
-    resource\n      - k8sattributes\n      - batch\n      receivers:\n      - k8s_events\n
-    \     - filelog\n    metrics:\n      exporters: []\n      processors:\n      -
-    memory_limiter\n      - resource\n      - resourcedetection/env\n      - k8sattributes\n
-    \     - metricstransform/k8sservicename\n      - batch\n      receivers:\n      -
-    prometheus\n"
-  env:
-  - name: LS_TOKEN
-    valueFrom:
-      secretKeyRef:
-        key: LS_TOKEN
-        name: otel-collector-secret
-  - name: K8S_NODE_NAME
-    valueFrom:
-      fieldRef:
-        fieldPath: spec.nodeName
-  - name: K8S_NODE_IP
-    valueFrom:
-      fieldRef:
-        fieldPath: status.hostIP
-  - name: K8S_NAMESPACE
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.namespace
-  - name: K8S_POD_NAME
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.name
-  - name: K8S_POD_UID
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.uid
-  - name: K8S_POD_IP
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: status.podIP
-  - name: OTEL_RESOURCE_ATTRIBUTES
-    value: k8s.cluster.name=unknown
-  image: otel/opentelemetry-collector-contrib:0.83.0
-  mode: daemonset
-  resources:
-    limits:
-      cpu: 250m
-      memory: 500Mi
-    requests:
-      cpu: 250m
-      memory: 128Mi
-  volumeMounts:
-  - mountPath: /hostfs
-    mountPropagation: HostToContainer
-    name: hostfs
-    readOnly: true
-  volumes:
-  - hostPath:
-      path: /
-    name: hostfs
----
-apiVersion: opentelemetry.io/v1alpha1
-kind: OpenTelemetryCollector
-metadata:
-  labels:
-    app: ackstorm-opentelemetry-collector-traces
-    app.kubernetes.io/instance: ackstorm-opentelemetry-collector
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/part-of: otel-cloud-stack
-    app.kubernetes.io/version: 0.1.3
-    chart: otel-cloud-stack-0.1.3
-    environment: observability-peer
-    heritage: Helm
-    release: ackstorm-opentelemetry-collector
-  name: ackstorm-opentelemetry-collector-traces
-  namespace: observability-peer
-spec:
-  autoscaler:
-    maxReplicas: 3
-    minReplicas: 1
-    targetMemoryUtilization: 70
-  config: |
-    exporters:
-      logging:
-        loglevel: warn
-      loki:
-        auth:
-          authenticator: basicauth/observer
-        endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push
-        headers:
-          X-Scope-OrgID: ${PEER_ID}
-      otlp:
-        endpoint: ingest.lightstep.com:443
-        headers:
-          lightstep-access-token: ${LS_TOKEN}
-      otlp/spanmetrics:
-        endpoint: ${env:MY_POD_IP}:4317
-        tls:
-          insecure: true
-      otlphttp/observer:
-        auth:
-          authenticator: basicauth/observer
-        endpoint: ${PEER_OBSERVER_URL}
-        headers:
-          X-Scope-OrgID: ${PEER_ID}
-        tls:
-          insecure: true
-      prometheusremotewrite:
-        endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write
-        external_labels:
-          cluster: ${PEER_ID}
-        resource_to_telemetry_conversion:
-          enabled: true
-        retry_on_failure:
-          enabled: true
-          initial_interval: 5s
-          max_elapsed_time: 30s
-          max_interval: 10s
-        timeout: 15s
-    receivers:
-      jaeger:
-        protocols:
-          grpc:
-            endpoint: ${env:MY_POD_IP}:14250
-          thrift_compact:
-            endpoint: ${env:MY_POD_IP}:6831
-          thrift_http:
-            endpoint: ${env:MY_POD_IP}:14268
-      otlp:
-        protocols:
-          grpc:
-            endpoint: ${env:MY_POD_IP}:4317
-          http:
-            cors:
-              allowed_origins:
-              - http://*
-              - https://*
-            endpoint: ${env:MY_POD_IP}:4318
-      otlp/spanmetrics:
-        protocols:
-          grpc:
-            endpoint: localhost:12345
-      zipkin:
-        endpoint: ${env:MY_POD_IP}:9411
-    processors:
-      attributes/cluster:
-        actions:
-        - action: insert
-          key: environment
-          value: ${PEER_ENVIRONMENT}
-        - action: insert
-          key: cluster
-          value: ${PEER_ID}
-      batch:
-        send_batch_max_size: 1500
-        send_batch_size: 10000
-        timeout: 10s
-      groupbytrace:
-        num_traces: 1000
-        wait_duration: 30s
-      k8sattributes:
-        auth_type: serviceAccount
-        extract:
-          labels:
-          - from: pod
-            key: app.kubernetes.io/name
-            tag_name: service.name
-          - from: pod
-            key: k8s-app
-            tag_name: service.name
-          - from: pod
-            key: app.kubernetes.io/instance
-            tag_name: k8s.app.instance
-          - from: pod
-            key: app.kubernetes.io/version
-            tag_name: service.version
-          - from: pod
-            key: app.kubernetes.io/component
-            tag_name: k8s.app.component
-          metadata:
-          - k8s.cluster.uid
-          - k8s.namespace.name
-          - k8s.pod.name
-          - k8s.pod.uid
-          - k8s.node.name
-          - k8s.pod.start_time
-          - k8s.deployment.name
-          - k8s.replicaset.name
-          - k8s.replicaset.uid
-          - k8s.daemonset.name
-          - k8s.daemonset.uid
-          - k8s.job.name
-          - k8s.job.uid
-          - k8s.cronjob.name
-          - k8s.statefulset.name
-          - k8s.statefulset.uid
-          - container.image.tag
-          - container.image.name
-        passthrough: false
-        pod_association:
-        - sources:
-          - from: resource_attribute
-            name: k8s.pod.name
-        - sources:
-          - from: connection
-      memory_limiter:
-        check_interval: 5s
-        limit_percentage: 80
-        spike_limit_percentage: 25
-      metricstransform:
-        transforms:
-        - action: update
-          include: calls_total
-          new_name: traces_spanmetrics_calls_total
-          operations:
-          - action: update_label
-            label: operation
-            new_label: span.name
-        - action: update
-          include: latency
-          new_name: traces_spanmetrics_latency
-      resourcedetection/env:
-        detectors:
-        - env
-        override: false
-        timeout: 2s
-      servicegraph:
-        dimensions:
-        - k8s.namespace.name
-        latency_histogram_buckets:
-        - 100us
-        - 1ms
-        - 2ms
-        - 6ms
-        - 10ms
-        - 100ms
-        - 250ms
-        metrics_exporter: otlp/spanmetrics
-        store:
-          max_items: 200
-          ttl: 2s
-      spanmetrics:
-        aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE
-        dimensions:
-        - default: GET
-          name: http.method
-        - name: http.status_code
-        dimensions_cache_size: 1500
-        latency_histogram_buckets:
-        - 100us
-        - 1ms
-        - 2ms
-        - 6ms
-        - 10ms
-        - 100ms
-        - 250ms
-        metrics_exporter: otlp/spanmetrics
-        metrics_flush_interval: 30s
-    service:
-      extensions:
-      - health_check
-      - memory_ballast
-      - basicauth/observer
-      pipelines:
-        logs:
-          exporters:
-          - logging
-          - loki
-          processors:
-          - memory_limiter
-          - k8sattributes
-          - batch
-          receivers:
-          - otlp
-        metrics:
-          exporters:
-          - logging
-          - prometheusremotewrite
-          processors:
-          - memory_limiter
-          - k8sattributes
-          - metricstransform
-          - batch
-          receivers:
-          - otlp
-          - prometheus
-        metrics/spanmetrics:
-          exporters:
-          - logging
-          - otlp/spanmetrics
-          receivers:
-          - otlp/spanmetrics
-        traces:
-          exporters:
-          - logging
-          - otlphttp/observer
-          processors:
-          - memory_limiter
-          - k8sattributes
-          - groupbytrace
-          - spanmetrics
-          - attributes/cluster
-          - batch
-          receivers:
-          - otlp
-          - jaeger
-          - zipkin
-        traces/servicegraph:
-          exporters:
-          - logging
-          processors:
-          - servicegraph
-          receivers:
-          - otlp
-          - jaeger
-          - zipkin
-      telemetry:
-        metrics:
-          address: ${env:MY_POD_IP}:8888
-  env:
-  - name: KUBE_NODE_NAME
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: spec.nodeName
-  - name: MY_POD_IP
-    valueFrom:
-      fieldRef:
-        fieldPath: status.podIP
-  - name: LS_TOKEN
+  - name: PEER_PASSWORD
     valueFrom:
       secretKeyRef:
         key: password
         name: observability-peer-auth
-  - name: K8S_NODE_NAME
-    valueFrom:
-      fieldRef:
-        fieldPath: spec.nodeName
-  - name: K8S_NODE_IP
-    valueFrom:
-      fieldRef:
-        fieldPath: status.hostIP
-  - name: K8S_NAMESPACE
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.namespace
-  - name: K8S_POD_NAME
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.name
-  - name: K8S_POD_UID
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: metadata.uid
-  - name: K8S_POD_IP
-    valueFrom:
-      fieldRef:
-        apiVersion: v1
-        fieldPath: status.podIP
-  - name: OTEL_RESOURCE_ATTRIBUTES
-    value: k8s.cluster.name=unknown
-  image: otel/opentelemetry-collector-contrib:0.83.0
-  mode: deployment
-  replicas: 1
-  resources:
-    limits:
-      cpu: 250m
-      memory: 250Mi
-    requests:
-      cpu: 250m
-      memory: 250Mi
-  volumeMounts: null
-  volumes: null
----
-apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-    helm.sh/hook: test
-  labels:
-    app.kubernetes.io/component: webhook
-    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: opentelemetry-operator
-    app.kubernetes.io/version: 0.83.0
-    helm.sh/chart: opentelemetry-operator-0.37.1
-  name: opentelemetry-operator-peer-cert-manager
-  namespace: observability-peer
-spec:
-  containers:
-  - command:
-    - sh
-    - -c
-    - |
-      wget_output=$(wget -q "$CERT_MANAGER_CLUSTERIP:$CERT_MANAGER_PORT")
-      if wget_output=="wget: server returned error: HTTP/1.0 400 Bad Request"
-      then exit 0
-      else exit 1
-      fi
-    env:
-    - name: CERT_MANAGER_CLUSTERIP
-      value: cert-manager-webhook
-    - name: CERT_MANAGER_PORT
-      value: "443"
-    image: busybox:latest
-    name: wget
-  restartPolicy: Never
+  mode: daemonset
+  securityContext:
+    runAsGroup: 0
+    runAsUser: 0
+  serviceAccount: opentelemetry-peer-collector
+  targetAllocator:
+    allocationStrategy: per-node
+    enabled: true
+    filterStrategy: relabel-config
+    prometheusCR:
+      enabled: true
+    replicas: 1
+    serviceAccount: opentelemetry-peer-targetallocator
+  volumeMounts:
+  - mountPath: /var/log/pods
+    name: var-log-pods
+    readOnly: true
+  - mountPath: /var/lib/docker/containers
+    name: var-lib-docker-containers
+    readOnly: true
+  - mountPath: /var/lib/otelcol
+    name: var-lib-otelcol
+  volumes:
+  - hostPath:
+      path: /var/log/pods
+    name: var-log-pods
+  - hostPath:
+      path: /var/lib/docker/containers
+    name: var-lib-docker-containers
+  - hostPath:
+      path: /var/lib/otelcol
+      type: DirectoryOrCreate
+    name: var-lib-otelcol
 ---
 apiVersion: v1
 kind: Pod
@@ -10186,8 +8889,6 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  annotations:
-    cert-manager.io/inject-ca-from: observability-peer/opentelemetry-operator-peer-serving-cert
   labels:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
@@ -10200,6 +8901,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10221,6 +8923,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10242,6 +8945,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10278,6 +8982,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10299,6 +9004,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10319,6 +9025,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
@@ -10340,6 +9047,7 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSVENDQWkyZ0F3SUJBZ0lRTnBKeXF5ZlhzMDRxZTUzNDZmdzJkREFOQmdrcWhraUc5dzBCQVFzRkFEQXQKTVNzd0tRWURWUVFERXlKdmNHVnVkR1ZzWlcxbGRISjVMVzl3WlhKaGRHOXlMVzl3WlhKaGRHOXlMV05oTUI0WApEVEkwTURRd016QTVNRGcxTjFvWERUSTFNRFF3TXpBNU1EZzFOMW93TFRFck1Da0dBMVVFQXhNaWIzQmxiblJsCmJHVnRaWFJ5ZVMxdmNHVnlZWFJ2Y2kxdmNHVnlZWFJ2Y2kxallUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQUQKZ2dFUEFEQ0NBUW9DZ2dFQkFOVFZ3Y21CR3J3aGJLYVo2ekxiYStRQ1Q1SDFkWmhHS3lLajBuOGNUOTRWZW4zVQpMRWxJU1JSOWVpTkRJa1JDVDJtaVFJTVF3ZXcxWVlwTGhXaDRLQTFzNEliTGpuU01BaG5aQy9lYkl4NmI1SmRiCjAwZXVacUcyUTNsVS9POUIweEI2dlpFcFJzV0RZQkJRbmU1T3pFWHRDbEZwYkJQUm5GN05oVSsrVkRFUEovNlIKTGpCKzZBK1dvTjNKbTc3OFR4SlIvOVRwNWdnblZ4UVZrcnBWemtMUXg0NXU2QWFZelNoQXIvQ3VoMDJvNStEKwo3RFh6Z1EwdkJBaG0vU0tyUTlyMjN0SnpQUCtsWnhHeDUxV0pQU0crVXEwSW1vWitXVE55Nk4rVnRTaDZ1bFV3CldkS25LTFhzRmRieGsycFZhb0l1bTVtQ05ER000cUlCYW5jbzBna0NBd0VBQWFOaE1GOHdEZ1lEVlIwUEFRSC8KQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUZCUWNEQWpBUEJnTlZIUk1CQWY4RQpCVEFEQVFIL01CMEdBMVVkRGdRV0JCUVNoVEVJOGY4VkZxNXFhcTVBQXMyaVJxbVB2akFOQmdrcWhraUc5dzBCCkFRc0ZBQU9DQVFFQUJYVjhjNFZXVVNrTW1ZeFZWbmhmbVpWSURSRlVIaWtiU2haU0RHUng1RStlMk5jTkJ2ZHMKYVRqZEdxSGFKdXhnVGg3Lzd4UTQ0dldsbnF2M2xnM3pQYUc2MkN0UXJRamgvUGgzNTM0S1E1K3pLWlJ5YSsxUwpIdGN4UkdMT0VjaFk0eHhob0FjK0t2cEwvOTVkUlZZeHB3Qkc1Snlvdys4Wm5KS3VOS2hvUFJ1bGtiVERmY0RnCkNGcnc1czdWVERhYWtUcUUrcXpzQTFPS1QvMjB3cE9sdWlDbzA0M2MvVllXcmFocEh0cW5iRkNROEdwYUllekoKVkhFWXlMOEZONitMd1B3SkljQUI3WCtLb2VDK2JuRzZvRnprY2NGUG5pL2JGd0lrL01kcEw1dTFHRU96RXJTbAp0WVcyempzaWlTMU1BU2Q1aTNuU01ISHZSQWJ5bWs2M2F3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
     service:
       name: opentelemetry-operator-peer-webhook
       namespace: observability-peer
