@@ -13,7 +13,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/version: 1.53.0
-    helm.sh/chart: jaeger-2.0.1
+    helm.sh/chart: jaeger-2.1.0
   name: hotrod-demo-hotrod
   namespace: hotrod-demo
 ---
@@ -26,7 +26,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/version: 1.53.0
-    helm.sh/chart: jaeger-2.0.1
+    helm.sh/chart: jaeger-2.1.0
   name: hotrod-demo-hotrod
   namespace: hotrod-demo
 spec:
@@ -50,7 +50,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/version: 1.53.0
-    helm.sh/chart: jaeger-2.0.1
+    helm.sh/chart: jaeger-2.1.0
   name: hotrod-demo-hotrod
   namespace: hotrod-demo
 spec:

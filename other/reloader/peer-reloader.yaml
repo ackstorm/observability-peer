@@ -7,7 +7,7 @@ metadata:
   labels:
     app: reloader-peer
     app.kubernetes.io/managed-by: Helm
-    chart: reloader-1.0.73
+    chart: reloader-1.0.79
     heritage: Helm
     release: ackstorm-reloader
   name: reloader-peer
@@ -22,7 +22,7 @@ metadata:
   labels:
     app: reloader-peer
     app.kubernetes.io/managed-by: Helm
-    chart: reloader-1.0.73
+    chart: reloader-1.0.79
     heritage: Helm
     release: ackstorm-reloader
   name: reloader-peer-role
@@ -95,7 +95,7 @@ metadata:
   labels:
     app: reloader-peer
     app.kubernetes.io/managed-by: Helm
-    chart: reloader-1.0.73
+    chart: reloader-1.0.79
     heritage: Helm
     release: ackstorm-reloader
   name: reloader-peer-role-binding
@@ -117,12 +117,12 @@ metadata:
   labels:
     app: reloader-peer
     app.kubernetes.io/managed-by: Helm
-    chart: reloader-1.0.73
+    chart: reloader-1.0.79
     group: com.stakater.platform
     heritage: Helm
     provider: stakater
     release: ackstorm-reloader
-    version: v1.0.73
+    version: v1.0.79
   name: reloader-peer
   namespace: observability-peer
 spec:
@@ -137,17 +137,17 @@ spec:
       labels:
         app: reloader-peer
         app.kubernetes.io/managed-by: Helm
-        chart: reloader-1.0.73
+        chart: reloader-1.0.79
         group: com.stakater.platform
         heritage: Helm
         provider: stakater
         release: ackstorm-reloader
-        version: v1.0.73
+        version: v1.0.79
     spec:
       containers:
       - args:
         - --namespace-selector=observability-peer
-        image: ghcr.io/stakater/reloader:v1.0.73
+        image: ghcr.io/stakater/reloader:v1.0.79
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5

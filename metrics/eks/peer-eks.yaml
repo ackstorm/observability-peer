@@ -43629,7 +43629,7 @@ spec:
     spec:
       containers:
       - args:
-        - --metric-labels-allowlist=nodes=[*],*=[app,app.kubernetes.io/name,team,owner]
+        - --metric-labels-allowlist=nodes=[*],*=[app,app.kubernetes.io/name, app.kubernetes.io/component,team,owner]
         - --port=8080
         - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
         - --custom-resource-state-config-file=/etc/customresourcestate/config.yaml
@@ -44245,6 +44245,14 @@ spec:
       targetLabel: app
     - regex: (.+)
       sourceLabels:
+      - label_app_kubernetes_io_component
+      targetLabel: component
+    - regex: (.+)
+      sourceLabels:
+      - label_component
+      targetLabel: component
+    - regex: (.+)
+      sourceLabels:
       - label_team
       targetLabel: team
     - regex: (.+)
@@ -44258,7 +44266,7 @@ spec:
     port: http
     relabelings:
     - action: labeldrop
-      regex: (pod|service|endpoint|namespace|label_team|label_app|label_owner)
+      regex: (pod|service|endpoint|namespace|label_app|label_component|label_team||label_owner)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
@@ -44285,6 +44293,14 @@ spec:
       targetLabel: app
     - regex: (.+)
       sourceLabels:
+      - label_app_kubernetes_io_component
+      targetLabel: component
+    - regex: (.+)
+      sourceLabels:
+      - label_component
+      targetLabel: component
+    - regex: (.+)
+      sourceLabels:
       - label_team
       targetLabel: team
     - regex: (.+)
@@ -44298,7 +44314,7 @@ spec:
     port: metrics
     relabelings:
     - action: labeldrop
-      regex: (pod|service|endpoint|namespace|label_team|label_app|label_owner)
+      regex: (pod|service|endpoint|namespace|label_app|label_component|label_team||label_owner)
     - action: replace
       regex: (.+)
       replacement: kube-state-metrics
