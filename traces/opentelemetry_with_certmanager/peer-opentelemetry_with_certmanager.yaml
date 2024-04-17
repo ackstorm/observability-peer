@@ -23316,18 +23316,26 @@ metadata:
   name: opentelemetry-peer
   namespace: observability-peer
 spec:
-  config: "connectors:\n  spanmetrics: \n  servicegraph: \n    latency_histogram_buckets:
-    [100ms, 250ms, 1s, 5s, 10s]\nreceivers:\n  otlp:\n    protocols:\n      grpc:\n
-    \       endpoint: ${env:POD_IP}:4317\n      http:\n        endpoint: ${env:POD_IP}:4318\n
-    \       cors:\n          allowed_origins:\n            - \"http://*\"\n            -
-    \"https://*\"\n  jaeger:\n    protocols:\n      grpc:\n        endpoint: ${env:POD_IP}:14250\n
-    \     thrift_http:\n        endpoint: ${env:POD_IP}:14268\n      thrift_compact:\n
-    \       endpoint: ${env:POD_IP}:6831\n  zipkin:\n    endpoint: ${env:POD_IP}:9411\n
-    \ # otlp/spanmetrics:\n  #   protocols:\n  #     grpc:\n  #       endpoint: \"localhost:12345\"\n\nexporters:\n
-    \ logging:\n    loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
+  config: "connectors:\n  spanmetrics:\n    histogram:\n      explicit:\n        buckets:
+    [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions:\n      - name: http.method\n
+    \       default: GET\n      - name: http.status_code\n    exemplars:\n      enabled:
+    true\n    exclude_dimensions: ['status.code']\n    dimensions_cache_size: 1000\n
+    \   aggregation_temporality: \"AGGREGATION_TEMPORALITY_CUMULATIVE\"    \n    metrics_flush_interval:
+    15s\n    metrics_expiration: 5m\n    events:\n      enabled: true\n      dimensions:\n
+    \       - name: exception.type\n        - name: exception.message\n    resource_metrics_key_attributes:\n
+    \     - service.name\n      - telemetry.sdk.language\n      - telemetry.sdk.name\n
+    \ servicegraph: \n    latency_histogram_buckets: [100ms, 250ms, 1s, 5s, 10s]\n
+    \   dimensions:\n      - k8s.namespace.name\n    store:\n      ttl: 2s\n      max_items:
+    200\nreceivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint: ${env:POD_IP}:4317\n
+    \     http:\n        endpoint: ${env:POD_IP}:4318\n        cors:\n          allowed_origins:\n
+    \           - \"http://*\"\n            - \"https://*\"\n  jaeger:\n    protocols:\n
+    \     grpc:\n        endpoint: ${env:POD_IP}:14250\n      thrift_http:\n        endpoint:
+    ${env:POD_IP}:14268\n      thrift_compact:\n        endpoint: ${env:POD_IP}:6831\n
+    \ zipkin:\n    endpoint: ${env:POD_IP}:9411\n  # otlp/spanmetrics:\n  #   protocols:\n
+    \ #     grpc:\n  #       endpoint: \"localhost:12345\"\n\nexporters:\n  logging:\n
+    \   loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
-    \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheus/servicegraph:\n    endpoint:
-    localhost:9090\n    namespace: servicegraph\n  prometheusremotewrite:\n    endpoint:
+    \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
     http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n    resource_to_telemetry_conversion:\n
     \     enabled: true\n  otlphttp/prometheus:\n    endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/otlp\n
     \ loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator:
@@ -23356,14 +23364,15 @@ spec:
     \     username: ${PEER_ID}\n      password: ${PEER_PASSWORD}\n\nservice:\n  extensions:\n
     \ - health_check\n  - memory_ballast\n  - basicauth/observer\n  pipelines:\n    traces:\n
     \     receivers: [otlp, jaeger, zipkin]\n      processors: [k8sattributes, memory_limiter,
-    groupbytrace, metricstransform, resource, batch]\n      exporters: [logging, otlphttp/observer,
-    spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp, spanmetrics]\n
-    \     processors: [k8sattributes, memory_limiter, resource, batch]\n      exporters:
-    [logging, prometheusremotewrite]\n    metrics/servicegraph:\n      receivers:
-    [servicegraph]\n      exporters: [logging, prometheusremotewrite]\n    logs:\n
-    \     receivers: [otlp]\n      processors: [k8sattributes, memory_limiter, resource,
-    batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n      address:
-    \":8888\"\n"
+    groupbytrace, resource, batch]\n      exporters: [logging, otlphttp/observer,
+    spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp]\n      processors:
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
+    \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
+    []\n      exporters: [logging, prometheusremotewrite]\n    metrics/spanmetrics:\n
+    \     receivers: [spanmetrics]\n      processors: [metricstransform]\n      exporters:
+    [logging, prometheusremotewrite]\n    logs:\n      receivers: [otlp]\n      processors:
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, loki]\n
+    \ telemetry:\n    metrics:\n      address: \":8888\"\n"
   env:
   - name: NODE_NAME
     valueFrom:
