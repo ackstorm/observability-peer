@@ -43941,6 +43941,7 @@ spec:
   - new-service-discovery-manager
   - remote-write-receiver
   - exemplar-storage
+  - otlp-write-receiver
   externalLabels:
     cluster: ${PEER_ID}
     env: ${PEER_ENVIRONMENT}
