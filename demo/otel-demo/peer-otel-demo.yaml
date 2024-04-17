@@ -7,258 +7,2362 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-backend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-backend
-    app.kubernetes.io/version: 0.1.13
-    helm.sh/chart: otel-demo-backend-0.1.12
-  name: otel-demo-backend
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo
+  name: ackstorm-opentelemetry-demo
   namespace: otel-demo
 ---
 apiVersion: v1
-kind: ServiceAccount
+data:
+  demo.flagd.json: |
+    {
+      "$schema": "https://flagd.dev/schema/v0/flags.json",
+      "flags": {
+        "productCatalogFailure": {
+          "description": "Fail product catalog service on a specific product",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "recommendationServiceCacheFailure": {
+          "description": "Fail recommendation service cache",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "adServiceManualGc": {
+          "description": "Triggers full manual garbage collections in the ad service",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "adServiceHighCpu": {
+          "description": "Triggers high cpu load in the ad service",
+          "state": "ENABLED",
+          "variants": {
+              "on": true,
+              "off": false
+            },
+            "defaultVariant": "off"
+        },
+        "adServiceFailure": {
+          "description": "Fail ad service",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off",
+          "targeting": {
+            "fractional": [
+              {
+                "var": "session"
+              },
+              [
+                "on",
+                10
+              ],
+              [
+                "off",
+                90
+              ]
+            ]
+          }
+        },
+        "cartServiceFailure": {
+          "description": "Fail cart service",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "paymentServiceFailure": {
+          "description": "Fail payment service charge requests",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "paymentServiceUnreachable": {
+          "description": "Payment service is unavailable",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
+        "loadgeneratorFloodHomepage": {
+          "description": "Flood the frontend with a large amount of requests.",
+          "state": "ENABLED",
+          "variants": {
+            "on": 100,
+            "off": 0
+          },
+          "defaultVariant": "off"
+        }
+      }
+    }
+kind: ConfigMap
 metadata:
   labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-frontend
-    app.kubernetes.io/version: 0.1.14
-    helm.sh/chart: otel-demo-frontend-0.1.14
-  name: otel-demo-frontend
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo
+  name: ackstorm-opentelemetry-demo-flagd-config
+  namespace: otel-demo
+---
+apiVersion: v1
+data:
+  opensearch.yml: |
+    cluster.name: opensearch-cluster
+
+    # Bind to all interfaces because we don't know what IP address Docker will assign to us.
+    network.host: 0.0.0.0
+
+    # Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
+    # Implicitly done if ".singleNode" is set to "true".
+    # discovery.type: single-node
+
+    # Start OpenSearch Security Demo Configuration
+    # WARNING: revise all the lines below before you go into production
+    plugins:
+      security:
+        ssl:
+          transport:
+            pemcert_filepath: esnode.pem
+            pemkey_filepath: esnode-key.pem
+            pemtrustedcas_filepath: root-ca.pem
+            enforce_hostname_verification: false
+          http:
+            enabled: true
+            pemcert_filepath: esnode.pem
+            pemkey_filepath: esnode-key.pem
+            pemtrustedcas_filepath: root-ca.pem
+        allow_unsafe_democertificates: true
+        allow_default_init_securityindex: true
+        authcz:
+          admin_dn:
+            - CN=kirk,OU=client,O=client,L=test,C=de
+        audit.type: internal_opensearch
+        enable_snapshot_restore_privilege: true
+        check_snapshot_restore_write_privileges: true
+        restapi:
+          roles_enabled: ["all_access", "security_rest_api_access"]
+        system_indices:
+          enabled: true
+          indices:
+            [
+              ".opendistro-alerting-config",
+              ".opendistro-alerting-alert*",
+              ".opendistro-anomaly-results*",
+              ".opendistro-anomaly-detector*",
+              ".opendistro-anomaly-checkpoints",
+              ".opendistro-anomaly-detection-state",
+              ".opendistro-reports-*",
+              ".opendistro-notifications-*",
+              ".opendistro-notebooks",
+              ".opendistro-asynchronous-search-response*",
+            ]
+    ######## End OpenSearch Security Demo Configuration ########
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-config
   namespace: otel-demo
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: otel-demo-backend
-    app.kubernetes.io/instance: ackstorm-otel-demo-backend
+    app.kubernetes.io/component: adservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-backend
-    app.kubernetes.io/version: 0.1.13
-    helm.sh/chart: otel-demo-backend-0.1.12
-  name: otel-demo-backend
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-adservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
+  name: ackstorm-opentelemetry-demo-adservice
   namespace: otel-demo
 spec:
   ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http-metrics
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
   selector:
-    app.kubernetes.io/instance: ackstorm-otel-demo-backend
-    app.kubernetes.io/name: otel-demo-backend
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
   type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: otel-demo-frontend
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
+    app.kubernetes.io/component: cartservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-frontend
-    app.kubernetes.io/version: 0.1.14
-    helm.sh/chart: otel-demo-frontend-0.1.14
-  name: otel-demo-frontend
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-cartservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
+  name: ackstorm-opentelemetry-demo-cartservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: checkoutservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-checkoutservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
+  name: ackstorm-opentelemetry-demo-checkoutservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: currencyservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-currencyservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
+  name: ackstorm-opentelemetry-demo-currencyservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: emailservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-emailservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
+  name: ackstorm-opentelemetry-demo-emailservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: flagd
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-flagd
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
+  name: ackstorm-opentelemetry-demo-flagd
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8013
+    targetPort: 8013
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontend
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
+  name: ackstorm-opentelemetry-demo-frontend
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: frontendproxy
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontendproxy
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
+  name: ackstorm-opentelemetry-demo-frontendproxy
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: kafka
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-kafka
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
+  name: ackstorm-opentelemetry-demo-kafka
+  namespace: otel-demo
+spec:
+  ports:
+  - name: plaintext
+    port: 9092
+    targetPort: 9092
+  - name: controller
+    port: 9093
+    targetPort: 9093
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: loadgenerator
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-loadgenerator
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
+  name: ackstorm-opentelemetry-demo-loadgenerator
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8089
+    targetPort: 8089
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: paymentservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-paymentservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
+  name: ackstorm-opentelemetry-demo-paymentservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: productcatalogservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+  name: ackstorm-opentelemetry-demo-productcatalogservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: quoteservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-quoteservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
+  name: ackstorm-opentelemetry-demo-quoteservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: recommendationservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-recommendationservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
+  name: ackstorm-opentelemetry-demo-recommendationservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-redis
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
+  name: ackstorm-opentelemetry-demo-redis
+  namespace: otel-demo
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: shippingservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-shippingservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
+  name: ackstorm-opentelemetry-demo-shippingservice
+  namespace: otel-demo
+spec:
+  ports:
+  - name: tcp-service
+    port: 8080
+    targetPort: 8080
+  selector:
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch
   namespace: otel-demo
 spec:
   ports:
   - name: http
-    port: 80
+    port: 9200
     protocol: TCP
-    targetPort: http-metrics
+  - name: transport
+    port: 9300
+    protocol: TCP
   selector:
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
-    app.kubernetes.io/name: otel-demo-frontend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/name: opensearch
   type: ClusterIP
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-backend
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-backend
-    app.kubernetes.io/version: 0.1.13
-    helm.sh/chart: otel-demo-backend-0.1.12
-  name: otel-demo-backend
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-headless
   namespace: otel-demo
 spec:
-  replicas: 1
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600
+  publishNotReadyAddresses: true
   selector:
-    matchLabels:
-      app.kubernetes.io/instance: ackstorm-otel-demo-backend
-      app.kubernetes.io/name: otel-demo-backend
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/instance: ackstorm-otel-demo-backend
-        app.kubernetes.io/name: otel-demo-backend
-    spec:
-      containers:
-      - env:
-        - name: BACKEND_LISTEN
-          value: 0.0.0.0:80
-        - name: JAEGER_ENDPOINT
-          value: http://opentelemetry-peer-collector.observability-peer.svc:14268/api/traces
-        image: jtyr/otel-demo:backend-0.1.13
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: 80
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        name: app
-        ports:
-        - containerPort: 80
-          name: http-metrics
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /metrics
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        resources: {}
-        securityContext: {}
-      securityContext: {}
-      serviceAccountName: otel-demo-backend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/name: opensearch
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
+    app.kubernetes.io/component: accountingservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-frontend
-    app.kubernetes.io/version: 0.1.14
-    helm.sh/chart: otel-demo-frontend-0.1.14
-  name: otel-demo-frontend
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-accountingservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-accountingservice
+  name: ackstorm-opentelemetry-demo-accountingservice
   namespace: otel-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/instance: ackstorm-otel-demo-frontend
-      app.kubernetes.io/name: otel-demo-frontend
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-accountingservice
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: ackstorm-otel-demo-frontend
-        app.kubernetes.io/name: otel-demo-frontend
+        app.kubernetes.io/component: accountingservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-accountingservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-accountingservice
     spec:
       containers:
       - env:
-        - name: BACKEND_ENDPOINT
-          value: http://otel-demo-backend/api/main
-        - name: FRONTEND_LISTEN
-          value: 0.0.0.0:80
-        - name: JAEGER_ENDPOINT
-          value: http://opentelemetry-peer-collector.observability-peer.svc:14268/api/traces
-        image: jtyr/otel-demo:frontend-0.1.14
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: KAFKA_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-kafka:9092
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-accountingservice
         imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: 80
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        name: app
+        name: accountingservice
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts: null
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nc -z -v -w30 ackstorm-opentelemetry-demo-kafka 9092; do echo waiting
+          for kafka; sleep 2; done;
+        image: busybox:latest
+        name: wait-for-kafka
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: adservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-adservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
+  name: ackstorm-opentelemetry-demo-adservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: adservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-adservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: AD_SERVICE_PORT
+          value: "8080"
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4318
+        - name: OTEL_LOGS_EXPORTER
+          value: otlp
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-adservice
+        imagePullPolicy: IfNotPresent
+        name: adservice
         ports:
-        - containerPort: 80
-          name: http-metrics
-          protocol: TCP
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 300Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: cartservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-cartservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
+  name: ackstorm-opentelemetry-demo-cartservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: cartservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-cartservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: CART_SERVICE_PORT
+          value: "8080"
+        - name: ASPNETCORE_URLS
+          value: http://*:$(CART_SERVICE_PORT)
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: REDIS_ADDR
+          value: ackstorm-opentelemetry-demo-redis:6379
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-cartservice
+        imagePullPolicy: IfNotPresent
+        name: cartservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 160Mi
+        volumeMounts: null
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nc -z -v -w30 ackstorm-opentelemetry-demo-redis 6379; do echo waiting
+          for redis; sleep 2; done;
+        image: busybox:latest
+        name: wait-for-redis
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: checkoutservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-checkoutservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
+  name: ackstorm-opentelemetry-demo-checkoutservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: checkoutservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-checkoutservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: CHECKOUT_SERVICE_PORT
+          value: "8080"
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: CART_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-cartservice:8080
+        - name: CURRENCY_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-currencyservice:8080
+        - name: EMAIL_SERVICE_ADDR
+          value: http://ackstorm-opentelemetry-demo-emailservice:8080
+        - name: PAYMENT_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-paymentservice:8080
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-productcatalogservice:8080
+        - name: SHIPPING_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-shippingservice:8080
+        - name: KAFKA_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-kafka:9092
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-checkoutservice
+        imagePullPolicy: IfNotPresent
+        name: checkoutservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts: null
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nc -z -v -w30 ackstorm-opentelemetry-demo-kafka 9092; do echo waiting
+          for kafka; sleep 2; done;
+        image: busybox:latest
+        name: wait-for-kafka
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: currencyservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-currencyservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
+  name: ackstorm-opentelemetry-demo-currencyservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: currencyservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-currencyservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: CURRENCY_SERVICE_PORT
+          value: "8080"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: VERSION
+          value: 1.9.0
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-currencyservice
+        imagePullPolicy: IfNotPresent
+        name: currencyservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: emailservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-emailservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
+  name: ackstorm-opentelemetry-demo-emailservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: emailservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-emailservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: EMAIL_SERVICE_PORT
+          value: "8080"
+        - name: APP_ENV
+          value: production
+        - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4318/v1/traces
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-emailservice
+        imagePullPolicy: IfNotPresent
+        name: emailservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 100Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: flagd
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-flagd
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
+  name: ackstorm-opentelemetry-demo-flagd
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: flagd
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-flagd
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
+    spec:
+      containers:
+      - command:
+        - /flagd-build
+        - start
+        - --uri
+        - file:./etc/flagd/demo.flagd.json
+        env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-feature/flagd:v0.9.0
+        imagePullPolicy: IfNotPresent
+        name: flagd
+        ports:
+        - containerPort: 8013
+          name: service
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /etc/flagd
+          name: config
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes:
+      - configMap:
+          name: ackstorm-opentelemetry-demo-flagd-config
+        name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: frauddetectionservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
+  name: ackstorm-opentelemetry-demo-frauddetectionservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: frauddetectionservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: KAFKA_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-kafka:9092
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4318
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-frauddetectionservice
+        imagePullPolicy: IfNotPresent
+        name: frauddetectionservice
+        resources:
+          limits:
+            memory: 200Mi
+        volumeMounts: null
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nc -z -v -w30 ackstorm-opentelemetry-demo-kafka 9092; do echo waiting
+          for kafka; sleep 2; done;
+        image: busybox:latest
+        name: wait-for-kafka
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontend
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
+  name: ackstorm-opentelemetry-demo-frontend
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontend
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: FRONTEND_PORT
+          value: "8080"
+        - name: FRONTEND_ADDR
+          value: :8080
+        - name: AD_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-adservice:8080
+        - name: CART_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-cartservice:8080
+        - name: CHECKOUT_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-checkoutservice:8080
+        - name: CURRENCY_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-currencyservice:8080
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-productcatalogservice:8080
+        - name: RECOMMENDATION_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-recommendationservice:8080
+        - name: SHIPPING_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-shippingservice:8080
+        - name: OTEL_COLLECTOR_HOST
+          value: $(OTEL_COLLECTOR_NAME)
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: WEB_OTEL_SERVICE_NAME
+          value: frontend-web
+        - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+          value: http://localhost:8080/otlp-http/v1/traces
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-frontend
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 200Mi
+        securityContext:
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: frontendproxy
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontendproxy
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
+  name: ackstorm-opentelemetry-demo-frontendproxy
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: frontendproxy
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontendproxy
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: ENVOY_PORT
+          value: "8080"
+        - name: FRONTEND_PORT
+          value: "8080"
+        - name: FRONTEND_HOST
+          value: ackstorm-opentelemetry-demo-frontend
+        - name: LOCUST_WEB_PORT
+          value: "8089"
+        - name: LOCUST_WEB_HOST
+          value: ackstorm-opentelemetry-demo-loadgenerator
+        - name: GRAFANA_SERVICE_PORT
+          value: "80"
+        - name: GRAFANA_SERVICE_HOST
+          value: ackstorm-opentelemetry-demo-grafana
+        - name: JAEGER_SERVICE_PORT
+          value: "16686"
+        - name: JAEGER_SERVICE_HOST
+          value: ackstorm-opentelemetry-demo-jaeger-query
+        - name: OTEL_COLLECTOR_PORT_GRPC
+          value: "4317"
+        - name: OTEL_COLLECTOR_PORT_HTTP
+          value: "4318"
+        - name: OTEL_COLLECTOR_HOST
+          value: $(OTEL_COLLECTOR_NAME)
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-frontendproxy
+        imagePullPolicy: IfNotPresent
+        name: frontendproxy
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 50Mi
+        securityContext:
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kafka
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-kafka
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
+  name: ackstorm-opentelemetry-demo-kafka
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: kafka
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-kafka
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://ackstorm-opentelemetry-demo-kafka:9092
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4318
+        - name: KAFKA_HEAP_OPTS
+          value: -Xmx200M -Xms200M
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-kafka
+        imagePullPolicy: IfNotPresent
+        name: kafka
+        ports:
+        - containerPort: 9092
+          name: plaintext
+        - containerPort: 9093
+          name: controller
+        resources:
+          limits:
+            memory: 500Mi
+        securityContext:
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: loadgenerator
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-loadgenerator
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
+  name: ackstorm-opentelemetry-demo-loadgenerator
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: loadgenerator
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-loadgenerator
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: LOCUST_WEB_PORT
+          value: "8089"
+        - name: LOCUST_USERS
+          value: "10"
+        - name: LOCUST_SPAWN_RATE
+          value: "1"
+        - name: LOCUST_HOST
+          value: http://ackstorm-opentelemetry-demo-frontendproxy:8080
+        - name: LOCUST_HEADLESS
+          value: "false"
+        - name: LOCUST_AUTOSTART
+          value: "true"
+        - name: LOCUST_BROWSER_TRAFFIC_ENABLED
+          value: "true"
+        - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+          value: python
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-loadgenerator
+        imagePullPolicy: IfNotPresent
+        name: loadgenerator
+        ports:
+        - containerPort: 8089
+          name: service
+        resources:
+          limits:
+            memory: 1Gi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: paymentservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-paymentservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
+  name: ackstorm-opentelemetry-demo-paymentservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: paymentservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-paymentservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: PAYMENT_SERVICE_PORT
+          value: "8080"
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-paymentservice
+        imagePullPolicy: IfNotPresent
+        name: paymentservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 120Mi
+        securityContext:
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: productcatalogservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+  name: ackstorm-opentelemetry-demo-productcatalogservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: productcatalogservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: PRODUCT_CATALOG_SERVICE_PORT
+          value: "8080"
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-productcatalogservice
+        imagePullPolicy: IfNotPresent
+        name: productcatalogservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: quoteservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-quoteservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
+  name: ackstorm-opentelemetry-demo-quoteservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: quoteservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-quoteservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: QUOTE_SERVICE_PORT
+          value: "8080"
+        - name: OTEL_PHP_AUTOLOAD_ENABLED
+          value: "true"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4318
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-quoteservice
+        imagePullPolicy: IfNotPresent
+        name: quoteservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 40Mi
+        securityContext:
+          runAsGroup: 33
+          runAsNonRoot: true
+          runAsUser: 33
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: recommendationservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-recommendationservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
+  name: ackstorm-opentelemetry-demo-recommendationservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: recommendationservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-recommendationservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: RECOMMENDATION_SERVICE_PORT
+          value: "8080"
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: ackstorm-opentelemetry-demo-productcatalogservice:8080
+        - name: FLAGD_HOST
+          value: ackstorm-opentelemetry-demo-flagd
+        - name: FLAGD_PORT
+          value: "8013"
+        - name: OTEL_PYTHON_LOG_CORRELATION
+          value: "true"
+        - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+          value: python
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-recommendationservice
+        imagePullPolicy: IfNotPresent
+        name: recommendationservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 500Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-redis
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
+  name: ackstorm-opentelemetry-demo-redis
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: redis
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-redis
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: redis:7.2-alpine
+        imagePullPolicy: IfNotPresent
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          limits:
+            memory: 20Mi
+        securityContext:
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 999
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: shippingservice
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ackstorm-opentelemetry-demo-shippingservice
+    app.kubernetes.io/part-of: opentelemetry-demo
+    app.kubernetes.io/version: 1.9.0
+    helm.sh/chart: opentelemetry-demo-0.30.2
+    opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
+  name: ackstorm-opentelemetry-demo-shippingservice
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: shippingservice
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: ackstorm-opentelemetry-demo-shippingservice
+        opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
+    spec:
+      containers:
+      - env:
+        - name: OTEL_COLLECTOR_NAME
+          value: opentelemetry-peer-collector.observability-peer.svc
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: OTEL_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: OTEL_K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: OTEL_K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+          value: cumulative
+        - name: SHIPPING_SERVICE_PORT
+          value: "8080"
+        - name: QUOTE_SERVICE_ADDR
+          value: http://ackstorm-opentelemetry-demo-quoteservice:8080
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_COLLECTOR_NAME):4317
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+        image: ghcr.io/open-telemetry/demo:1.9.0-shippingservice
+        imagePullPolicy: IfNotPresent
+        name: shippingservice
+        ports:
+        - containerPort: 8080
+          name: service
+        resources:
+          limits:
+            memory: 20Mi
+        volumeMounts: null
+      serviceAccountName: ackstorm-opentelemetry-demo
+      volumes: null
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    majorVersion: "2"
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch
+  namespace: otel-demo
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+      app.kubernetes.io/name: opensearch
+  serviceName: otel-demo-opensearch-headless
+  template:
+    metadata:
+      annotations:
+        configchecksum: 2a8a85eebbbc640dd63206d19c05765d30e32729f4b4046ab6145009a1aed38
+      labels:
+        app.kubernetes.io/component: otel-demo-opensearch
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: opensearch
+        app.kubernetes.io/version: 2.13.0
+        helm.sh/chart: opensearch-2.19.0
+      name: otel-demo-opensearch
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - ackstorm-opentelemetry-demo
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - opensearch
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: discovery.seed_hosts
+          value: opensearch-cluster-master-headless
+        - name: cluster.name
+          value: demo-cluster
+        - name: network.host
+          value: 0.0.0.0
+        - name: OPENSEARCH_JAVA_OPTS
+          value: -Xms300m -Xmx300m
+        - name: node.roles
+          value: master,ingest,data,remote_cluster_client,
+        - name: discovery.type
+          value: single-node
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: DISABLE_INSTALL_DEMO_CONFIG
+          value: "true"
+        - name: DISABLE_SECURITY_PLUGIN
+          value: "true"
+        image: opensearchproject/opensearch:2.13.0
+        imagePullPolicy: IfNotPresent
+        name: opensearch
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: transport
+        - containerPort: 9600
+          name: metrics
         readinessProbe:
-          httpGet:
-            path: /metrics
-            port: 80
+          failureThreshold: 3
+          periodSeconds: 5
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            cpu: 1000m
+            memory: 100Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+        startupProbe:
+          failureThreshold: 30
           initialDelaySeconds: 5
           periodSeconds: 10
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /usr/share/opensearch/config/opensearch.yml
+          name: config-emptydir
+          subPath: opensearch.yml
+      enableServiceLinks: true
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          cp -r /tmp/configfolder/*  /tmp/config/
+        image: opensearchproject/opensearch:2.13.0
+        imagePullPolicy: IfNotPresent
+        name: configfile
         resources: {}
-        securityContext: {}
-      securityContext: {}
-      serviceAccountName: otel-demo-frontend
+        volumeMounts:
+        - mountPath: /tmp/config/
+          name: config-emptydir
+        - mountPath: /tmp/configfolder/opensearch.yml
+          name: config
+          subPath: opensearch.yml
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          name: otel-demo-opensearch-config
+        name: config
+      - emptyDir: {}
+        name: config-emptydir
+  updateStrategy:
+    type: RollingUpdate
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: policy/v1
+kind: PodDisruptionBudget
 metadata:
   labels:
-    release: kps
-  name: otel-demo-backend
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-pdb
   namespace: otel-demo
 spec:
-  endpoints:
-  - path: /metrics
-    port: http
-  namespaceSelector:
-    matchNames:
-    - default
+  maxUnavailable: 1
   selector:
     matchLabels:
-      app: otel-demo-backend
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+      app.kubernetes.io/name: opensearch
 ---
 apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+kind: PodMonitor
 metadata:
-  labels:
-    release: kps
-  name: otel-demo-frontend
+  name: ote-demo2
   namespace: otel-demo
 spec:
-  endpoints:
-  - path: /metrics
-    port: http
   namespaceSelector:
     matchNames:
-    - default
+    - otel-demo2
+  podMetricsEndpoints:
+  - relabelings:
+    - action: keep
+      regex: (.*)
+      sourceLabels:
+      - __meta_kubernetes_pod_annotation_opentelemetry_community_demo
   selector:
     matchLabels:
-      app: otel-demo-frontend
----
-apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-    helm.sh/hook: test
-  labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-backend
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-backend
-    app.kubernetes.io/version: 0.1.13
-    helm.sh/chart: otel-demo-backend-0.1.12
-  name: otel-demo-backend-test-connection
-  namespace: otel-demo
-spec:
-  containers:
-  - args:
-    - otel-demo-backend:80
-    command:
-    - wget
-    image: busybox
-    name: wget
-  restartPolicy: Never
----
-apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-    helm.sh/hook: test
-  labels:
-    app.kubernetes.io/instance: ackstorm-otel-demo-frontend
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: otel-demo-frontend
-    app.kubernetes.io/version: 0.1.14
-    helm.sh/chart: otel-demo-frontend-0.1.14
-  name: otel-demo-frontend-test-connection
-  namespace: otel-demo
-spec:
-  containers:
-  - args:
-    - otel-demo-frontend:80
-    command:
-    - wget
-    image: busybox
-    name: wget
-  restartPolicy: Never
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
