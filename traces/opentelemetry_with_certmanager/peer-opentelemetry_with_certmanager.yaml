@@ -23340,10 +23340,11 @@ spec:
     5\n    sampling_thereafter: 200\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
-    ${PEER_OBSERVER_URL}\n    auth:\n      authenticator: basicauth/observer\n    headers:\n
-    \     \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure: true\n    #endpoint:
-    http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n    resource_to_telemetry_conversion:\n
-    \     enabled: true\n  #otlphttp/prometheus:\n  #  endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/otlp\n
+    ${PEER_OBSERVER_URL}/api/v1/write\n    auth:\n      authenticator: basicauth/observer\n
+    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
+    true\n    #endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n
+    \   resource_to_telemetry_conversion:\n      enabled: true\n  #otlphttp/prometheus:\n
+    \ #  endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/otlp\n
     \ loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n
     \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
