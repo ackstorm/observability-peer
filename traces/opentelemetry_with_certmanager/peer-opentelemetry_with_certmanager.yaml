@@ -23373,7 +23373,7 @@ spec:
     \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
     [k8sattributes, memory_limiter, resource]\n      exporters: [logging, prometheusremotewrite]\n
     \   metrics/spanmetrics:\n      receivers: [spanmetrics]\n      processors: [k8sattributes,
-    memory_limiter, resource, metricstransform]\n      exporters: [debug, prometheusremotewrite]\n
+    memory_limiter, resource, metricstransform]\n      exporters: [logging, prometheusremotewrite]\n
     \   logs:\n      receivers: [otlp]\n      processors: [k8sattributes, memory_limiter,
     resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n
     \     address: \":8888\"\n"
