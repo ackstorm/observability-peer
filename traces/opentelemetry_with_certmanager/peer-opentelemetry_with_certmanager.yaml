@@ -23316,7 +23316,7 @@ metadata:
   name: opentelemetry-peer
   namespace: observability-peer
 spec:
-  config: "connectors:\n  spanmetrics:\n    #namespace: span.metrics\n    histogram:\n
+  config: "connectors:\n  spanmetrics:\n    namespace: \"traces.spanmetrics\"\n    histogram:\n
     \     explicit:\n        buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n
     \   dimensions:\n      - name: http.method\n        default: GET\n      - name:
     http.status_code\n    exemplars:\n      enabled: true\n    exclude_dimensions:
@@ -23345,9 +23345,9 @@ spec:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n
     \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  groupbytrace:\n
-    \   wait_duration: 30s\n    num_traces: 1000\n  resource:\n    attributes:\n    -
-    key: service.instance.id\n      from_attribute: k8s.pod.uid \n      action: insert\n
-    \   - key: environment\n      value: \"${PEER_ENVIRONMENT}\"\n      action: insert\n
+    \   wait_duration: 30s\n    num_traces: 1000\n  resource:\n    attributes:\n    #-
+    key: service.instance.id\n    #  from_attribute: k8s.pod.uid \n    #  action:
+    insert\n    - key: env\n      value: \"${PEER_ENVIRONMENT}\"\n      action: insert\n
     \   - key: cluster\n      value: \"${PEER_ID}\"\n      action: insert\n    - key:
     span_name\n      from_attribute: span_name\n      action: upsert\n  k8sattributes:\n
     \   auth_type: \"serviceAccount\"\n    passthrough: false\n    filter:\n      node_from_env_var:
@@ -23358,22 +23358,25 @@ spec:
     \   pod_association:\n      - sources:\n          - from: resource_attribute\n
     \           name: k8s.pod.ip\n      - sources:\n          - from: resource_attribute\n
     \           name: k8s.pod.uid\n      - sources:\n          - from: connection\n
-    \ metricstransform:\n    transforms:\n      - include: calls_total\n        action:
-    update\n        new_name: traces_spanmetrics_calls_total\n        operations:\n
-    \         - action: update_label\n            label: operation\n            new_label:
-    span.name\n      - include: latency\n        action: update\n        new_name:
-    traces_spanmetrics_latency\n\nextensions:\n  health_check: \n    endpoint: ${env:POD_IP}:13133\n
-    \ memory_ballast:\n    size_in_percentage: 40\n  basicauth/observer:\n    client_auth:\n
-    \     username: ${PEER_ID}\n      password: ${PEER_PASSWORD}\n\nservice:\n  extensions:\n
-    \ - health_check\n  - memory_ballast\n  - basicauth/observer\n  pipelines:\n    traces:\n
-    \     receivers: [otlp, jaeger, zipkin]\n      processors: [k8sattributes, memory_limiter,
-    groupbytrace, resource, batch]\n      exporters: [logging, otlphttp/observer,
-    spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp]\n      processors:
-    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
-    \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
-    [k8sattributes, memory_limiter, resource]\n      exporters: [logging, prometheusremotewrite]\n
-    \   metrics/spanmetrics:\n      receivers: [spanmetrics]\n      processors: [k8sattributes,
-    memory_limiter, resource, metricstransform]\n      exporters: [logging, prometheusremotewrite]\n
+    \ metricstransform:\n    transforms:\n      - include: traces.spanmetrics.duration\n
+    \       action: update\n        new_name: traces.spanmetrics.latency\n      -
+    include: traces.spanmetrics.calls\n        action: update\n        new_name: traces.spanmetrics.calls.total\n
+    \     #- include: calls_total\n      #  action: update\n      #  new_name: traces_spanmetrics_calls_total\n
+    \     #  operations:\n      #    - action: update_label\n      #      label: operation\n
+    \     #      new_label: span.name\n      #- include: latency\n      #  action:
+    update\n      #  new_name: traces_spanmetrics_latency\n\nextensions:\n  health_check:
+    \n    endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
+    40\n  basicauth/observer:\n    client_auth:\n      username: ${PEER_ID}\n      password:
+    ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
+    \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
+    zipkin]\n      processors: [k8sattributes, memory_limiter, groupbytrace, resource,
+    batch]\n      exporters: [logging, otlphttp/observer, spanmetrics, servicegraph]\n
+    \   metrics:\n      receivers: [otlp]\n      processors: [k8sattributes, memory_limiter,
+    resource, batch]\n      exporters: [logging, prometheusremotewrite]\n    metrics/servicegraph:\n
+    \     receivers: [servicegraph]\n      processors: [k8sattributes, memory_limiter,
+    resource]\n      exporters: [logging, prometheusremotewrite]\n    metrics/spanmetrics:\n
+    \     receivers: [spanmetrics]\n      processors: [k8sattributes, memory_limiter,
+    resource, metricstransform]\n      exporters: [logging, prometheusremotewrite]\n
     \   logs:\n      receivers: [otlp]\n      processors: [k8sattributes, memory_limiter,
     resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n
     \     address: \":8888\"\n"
