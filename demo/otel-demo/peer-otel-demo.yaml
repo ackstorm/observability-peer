@@ -18,6 +18,74 @@ metadata:
   namespace: otel-demo
 ---
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+  namespace: otel-demo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - namespaces
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ackstorm-opentelemetry-demo-otelcol
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-opentelemetry-demo-otelcol
+  namespace: otel-demo
+---
+apiVersion: v1
 data:
   demo.flagd.json: |
     {
@@ -132,6 +200,213 @@ metadata:
     helm.sh/chart: opentelemetry-demo-0.30.2
     opentelemetry.io/name: ackstorm-opentelemetry-demo
   name: ackstorm-opentelemetry-demo-flagd-config
+  namespace: otel-demo
+---
+apiVersion: v1
+data:
+  relay: |
+    connectors:
+      spanmetrics: {}
+    exporters:
+      debug: {}
+      opensearch:
+        http:
+          endpoint: http://otel-demo-opensearch:9200
+          tls:
+            insecure: true
+        logs_index: otel
+      otlp:
+        endpoint: 'ackstorm-opentelemetry-demo-jaeger-collector:4317'
+        tls:
+          insecure: true
+      otlphttp/prometheus:
+        endpoint: http://ackstorm-opentelemetry-demo-prometheus-server:9090/api/v1/otlp
+        tls:
+          insecure: true
+    extensions:
+      health_check:
+        endpoint: ${env:MY_POD_IP}:13133
+    processors:
+      batch: {}
+      k8sattributes:
+        extract:
+          metadata:
+          - k8s.namespace.name
+          - k8s.deployment.name
+          - k8s.statefulset.name
+          - k8s.daemonset.name
+          - k8s.cronjob.name
+          - k8s.job.name
+          - k8s.node.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.pod.start_time
+        passthrough: false
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: connection
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+      resource:
+        attributes:
+        - action: insert
+          from_attribute: k8s.pod.uid
+          key: service.instance.id
+    receivers:
+      jaeger:
+        protocols:
+          grpc:
+            endpoint: ${env:MY_POD_IP}:14250
+          thrift_compact:
+            endpoint: ${env:MY_POD_IP}:6831
+          thrift_http:
+            endpoint: ${env:MY_POD_IP}:14268
+      otlp:
+        protocols:
+          grpc:
+            endpoint: ${env:MY_POD_IP}:4317
+          http:
+            cors:
+              allowed_origins:
+              - http://*
+              - https://*
+            endpoint: ${env:MY_POD_IP}:4318
+      prometheus:
+        config:
+          scrape_configs:
+          - job_name: opentelemetry-collector
+            scrape_interval: 10s
+            static_configs:
+            - targets:
+              - ${env:MY_POD_IP}:8888
+      zipkin:
+        endpoint: ${env:MY_POD_IP}:9411
+    service:
+      extensions:
+      - health_check
+      pipelines:
+        logs:
+          exporters:
+          - opensearch
+          - debug
+          processors:
+          - k8sattributes
+          - memory_limiter
+          - resource
+          - batch
+          receivers:
+          - otlp
+        metrics:
+          exporters:
+          - otlphttp/prometheus
+          - debug
+          processors:
+          - k8sattributes
+          - memory_limiter
+          - resource
+          - batch
+          receivers:
+          - otlp
+          - spanmetrics
+        traces:
+          exporters:
+          - otlp
+          - debug
+          - spanmetrics
+          processors:
+          - k8sattributes
+          - memory_limiter
+          - resource
+          - batch
+          receivers:
+          - otlp
+          - jaeger
+          - zipkin
+      telemetry:
+        metrics:
+          address: ${env:MY_POD_IP}:8888
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+  namespace: otel-demo
+---
+apiVersion: v1
+data:
+  opensearch.yml: |
+    cluster.name: opensearch-cluster
+
+    # Bind to all interfaces because we don't know what IP address Docker will assign to us.
+    network.host: 0.0.0.0
+
+    # Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
+    # Implicitly done if ".singleNode" is set to "true".
+    # discovery.type: single-node
+
+    # Start OpenSearch Security Demo Configuration
+    # WARNING: revise all the lines below before you go into production
+    plugins:
+      security:
+        ssl:
+          transport:
+            pemcert_filepath: esnode.pem
+            pemkey_filepath: esnode-key.pem
+            pemtrustedcas_filepath: root-ca.pem
+            enforce_hostname_verification: false
+          http:
+            enabled: true
+            pemcert_filepath: esnode.pem
+            pemkey_filepath: esnode-key.pem
+            pemtrustedcas_filepath: root-ca.pem
+        allow_unsafe_democertificates: true
+        allow_default_init_securityindex: true
+        authcz:
+          admin_dn:
+            - CN=kirk,OU=client,O=client,L=test,C=de
+        audit.type: internal_opensearch
+        enable_snapshot_restore_privilege: true
+        check_snapshot_restore_write_privileges: true
+        restapi:
+          roles_enabled: ["all_access", "security_rest_api_access"]
+        system_indices:
+          enabled: true
+          indices:
+            [
+              ".opendistro-alerting-config",
+              ".opendistro-alerting-alert*",
+              ".opendistro-anomaly-results*",
+              ".opendistro-anomaly-detector*",
+              ".opendistro-anomaly-checkpoints",
+              ".opendistro-anomaly-detection-state",
+              ".opendistro-reports-*",
+              ".opendistro-notifications-*",
+              ".opendistro-notebooks",
+              ".opendistro-asynchronous-search-response*",
+            ]
+    ######## End OpenSearch Security Demo Configuration ########
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-config
   namespace: otel-demo
 ---
 apiVersion: v1
@@ -371,6 +646,60 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    component: standalone-collector
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+  namespace: otel-demo
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+  - name: jaeger-compact
+    port: 6831
+    protocol: UDP
+    targetPort: 6831
+  - name: jaeger-grpc
+    port: 14250
+    protocol: TCP
+    targetPort: 14250
+  - name: jaeger-thrift
+    port: 14268
+    protocol: TCP
+    targetPort: 14268
+  - name: metrics
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  - appProtocol: grpc
+    name: otlp
+    port: 4317
+    protocol: TCP
+    targetPort: 4317
+  - name: otlp-http
+    port: 4318
+    protocol: TCP
+    targetPort: 4318
+  - name: prometheus
+    port: 9464
+    protocol: TCP
+    targetPort: 9464
+  - name: zipkin
+    port: 9411
+    protocol: TCP
+    targetPort: 9411
+  selector:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/name: otelcol
+    component: standalone-collector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/component: paymentservice
     app.kubernetes.io/instance: ackstorm-opentelemetry-demo
     app.kubernetes.io/managed-by: Helm
@@ -505,6 +834,59 @@ spec:
     opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
   type: ClusterIP
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch
+  namespace: otel-demo
+spec:
+  ports:
+  - name: http
+    port: 9200
+    protocol: TCP
+  - name: transport
+    port: 9300
+    protocol: TCP
+  selector:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/name: opensearch
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-headless
+  namespace: otel-demo
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/name: opensearch
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -568,7 +950,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-accountingservice
         imagePullPolicy: IfNotPresent
         name: accountingservice
@@ -656,7 +1038,7 @@ spec:
         - name: OTEL_LOGS_EXPORTER
           value: otlp
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-adservice
         imagePullPolicy: IfNotPresent
         name: adservice
@@ -741,7 +1123,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-cartservice
         imagePullPolicy: IfNotPresent
         name: cartservice
@@ -844,7 +1226,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-checkoutservice
         imagePullPolicy: IfNotPresent
         name: checkoutservice
@@ -931,7 +1313,7 @@ spec:
         - name: VERSION
           value: 1.9.0
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-currencyservice
         imagePullPolicy: IfNotPresent
         name: currencyservice
@@ -1010,7 +1392,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4318/v1/traces
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-emailservice
         imagePullPolicy: IfNotPresent
         name: emailservice
@@ -1088,7 +1470,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
           value: cumulative
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-feature/flagd:v0.9.0
         imagePullPolicy: IfNotPresent
         name: flagd
@@ -1170,7 +1552,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4318
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-frauddetectionservice
         imagePullPolicy: IfNotPresent
         name: frauddetectionservice
@@ -1274,7 +1656,7 @@ spec:
         - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
           value: http://localhost:8080/otlp-http/v1/traces
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-frontend
         imagePullPolicy: IfNotPresent
         name: frontend
@@ -1375,7 +1757,7 @@ spec:
         - name: OTEL_COLLECTOR_HOST
           value: $(OTEL_COLLECTOR_NAME)
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-frontendproxy
         imagePullPolicy: IfNotPresent
         name: frontendproxy
@@ -1458,7 +1840,7 @@ spec:
         - name: KAFKA_HEAP_OPTS
           value: -Xmx200M -Xms200M
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-kafka
         imagePullPolicy: IfNotPresent
         name: kafka
@@ -1559,7 +1941,7 @@ spec:
         - name: FLAGD_PORT
           value: "8013"
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-loadgenerator
         imagePullPolicy: IfNotPresent
         name: loadgenerator
@@ -1572,6 +1954,105 @@ spec:
         volumeMounts: null
       serviceAccountName: ackstorm-opentelemetry-demo
       volumes: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: otelcol
+    app.kubernetes.io/version: 0.97.0
+    helm.sh/chart: opentelemetry-collector-0.86.0
+  name: ackstorm-opentelemetry-demo-otelcol
+  namespace: otel-demo
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+      app.kubernetes.io/name: otelcol
+      component: standalone-collector
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 42a3ba0f2c6d1024db57d493429ff6f73b7cdc02574df8f7deced1ee98fcdf30
+        opentelemetry_community_demo: "true"
+        prometheus.io/port: "9464"
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/name: otelcol
+        component: standalone-collector
+    spec:
+      containers:
+      - command:
+        - /otelcol-contrib
+        - --config=/conf/relay.yaml
+        env:
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: GOMEMLIMIT
+          value: 160MiB
+        image: otel/opentelemetry-collector-contrib:0.97.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        name: opentelemetry-collector
+        ports:
+        - containerPort: 6831
+          name: jaeger-compact
+          protocol: UDP
+        - containerPort: 14250
+          name: jaeger-grpc
+          protocol: TCP
+        - containerPort: 14268
+          name: jaeger-thrift
+          protocol: TCP
+        - containerPort: 8888
+          name: metrics
+          protocol: TCP
+        - containerPort: 4317
+          name: otlp
+          protocol: TCP
+        - containerPort: 4318
+          name: otlp-http
+          protocol: TCP
+        - containerPort: 9464
+          name: prometheus
+          protocol: TCP
+        - containerPort: 9411
+          name: zipkin
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        resources:
+          limits:
+            memory: 200Mi
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /conf
+          name: opentelemetry-collector-configmap
+      hostNetwork: false
+      securityContext: {}
+      serviceAccountName: ackstorm-opentelemetry-demo-otelcol
+      volumes:
+      - configMap:
+          items:
+          - key: relay
+            path: relay.yaml
+          name: ackstorm-opentelemetry-demo-otelcol
+        name: opentelemetry-collector-configmap
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1640,7 +2121,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-paymentservice
         imagePullPolicy: IfNotPresent
         name: paymentservice
@@ -1725,7 +2206,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-productcatalogservice
         imagePullPolicy: IfNotPresent
         name: productcatalogservice
@@ -1804,7 +2285,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4318
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-quoteservice
         imagePullPolicy: IfNotPresent
         name: quoteservice
@@ -1895,7 +2376,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-recommendationservice
         imagePullPolicy: IfNotPresent
         name: recommendationservice
@@ -1968,7 +2449,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
           value: cumulative
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: redis:7.2-alpine
         imagePullPolicy: IfNotPresent
         name: redis
@@ -2051,7 +2532,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_COLLECTOR_NAME):4317
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=opentelemetry-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
+          value: app.name="otel-demo",service.name=$(OTEL_SERVICE_NAME),service.instance.id=$(OTEL_K8S_POD_UID),service.namespace=otel-demo,k8s.namespace.name=$(OTEL_K8S_NAMESPACE),k8s.node.name=$(OTEL_K8S_NODE_NAME),k8s.pod.name=$(OTEL_K8S_POD_NAME)
         image: ghcr.io/open-telemetry/demo:1.9.0-shippingservice
         imagePullPolicy: IfNotPresent
         name: shippingservice
@@ -2064,6 +2545,171 @@ spec:
         volumeMounts: null
       serviceAccountName: ackstorm-opentelemetry-demo
       volumes: null
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    majorVersion: "2"
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch
+  namespace: otel-demo
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+      app.kubernetes.io/name: opensearch
+  serviceName: otel-demo-opensearch-headless
+  template:
+    metadata:
+      annotations:
+        configchecksum: 2a8a85eebbbc640dd63206d19c05765d30e32729f4b4046ab6145009a1aed38
+      labels:
+        app.kubernetes.io/component: otel-demo-opensearch
+        app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: opensearch
+        app.kubernetes.io/version: 2.13.0
+        helm.sh/chart: opensearch-2.19.0
+      name: otel-demo-opensearch
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - ackstorm-opentelemetry-demo
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - opensearch
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: discovery.seed_hosts
+          value: opensearch-cluster-master-headless
+        - name: cluster.name
+          value: demo-cluster
+        - name: network.host
+          value: 0.0.0.0
+        - name: OPENSEARCH_JAVA_OPTS
+          value: -Xms300m -Xmx300m
+        - name: node.roles
+          value: master,ingest,data,remote_cluster_client,
+        - name: discovery.type
+          value: single-node
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: DISABLE_INSTALL_DEMO_CONFIG
+          value: "true"
+        - name: DISABLE_SECURITY_PLUGIN
+          value: "true"
+        image: opensearchproject/opensearch:2.13.0
+        imagePullPolicy: IfNotPresent
+        name: opensearch
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: transport
+        - containerPort: 9600
+          name: metrics
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 5
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            cpu: 1000m
+            memory: 100Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+        startupProbe:
+          failureThreshold: 30
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /usr/share/opensearch/config/opensearch.yml
+          name: config-emptydir
+          subPath: opensearch.yml
+      enableServiceLinks: true
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          cp -r /tmp/configfolder/*  /tmp/config/
+        image: opensearchproject/opensearch:2.13.0
+        imagePullPolicy: IfNotPresent
+        name: configfile
+        resources: {}
+        volumeMounts:
+        - mountPath: /tmp/config/
+          name: config-emptydir
+        - mountPath: /tmp/configfolder/opensearch.yml
+          name: config
+          subPath: opensearch.yml
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          name: otel-demo-opensearch-config
+        name: config
+      - emptyDir: {}
+        name: config-emptydir
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-demo-opensearch
+    app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/version: 2.13.0
+    helm.sh/chart: opensearch-2.19.0
+  name: otel-demo-opensearch-pdb
+  namespace: otel-demo
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
+      app.kubernetes.io/name: opensearch
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
