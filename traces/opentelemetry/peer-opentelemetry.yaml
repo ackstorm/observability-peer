@@ -13320,7 +13320,8 @@ metadata:
   name: opentelemetry-operator-peer
   namespace: observability-peer
 spec:
-  groups: null
+  groups:
+  - opentelemetry-peer-collector
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
