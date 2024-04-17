@@ -23338,10 +23338,15 @@ spec:
     key: service.instance.id\n      from_attribute: k8s.pod.uid \n      action: insert\n
     \   - key: environment\n      value: \"${PEER_ENVIRONMENT}\"\n      action: insert\n
     \   - key: cluster\n      value: \"${PEER_ID}\"\n      action: insert\n    #-
-    key: span_name\n    #  from_attribute: span_name\n    #  action: upsert\n  # spanmetrics:\n
-    \ #   metrics_exporter: 'otlp/spanmetrics'\n  #   latency_histogram_buckets: [100us,
-    1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n  #   dimensions_cache_size: 1500\n  #   dimensions:\n
-    \ #       - name: http.method\n  #         default: GET\n  #       - name: http.status_code\n
+    key: span_name\n    #  from_attribute: span_name\n    #  action: upsert\n  spanmetrics:\n
+    \   metrics_exporter: otlp/spanmetrics\n    latency_histogram_buckets: [100us,
+    1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions_cache_size: 1500\n  servicegraph:\n
+    \   metrics_exporter: otlp/spanmetrics\n    latency_histogram_buckets: [100us,
+    1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n    dimensions: [cluster, namespace]\n    store:\n
+    \     ttl: 2s\n      max_items: 200\n  # spanmetrics:\n  #   metrics_exporter:
+    'otlp/spanmetrics'\n  #   latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms,
+    100ms, 250ms]\n  #   dimensions_cache_size: 1500\n  #   dimensions:\n  #       -
+    name: http.method\n  #         default: GET\n  #       - name: http.status_code\n
     \ #   aggregation_temporality: \"AGGREGATION_TEMPORALITY_CUMULATIVE\"     \n  #
     \  metrics_flush_interval: 30s\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n
     \   passthrough: false\n    filter:\n      node_from_env_var: <NODE_NAME>\n    extract:\n
@@ -23353,20 +23358,22 @@ spec:
     \         - from: resource_attribute\n            name: k8s.pod.uid\n      - sources:\n
     \         - from: connection\n  metricstransform:\n    transforms:\n      - include:
     calls_total\n        action: update\n        new_name: traces_spanmetrics_calls_total\n
-    \       operations:\n          - action: update_label\n            label: operation\n
-    \           new_label: span.name\n      - include: latency\n        action: update\n
-    \       new_name: traces_spanmetrics_latency\n\nextensions:\n  health_check: \n
-    \   endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
+    \       # operations:\n        #   - action: update_label\n        #     label:
+    operation\n        #     new_label: span.name\n      - include: latency\n        action:
+    update\n        new_name: traces_spanmetrics_latency\n\nextensions:\n  health_check:
+    \n    endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
     40\n  basicauth/observer:\n    client_auth:\n      username: ${PEER_ID}\n      password:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
-    zipkin]\n      processors: [k8sattributes, memory_limiter, groupbytrace, resource,
-    batch]\n      exporters: [logging, otlphttp/observer, spanmetrics]\n    metrics:\n
-    \     receivers: [otlp, spanmetrics]\n      processors: [k8sattributes, memory_limiter,
-    metricstransform, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
-    \   logs:\n      receivers: [otlp]\n      processors: [k8sattributes, memory_limiter,
-    resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n
-    \     address: \":8888\"\n"
+    zipkin]\n      processors: [k8sattributes, memory_limiter, groupbytrace, spanmetrics,
+    servicegraph, resource, batch]\n      exporters: [logging, otlphttp/observer]\n
+    \   metrics/spanmetrics:\n      receivers: [otlp]\n      processors: [metricstransform]\n
+    \     exporters: [logging, prometheusremotewrite]\n    metrics:\n      receivers:
+    [otlp, spanmetrics]\n      processors: [k8sattributes, memory_limiter, metricstransform,
+    resource, batch]\n      exporters: [logging, prometheusremotewrite]\n    logs:\n
+    \     receivers: [otlp]\n      processors: [k8sattributes, memory_limiter, resource,
+    batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n      address:
+    \":8888\"\n"
   env:
   - name: NODE_NAME
     valueFrom:
