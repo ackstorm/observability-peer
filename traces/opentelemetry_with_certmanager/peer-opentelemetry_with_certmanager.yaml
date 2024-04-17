@@ -23317,9 +23317,10 @@ metadata:
   namespace: observability-peer
 spec:
   config: "connectors:\n  spanmetrics:\n    namespace: \"traces.spanmetrics\"\n    histogram:\n
-    \     unit: \"s\"\n      explicit:\n        buckets: [100us, 1ms, 2ms, 6ms, 10ms,
-    100ms, 250ms]\n    dimensions:\n      - name: http.method\n        default: GET\n
-    \     - name: http.status_code\n    exemplars:\n      enabled: true\n    exclude_dimensions:
+    \     #unit: \"s\" # changes metric names from x_miliseconds_bucket to X_seconds_bucket\n
+    \     explicit:\n        buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n
+    \   dimensions:\n      - name: http.method\n        default: GET\n      - name:
+    http.status_code\n    exemplars:\n      enabled: true\n    exclude_dimensions:
     ['status.code']\n    dimensions_cache_size: 1000\n    aggregation_temporality:
     \"AGGREGATION_TEMPORALITY_CUMULATIVE\"    \n    metrics_flush_interval: 15s\n
     \   metrics_expiration: 5m\n    events:\n      enabled: true\n      dimensions:\n
@@ -23359,13 +23360,10 @@ spec:
     k8s.pod.start_time\n    pod_association:\n      - sources:\n          - from:
     resource_attribute\n            name: k8s.pod.ip\n      - sources:\n          -
     from: resource_attribute\n            name: k8s.pod.uid\n      - sources:\n          -
-    from: connection\n  metricstransform:\n    transforms:\n      - include: traces.spanmetrics.duration\n
-    \       action: update\n        new_name: traces.spanmetrics.latency\n      -
-    include: traces.spanmetrics.calls\n        action: update\n        new_name: traces.spanmetrics.calls.total\n
-    \     #- include: calls_total\n      #  action: update\n      #  new_name: traces_spanmetrics_calls_total\n
-    \     #  operations:\n      #    - action: update_label\n      #      label: operation\n
-    \     #      new_label: span.name\n      #- include: latency\n      #  action:
-    update\n      #  new_name: traces_spanmetrics_latency\n\nextensions:\n  health_check:
+    from: connection\n  metricstransform:\n    # Grafana requires this format\n    transforms:\n
+    \     - include: traces.spanmetrics.duration\n        action: update\n        new_name:
+    traces.spanmetrics.latency\n      - include: traces.spanmetrics.calls\n        action:
+    update\n        new_name: traces.spanmetrics.calls.total\nextensions:\n  health_check:
     \n    endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
     40\n  basicauth/observer:\n    client_auth:\n      username: ${PEER_ID}\n      password:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
