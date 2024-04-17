@@ -13380,36 +13380,38 @@ spec:
     5\n    sampling_thereafter: 200\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
-    ${PEER_OBSERVER_URL}/api/v1/push\n    auth:\n      authenticator: basicauth/observer\n
+    ${PEER_OBSERVER_URL}/api/v1/push\n    external_labels:\n      cluster: ${PEER_ID}\n
+    \     env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator: basicauth/observer\n
     \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
-    true\n    #endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/write\n
-    \   resource_to_telemetry_conversion:\n      enabled: true\n  #otlphttp/prometheus:\n
-    \ #  endpoint: http://prometheus-prometheus-peer.observability-peer.svc:9090/api/v1/otlp\n
-    \ loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator:
-    basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n
-    \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
-    15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  filter:\n    error_mode:
-    ignore\n    traces:\n      span:\n        # filter out internal spans\n        -
-    \"kind == 1\"\n  groupbytrace:\n    wait_duration: 30s\n    num_traces: 1000\n
-    \ resource:\n    attributes:\n    #- key: service.instance.id\n    #  from_attribute:
-    k8s.pod.uid \n    #  action: insert\n    - key: service\n      from_attribute:
-    service.name\n      action: insert\n    - key: env\n      value: \"${PEER_ENVIRONMENT}\"\n
-    \     action: insert\n    - key: cluster\n      value: \"${PEER_ID}\"\n      action:
-    insert\n    - key: span_name\n      from_attribute: span_name\n      action: upsert\n
-    \ resource/add_container:\n    attributes:\n    - key: container\n      from_attribute:
-    service.name\n      action: insert\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n
-    \   passthrough: false\n    filter:\n      node_from_env_var: <NODE_NAME>\n    extract:\n
-    \     metadata:\n        - k8s.namespace.name\n        - k8s.deployment.name\n
-    \       - k8s.statefulset.name\n        - k8s.daemonset.name\n        - k8s.cronjob.name\n
-    \       - k8s.job.name\n        - k8s.node.name\n        - k8s.pod.name\n        -
-    k8s.pod.uid\n        - k8s.pod.start_time\n    pod_association:\n      - sources:\n
-    \         - from: resource_attribute\n            name: k8s.pod.ip\n      - sources:\n
-    \         - from: resource_attribute\n            name: k8s.pod.uid\n      - sources:\n
-    \         - from: connection\n  metricstransform:\n    # Grafana requires this
-    format\n    transforms:\n      - include: traces.spanmetrics.duration\n        action:
-    update\n        new_name: traces.spanmetrics.latency\n      - include: traces.spanmetrics.calls\n
-    \       action: update\n        new_name: traces.spanmetrics.calls.total\nextensions:\n
-    \ health_check: \n    endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
+    true\n    resource_to_telemetry_conversion:\n      enabled: true\n  # otlphttp/mimir:\n
+    \ #   endpoint: ${PEER_OBSERVER_URL}/otlp\n  #   auth:\n  #     authenticator:
+    basicauth/observer\n  #   headers:\n  #     \"X-Scope-OrgID\": \"${PEER_ID}\"\n
+    \ #   tls:\n  #     insecure: true   \n  loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n
+    \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ID}\"\n\nprocessors:\n  memory_limiter:\n    check_interval: 2s\n    limit_percentage:
+    75\n    spike_limit_percentage: 15\n  batch:\n    send_batch_size: 10000\n    timeout:
+    10s\n  filter:\n    error_mode: ignore\n    traces:\n      span:\n        # filter
+    out internal spans\n        - \"kind == 1\"\n  groupbytrace:\n    wait_duration:
+    30s\n    num_traces: 1000\n  resource:\n    attributes:\n    #- key: service.instance.id\n
+    \   #  from_attribute: k8s.pod.uid \n    #  action: insert\n    - key: service\n
+    \     from_attribute: service.name\n      action: insert\n    - key: env\n      value:
+    \"${PEER_ENVIRONMENT}\"\n      action: insert\n    - key: cluster\n      value:
+    \"${PEER_ID}\"\n      action: insert\n    - key: span_name\n      from_attribute:
+    span_name\n      action: upsert\n  resource/add_container:\n    attributes:\n
+    \   - key: container\n      from_attribute: service.name\n      action: insert\n
+    \ k8sattributes:\n    auth_type: \"serviceAccount\"\n    passthrough: false\n
+    \   filter:\n      node_from_env_var: <NODE_NAME>\n    extract:\n      metadata:\n
+    \       - k8s.namespace.name\n        - k8s.deployment.name\n        - k8s.statefulset.name\n
+    \       - k8s.daemonset.name\n        - k8s.cronjob.name\n        - k8s.job.name\n
+    \       - k8s.node.name\n        - k8s.pod.name\n        - k8s.pod.uid\n        -
+    k8s.pod.start_time\n    pod_association:\n      - sources:\n          - from:
+    resource_attribute\n            name: k8s.pod.ip\n      - sources:\n          -
+    from: resource_attribute\n            name: k8s.pod.uid\n      - sources:\n          -
+    from: connection\n  metricstransform:\n    # Grafana requires this format\n    transforms:\n
+    \     - include: traces.spanmetrics.duration\n        action: update\n        new_name:
+    traces.spanmetrics.latency\n      - include: traces.spanmetrics.calls\n        action:
+    update\n        new_name: traces.spanmetrics.calls.total\nextensions:\n  health_check:
+    \n    endpoint: ${env:POD_IP}:13133\n  memory_ballast:\n    size_in_percentage:
     40\n  basicauth/observer:\n    client_auth:\n      username: ${PEER_ID}\n      password:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
