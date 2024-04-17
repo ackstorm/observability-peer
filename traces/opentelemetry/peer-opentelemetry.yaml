@@ -13311,22 +13311,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   labels:
-    app.kubernetes.io/component: controller-manager
-    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: opentelemetry-operator
-    app.kubernetes.io/version: 0.98.0
-    helm.sh/chart: opentelemetry-operator-0.55.2
-  name: opentelemetry-operator-peer
-  namespace: observability-peer
-spec:
-  groups:
-  - opentelemetry-peer-collector
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
     app.kubernetes.io/name: opentelemetry-peer-collector
   name: opentelemetry-peer-collector
   namespace: observability-peer
