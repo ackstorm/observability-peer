@@ -23271,21 +23271,16 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   labels:
-    app.kubernetes.io/name: opentelemetry-peer-collector
-  name: opentelemetry-peer-collector
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/instance: ackstorm-opentelemetry-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opentelemetry-operator
+    app.kubernetes.io/version: 0.98.0
+    helm.sh/chart: opentelemetry-operator-0.55.2
+  name: opentelemetry-operator-peer
   namespace: observability-peer
 spec:
-  groups:
-  - name: opentelemetry-peer-collector
-    rules:
-    - alert: OpenTelemetryCollectorNotRunning
-      annotations:
-        description: OpenTelemetryCollector is not running
-        summary: OpenTelemetryCollector is not running
-      expr: absent(up{app="opentelemetry-peer-collector"}) > 0
-      for: 15m
-      labels:
-        severity: major
+  groups: null
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -23323,7 +23318,7 @@ spec:
     \     thrift_http:\n        endpoint: ${env:POD_IP}:14268\n      thrift_compact:\n
     \       endpoint: ${env:POD_IP}:6831\n  zipkin:\n    endpoint: ${env:POD_IP}:9411\n
     \ # otlp/spanmetrics:\n  #   protocols:\n  #     grpc:\n  #       endpoint: \"localhost:12345\"\n\nexporters:\n
-    \ debug:\n    loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
+    \ logging:\n    loglevel: warn\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ID}\"\n    tls:\n      insecure: true\n  # otlp/spanmetrics:\n  #   endpoint:
     ${env:POD_IP}:4317\n  #   tls:\n  #     insecure: true\n  prometheusremotewrite:\n
@@ -23361,11 +23356,11 @@ spec:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
     zipkin]\n      processors: [k8sattributes, memory_limiter, groupbytrace, resource,
-    batch]\n      exporters: [debug, otlphttp/observer, spanmetrics]\n    metrics:\n
+    batch]\n      exporters: [logging, otlphttp/observer, spanmetrics]\n    metrics:\n
     \     receivers: [otlp, spanmetrics]\n      processors: [k8sattributes, memory_limiter,
-    metricstransform, resource, batch]\n      exporters: [debug, prometheusremotewrite]\n
+    metricstransform, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
     \   logs:\n      receivers: [otlp]\n      processors: [k8sattributes, memory_limiter,
-    resource, batch]\n      exporters: [debug, loki]\n  telemetry:\n    metrics:\n
+    resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n
     \     address: \":8888\"\n"
   env:
   - name: NODE_NAME
