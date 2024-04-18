@@ -13330,6 +13330,22 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  name: opentelemetry-collector-monitoring
+  namespace: observability-peer
+spec:
+  endpoints:
+  - port: monitoring
+  namespaceSelector:
+    matchNames:
+    - observability-peer
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: opentelemetry-collector
+      app.kubernetes.io/name: opentelemetry-peer-collector-monitoring
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
   labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
@@ -13384,7 +13400,8 @@ spec:
     \     env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator: basicauth/observer\n
     \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
     true\n    resource_to_telemetry_conversion:\n      enabled: true\n  # otlphttp/mimir:\n
-    \ #   endpoint: ${PEER_OBSERVER_URL}/otlp\n  #   auth:\n  #     authenticator:
+    \ #   endpoint: ${PEER_OBSERVER_URL}/otlp\n  #   external_labels:\n  #     cluster:
+    ${PEER_ID}\n  #     env: ${PEER_ENVIRONMENT}\n  #   auth:\n  #     authenticator:
     basicauth/observer\n  #   headers:\n  #     \"X-Scope-OrgID\": \"${PEER_ID}\"\n
     \ #   tls:\n  #     insecure: true   \n  loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
