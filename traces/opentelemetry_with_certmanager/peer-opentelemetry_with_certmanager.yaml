@@ -23341,7 +23341,7 @@ spec:
     \   metrics_endpoint: ${PEER_OBSERVER_URL}/otlp/v1/metrics\n    auth:\n      authenticator:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n
     \     insecure: true\n  prometheusremotewrite:\n    endpoint: ${PEER_OBSERVER_URL}/api/v1/push\n
-    \   remote_write_queue:\n      enabled: ture\n    external_labels:\n      cluster:
+    \   remote_write_queue:\n      enabled: true\n    external_labels:\n      cluster:
     ${PEER_ID}\n      env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator: basicauth/observer\n
     \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
     true\n    resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
