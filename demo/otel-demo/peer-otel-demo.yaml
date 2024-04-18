@@ -2427,22 +2427,3 @@ spec:
         volumeMounts: null
       serviceAccountName: ackstorm-opentelemetry-demo
       volumes: null
----
-apiVersion: monitoring.coreos.com/v1
-kind: PodMonitor
-metadata:
-  name: ote-demo2
-  namespace: otel-demo
-spec:
-  namespaceSelector:
-    matchNames:
-    - otel-demo2
-  podMetricsEndpoints:
-  - relabelings:
-    - action: keep
-      regex: (.*)
-      sourceLabels:
-      - __meta_kubernetes_pod_annotation_opentelemetry_community_demo
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: ackstorm-opentelemetry-demo
