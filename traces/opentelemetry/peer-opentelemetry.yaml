@@ -13377,17 +13377,14 @@ spec:
     \ # otlp/spanmetrics:\n  #   protocols:\n  #     grpc:\n  #       endpoint: \"localhost:12345\"\n\nexporters:\n
     \ logging:\n    verbosity: basic\n    sampling_initial: 5\n    sampling_thereafter:
     200\n  debug:\n    verbosity: detailed # basic, normal, detailed\n    sampling_initial:
-    5\n    sampling_thereafter: 200\n  otlphttp/tempo: \n    endpoint: ${PEER_OBSERVER_URL}\n
-    \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
-    \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
-    ${PEER_OBSERVER_URL}/api/v1/push\n    external_labels:\n      cluster: ${PEER_ID}\n
-    \     env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator: basicauth/observer\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
-    true\n    resource_to_telemetry_conversion:\n      enabled: true\n  otlphttp/mimir:\n
-    \   endpoint: ${PEER_OBSERVER_URL}/otlp/v1/metrics\n    #external_labels:\n    #
-    \ cluster: ${PEER_ID}\n    #  env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator:
+    5\n    sampling_thereafter: 200\n  otlphttp/observer: \n    traces_endpoint: ${PEER_OBSERVER_URL}/v1/traces\n
+    \   metrics_endpoint: ${PEER_OBSERVER_URL}/otlp/v1/metrics\n    auth:\n      authenticator:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n
-    \     insecure: true   \n  loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n
+    \     insecure: true\n  prometheusremotewrite:\n    endpoint: ${PEER_OBSERVER_URL}/api/v1/push\n
+    \   external_labels:\n      cluster: ${PEER_ID}\n      env: ${PEER_ENVIRONMENT}\n
+    \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
+    \"${PEER_ID}\"\n    tls:\n      insecure: true\n    resource_to_telemetry_conversion:\n
+    \     enabled: true\n  loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ID}\"\n\nprocessors:\n  memory_limiter:\n    check_interval: 2s\n    limit_percentage:
     75\n    spike_limit_percentage: 15\n  batch:\n    send_batch_size: 10000\n    timeout:
@@ -13417,17 +13414,16 @@ spec:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
     zipkin]\n      processors: [filter, k8sattributes, memory_limiter, groupbytrace,
-    resource, resource/add_container, batch]\n      exporters: [logging, otlphttp/tempo,
-    spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp, jaeger, zipkin]\n
-    \     processors: [k8sattributes, memory_limiter, resource, batch]\n      exporters:
-    [logging, otlphttp/mimir]\n    metrics/servicegraph:\n      receivers: [servicegraph]\n
-    \     processors: [k8sattributes, memory_limiter, resource, batch]\n      exporters:
-    [logging, otlphttp/mimir]\n    metrics/spanmetrics:\n      receivers: [spanmetrics]\n
-    \     processors: [k8sattributes, memory_limiter, resource, metricstransform,
-    batch]\n      exporters: [logging, otlphttp/mimir]\n    logs:\n      receivers:
-    [otlp, jaeger, zipkin]\n      processors: [k8sattributes, memory_limiter, resource,
-    batch]\n      exporters: [logging, loki]\n  telemetry:\n    metrics:\n      address:
-    \":8888\"\n"
+    resource, resource/add_container, batch]\n      exporters: [logging, otlphttp/observer,
+    spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp]\n      processors:
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, otlphttp/observer]\n
+    \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, otlphttp/observer]\n
+    \   metrics/spanmetrics:\n      receivers: [spanmetrics]\n      processors: [k8sattributes,
+    memory_limiter, resource, metricstransform, batch]\n      exporters: [logging,
+    otlphttp/observer]\n    logs:\n      receivers: [otlp]\n      processors: [k8sattributes,
+    memory_limiter, resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n
+    \   metrics:\n      address: \":8888\"\n"
   env:
   - name: NODE_NAME
     valueFrom:
