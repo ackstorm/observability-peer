@@ -23340,13 +23340,13 @@ spec:
     \   metrics_endpoint: ${PEER_OBSERVER_URL}/otlp/v1/metrics\n    auth:\n      authenticator:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n
     \     insecure: true\n  prometheusremotewrite\n    endpoint: ${PEER_OBSERVER_URL}/api/v1/push\n
-    \   remote_write_queue:\n      enabled: true\n    external_labels:\n      cluster:
-    ${PEER_ID}\n      env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator: basicauth/observer\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n      insecure:
-    true\n    resource_to_telemetry_conversion:\n      enabled: true\n  loki:\n    endpoint:
-    ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator: basicauth/observer\n
-    \   headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n  memory_limiter:\n
-    \   check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
+    \   timeout: 20s\n    remote_write_queue:\n      enabled: true\n    external_labels:\n
+    \     cluster: ${PEER_ID}\n      env: ${PEER_ENVIRONMENT}\n    auth:\n      authenticator:
+    basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n
+    \     insecure: true\n    resource_to_telemetry_conversion:\n      enabled: true\n
+    \ loki:\n    endpoint: ${PEER_OBSERVER_URL}/loki/api/v1/push\n    auth:\n      authenticator:
+    basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n\nprocessors:\n
+    \ memory_limiter:\n    check_interval: 2s\n    limit_percentage: 75\n    spike_limit_percentage:
     15\n  batch:\n    send_batch_size: 10000\n    timeout: 10s\n  filter:\n    error_mode:
     ignore\n    traces:\n      span:\n        # filter out internal spans\n        -
     \"kind == 1\"\n  groupbytrace:\n    wait_duration: 30s\n    num_traces: 1000\n
