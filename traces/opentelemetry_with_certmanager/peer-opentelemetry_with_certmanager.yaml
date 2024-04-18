@@ -23376,14 +23376,14 @@ spec:
     zipkin]\n      processors: [filter, k8sattributes, memory_limiter, groupbytrace,
     resource, resource/add_container, batch]\n      exporters: [logging, otlphttp/observer,
     spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp]\n      processors:
-    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, otlphttp/observer]\n
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
     \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
-    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, otlphttp/observer]\n
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, prometheusremotewrite]\n
     \   metrics/spanmetrics:\n      receivers: [spanmetrics]\n      processors: [k8sattributes,
     memory_limiter, resource, metricstransform, batch]\n      exporters: [logging,
-    otlphttp/observer]\n    logs:\n      receivers: [otlp]\n      processors: [k8sattributes,
-    memory_limiter, resource, batch]\n      exporters: [logging, loki]\n  telemetry:\n
-    \   metrics:\n      address: \":8888\"\n"
+    prometheusremotewrite]\n    logs:\n      receivers: [otlp]\n      processors:
+    [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, loki]\n
+    \ telemetry:\n    metrics:\n      address: \":8888\"\n"
   env:
   - name: NODE_NAME
     valueFrom:
