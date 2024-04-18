@@ -23290,22 +23290,6 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: opentelemetry-collector-monitoring
-  namespace: observability-peer
-spec:
-  endpoints:
-  - port: monitoring
-  namespaceSelector:
-    matchNames:
-    - observability-peer
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: opentelemetry-collector
-      app.kubernetes.io/name: opentelemetry-peer-collector-monitoring
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
   labels:
     app.kubernetes.io/component: controller-manager
     app.kubernetes.io/instance: ackstorm-opentelemetry-operator
