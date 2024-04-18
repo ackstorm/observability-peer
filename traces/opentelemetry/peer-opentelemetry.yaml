@@ -13396,7 +13396,8 @@ spec:
     service.name\n      action: insert\n    - key: env\n      value: \"${PEER_ENVIRONMENT}\"\n
     \     action: insert\n    - key: cluster\n      value: \"${PEER_ID}\"\n      action:
     insert\n    - key: span_name\n      from_attribute: span_name\n      action: upsert\n
-    \ resource/add_container:\n    attributes:\n    - key: container\n      from_attribute:
+    \   - key: os_description\n      action: delete\n    - key: os.description\n      action:
+    delete\n  resource/add_container:\n    attributes:\n    - key: container\n      from_attribute:
     service.name\n      action: insert\n  k8sattributes:\n    auth_type: \"serviceAccount\"\n
     \   passthrough: false\n    filter:\n      node_from_env_var: <NODE_NAME>\n    extract:\n
     \     metadata:\n        - k8s.namespace.name\n        - k8s.deployment.name\n
