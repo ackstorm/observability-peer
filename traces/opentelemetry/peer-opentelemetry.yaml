@@ -13361,7 +13361,7 @@ spec:
     \     explicit:\n        buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]\n
     \   dimensions:\n      - name: http.method\n        default: GET\n      - name:
     http.status_code\n    exemplars:\n      enabled: true\n    exclude_dimensions:
-    [\"status.code\", \"os.description\"]\n    dimensions_cache_size: 1000\n    aggregation_temporality:
+    [\"os.description\"] # line is too big\n    dimensions_cache_size: 1000\n    aggregation_temporality:
     \"AGGREGATION_TEMPORALITY_CUMULATIVE\"    \n    metrics_flush_interval: 15s\n
     \   metrics_expiration: 5m\n    events:\n      enabled: true\n      dimensions:\n
     \       - name: exception.type\n        - name: exception.message\n    resource_metrics_key_attributes:\n
