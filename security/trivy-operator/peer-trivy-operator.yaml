@@ -3667,7 +3667,7 @@ spec:
           successThreshold: 1
         resources:
           limits:
-            cpu: 200m
+            cpu: 250m
             memory: 512Mi
           requests:
             cpu: 100m

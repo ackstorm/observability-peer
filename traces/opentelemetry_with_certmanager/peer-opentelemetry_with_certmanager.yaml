@@ -23328,17 +23328,17 @@ spec:
     5m\n    events:\n      enabled: true\n      dimensions:\n        - name: exception.type\n
     \       - name: exception.message\n    resource_metrics_key_attributes:\n      -
     service.name\n      - telemetry.sdk.language\n      - telemetry.sdk.name\n  servicegraph:\n
-    \   #namespace: servicegraph \n    latency_histogram_buckets: [100ms, 250ms, 1s,
-    5s, 10s]\n    dimensions:\n      - k8s.namespace.name\n    store:\n      ttl:
-    2s\n      max_items: 200\nreceivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint:
-    ${env:POD_IP}:4317\n      http:\n        endpoint: ${env:POD_IP}:4318\n        cors:\n
-    \         allowed_origins:\n            - \"http://*\"\n            - \"https://*\"\n
-    \ jaeger:\n    protocols:\n      grpc:\n        endpoint: ${env:POD_IP}:14250\n
-    \     thrift_http:\n        endpoint: ${env:POD_IP}:14268\n      thrift_compact:\n
-    \       endpoint: ${env:POD_IP}:6831\n  zipkin:\n    endpoint: ${env:POD_IP}:9411\n\nexporters:\n
-    \ logging:\n    verbosity: basic\n    sampling_initial: 5\n    sampling_thereafter:
-    200\n  debug:\n    verbosity: detailed # basic, normal, detailed\n    sampling_initial:
-    5\n    sampling_thereafter: 200\n  otlphttp/observer: \n    traces_endpoint: ${PEER_OBSERVER_URL}/v1/traces\n
+    \   latency_histogram_buckets: [100ms, 250ms, 1s, 5s, 10s]\n    dimensions:\n
+    \     - k8s.namespace.name\n    store:\n      ttl: 2s\n      max_items: 200\nreceivers:\n
+    \ otlp:\n    protocols:\n      grpc:\n        endpoint: ${env:POD_IP}:4317\n      http:\n
+    \       endpoint: ${env:POD_IP}:4318\n        cors:\n          allowed_origins:\n
+    \           - \"http://*\"\n            - \"https://*\"\n  jaeger:\n    protocols:\n
+    \     grpc:\n        endpoint: ${env:POD_IP}:14250\n      thrift_http:\n        endpoint:
+    ${env:POD_IP}:14268\n      thrift_compact:\n        endpoint: ${env:POD_IP}:6831\n
+    \ zipkin:\n    endpoint: ${env:POD_IP}:9411\n\nexporters:\n  logging:\n    verbosity:
+    basic\n    sampling_initial: 5\n    sampling_thereafter: 200\n  debug:\n    verbosity:
+    detailed # basic, normal, detailed\n    sampling_initial: 5\n    sampling_thereafter:
+    200\n  otlphttp/observer: \n    traces_endpoint: ${PEER_OBSERVER_URL}/v1/traces\n
     \   metrics_endpoint: ${PEER_OBSERVER_URL}/otlp/v1/metrics\n    auth:\n      authenticator:
     basicauth/observer\n    headers:\n      \"X-Scope-OrgID\": \"${PEER_ID}\"\n    tls:\n
     \     insecure: true\n  prometheusremotewrite:\n    endpoint: ${PEER_OBSERVER_URL}/api/v1/push\n
