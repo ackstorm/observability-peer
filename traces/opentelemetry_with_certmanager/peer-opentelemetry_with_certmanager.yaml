@@ -23337,7 +23337,7 @@ spec:
     \ # otlp/spanmetrics:\n  #   protocols:\n  #     grpc:\n  #       endpoint: \"localhost:12345\"\n\nexporters:\n
     \ logging:\n    verbosity: basic\n    sampling_initial: 5\n    sampling_thereafter:
     200\n  debug:\n    verbosity: detailed # basic, normal, detailed\n    sampling_initial:
-    5\n    sampling_thereafter: 200\n  otlphttp/observer: \n    endpoint: ${PEER_OBSERVER_URL}\n
+    5\n    sampling_thereafter: 200\n  otlphttp/tempo: \n    endpoint: ${PEER_OBSERVER_URL}\n
     \   auth:\n      authenticator: basicauth/observer\n    headers:\n      \"X-Scope-OrgID\":
     \"${PEER_ID}\"\n    tls:\n      insecure: true\n  prometheusremotewrite:\n    endpoint:
     ${PEER_OBSERVER_URL}/api/v1/push\n    external_labels:\n      cluster: ${PEER_ID}\n
@@ -23377,7 +23377,7 @@ spec:
     ${PEER_PASSWORD}\n\nservice:\n  extensions:\n  - health_check\n  - memory_ballast\n
     \ - basicauth/observer\n  pipelines:\n    traces:\n      receivers: [otlp, jaeger,
     zipkin]\n      processors: [filter, k8sattributes, memory_limiter, groupbytrace,
-    resource, resource/add_container, batch]\n      exporters: [logging, otlphttp/observer,
+    resource, resource/add_container, batch]\n      exporters: [logging, otlphttp/tempo,
     spanmetrics, servicegraph]\n    metrics:\n      receivers: [otlp]\n      processors:
     [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, otlphttp/mimir]\n
     \   metrics/servicegraph:\n      receivers: [servicegraph]\n      processors:
