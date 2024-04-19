@@ -23276,7 +23276,7 @@ metadata:
   namespace: observability-peer
 spec:
   groups:
-  - name: opentelemetry-peer-collector
+  - name: opentelemetry-collector
     rules:
     - alert: OpenTelemetryCollectorNotRunning
       annotations:
@@ -23286,6 +23286,74 @@ spec:
       for: 15m
       labels:
         severity: major
+    - alert: processor-dropped-spans
+      annotations:
+        description: Maybe collector has received non standard spans or it reached
+          some limits
+        summary: Some spans have been dropped by processor
+      expr: sum(rate(otelcol_processor_dropped_spans{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: processor-dropped-metrics
+      annotations:
+        description: Maybe collector has received non standard metric points or it
+          reached some limits
+        summary: Some metric points have been dropped by processor
+      expr: sum(rate(otelcol_processor_dropped_metric_points{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: receiver-refused-spans
+      annotations:
+        description: Maybe collector has received non standard spans or it reached
+          some limits
+        summary: Some spans have been refused by receiver
+      expr: sum(rate(otelcol_receiver_refused_spans{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: receiver-refused-metrics
+      annotations:
+        description: Maybe collector has received non standard metric points or it
+          reached some limits
+        summary: Some metric points have been refused by receiver
+      expr: sum(rate(otelcol_receiver_refused_metric_points{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: exporter-enqueued-spans
+      annotations:
+        description: Maybe used destination has a problem or used payload is not correct
+        summary: Some spans have been enqueued by exporter
+      expr: sum(rate(otelcol_exporter_enqueue_failed_spans{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: exporter-enqueued-metrics
+      annotations:
+        description: Maybe used destination has a problem or used payload is not correct
+        summary: Some metric points have been enqueued by exporter
+      expr: sum(rate(otelcol_exporter_enqueue_failed_metric_points{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: exporter-failed-requests
+      annotations:
+        description: Maybe used destination has a problem or used payload is not correct
+        summary: Some exporter requests failed
+      expr: sum(rate(otelcol_exporter_send_failed_requests{}[5m])) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: high-cpu-usage
+      annotations:
+        description: Collector need to scale up
+        summary: High max CPU usage
+      expr: max(rate(otelcol_process_cpu_seconds{}[5m])*100) > 90
+      for: 5m
+      labels:
+        severity: info
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -23386,7 +23454,7 @@ spec:
     memory_limiter, resource, metricstransform, batch]\n      exporters: [logging,
     prometheusremotewrite]\n    logs:\n      receivers: [otlp]\n      processors:
     [k8sattributes, memory_limiter, resource, batch]\n      exporters: [logging, loki]\n
-    \ telemetry:\n    metrics:\n      address: \":8888\"\n"
+    \ telemetry:\n    metrics:\n      address: \":8888\"\n      level: detailed\n"
   env:
   - name: NODE_NAME
     valueFrom:
