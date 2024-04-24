@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
   namespace: observability-peer
 ---
@@ -19,8 +19,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-recommender
   namespace: observability-peer
 ---
@@ -43,8 +43,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test
   namespace: observability-peer
 rules:
@@ -87,7 +87,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
 rules:
 - apiGroups:
@@ -167,7 +167,6 @@ rules:
   - get
   - list
   - watch
-  - patch
 - apiGroups:
   - autoscaling.k8s.io
   resources:
@@ -255,8 +254,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test
 rules:
 - apiGroups:
@@ -286,6 +285,19 @@ rules:
   - get
   - list
   - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-status-actor
+rules:
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers/status
+  verbs:
+  - get
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -352,8 +364,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test
   namespace: observability-peer
 roleRef:
@@ -373,7 +385,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -433,8 +445,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -443,6 +455,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vpa-recommender-peer-test
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-status-actor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-status-actor
+subjects:
+- kind: ServiceAccount
+  name: vpa-recommender-peer-recommender
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -466,7 +491,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.0
+    helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
   namespace: observability-peer
 spec:
@@ -520,8 +545,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-recommender
   namespace: observability-peer
 spec:
@@ -555,7 +580,7 @@ spec:
         - --storage=prometheus
         - --target-cpu-percentile=0.95
         - --v=4
-        image: registry.k8s.io/autoscaling/vpa-recommender:0.14.0
+        image: registry.k8s.io/autoscaling/vpa-recommender:1.0.0
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 6
@@ -583,14 +608,21 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 1000Mi
+            memory: 256Mi
           requests:
             cpu: 50m
-            memory: 500Mi
-        securityContext: {}
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: vpa-recommender-peer-recommender
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -643,8 +675,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test-crds-available
   namespace: observability-peer
 spec:
@@ -681,8 +713,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test-create-vpa
   namespace: observability-peer
 spec:
@@ -736,8 +768,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
-    app.kubernetes.io/version: 0.14.0
-    helm.sh/chart: vpa-3.0.2
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
   name: vpa-recommender-peer-test-metrics-api-available
   namespace: observability-peer
 spec:

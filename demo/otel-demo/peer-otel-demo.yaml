@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo
   name: ackstorm-opentelemetry-demo
   namespace: otel-demo
@@ -197,7 +197,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo
   name: ackstorm-opentelemetry-demo-flagd-config
   namespace: otel-demo
@@ -354,7 +354,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-adservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
   name: ackstorm-opentelemetry-demo-adservice
   namespace: otel-demo
@@ -377,7 +377,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-cartservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
   name: ackstorm-opentelemetry-demo-cartservice
   namespace: otel-demo
@@ -400,7 +400,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-checkoutservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
   name: ackstorm-opentelemetry-demo-checkoutservice
   namespace: otel-demo
@@ -423,7 +423,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-currencyservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
   name: ackstorm-opentelemetry-demo-currencyservice
   namespace: otel-demo
@@ -446,7 +446,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-emailservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
   name: ackstorm-opentelemetry-demo-emailservice
   namespace: otel-demo
@@ -469,7 +469,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-flagd
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
   name: ackstorm-opentelemetry-demo-flagd
   namespace: otel-demo
@@ -492,7 +492,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontend
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
   name: ackstorm-opentelemetry-demo-frontend
   namespace: otel-demo
@@ -515,7 +515,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontendproxy
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
   name: ackstorm-opentelemetry-demo-frontendproxy
   namespace: otel-demo
@@ -538,7 +538,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-kafka
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
   name: ackstorm-opentelemetry-demo-kafka
   namespace: otel-demo
@@ -564,7 +564,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-loadgenerator
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
   name: ackstorm-opentelemetry-demo-loadgenerator
   namespace: otel-demo
@@ -641,7 +641,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-paymentservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
   name: ackstorm-opentelemetry-demo-paymentservice
   namespace: otel-demo
@@ -664,7 +664,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-productcatalogservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
   name: ackstorm-opentelemetry-demo-productcatalogservice
   namespace: otel-demo
@@ -687,7 +687,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-quoteservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
   name: ackstorm-opentelemetry-demo-quoteservice
   namespace: otel-demo
@@ -710,7 +710,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-recommendationservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
   name: ackstorm-opentelemetry-demo-recommendationservice
   namespace: otel-demo
@@ -733,7 +733,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-redis
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
   name: ackstorm-opentelemetry-demo-redis
   namespace: otel-demo
@@ -756,7 +756,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-shippingservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
   name: ackstorm-opentelemetry-demo-shippingservice
   namespace: otel-demo
@@ -779,7 +779,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-accountingservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-accountingservice
   name: ackstorm-opentelemetry-demo-accountingservice
   namespace: otel-demo
@@ -861,7 +861,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-adservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-adservice
   name: ackstorm-opentelemetry-demo-adservice
   namespace: otel-demo
@@ -944,7 +944,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-cartservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-cartservice
   name: ackstorm-opentelemetry-demo-cartservice
   namespace: otel-demo
@@ -1037,7 +1037,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-checkoutservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-checkoutservice
   name: ackstorm-opentelemetry-demo-checkoutservice
   namespace: otel-demo
@@ -1140,7 +1140,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-currencyservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-currencyservice
   name: ackstorm-opentelemetry-demo-currencyservice
   namespace: otel-demo
@@ -1219,7 +1219,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-emailservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-emailservice
   name: ackstorm-opentelemetry-demo-emailservice
   namespace: otel-demo
@@ -1298,7 +1298,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-flagd
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-flagd
   name: ackstorm-opentelemetry-demo-flagd
   namespace: otel-demo
@@ -1381,7 +1381,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-frauddetectionservice
   name: ackstorm-opentelemetry-demo-frauddetectionservice
   namespace: otel-demo
@@ -1463,7 +1463,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontend
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-frontend
   name: ackstorm-opentelemetry-demo-frontend
   namespace: otel-demo
@@ -1566,7 +1566,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-frontendproxy
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-frontendproxy
   name: ackstorm-opentelemetry-demo-frontendproxy
   namespace: otel-demo
@@ -1667,7 +1667,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-kafka
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-kafka
   name: ackstorm-opentelemetry-demo-kafka
   namespace: otel-demo
@@ -1752,7 +1752,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-loadgenerator
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-loadgenerator
   name: ackstorm-opentelemetry-demo-loadgenerator
   namespace: otel-demo
@@ -1946,7 +1946,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-paymentservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-paymentservice
   name: ackstorm-opentelemetry-demo-paymentservice
   namespace: otel-demo
@@ -2031,7 +2031,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-productcatalogservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-productcatalogservice
   name: ackstorm-opentelemetry-demo-productcatalogservice
   namespace: otel-demo
@@ -2112,7 +2112,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-quoteservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-quoteservice
   name: ackstorm-opentelemetry-demo-quoteservice
   namespace: otel-demo
@@ -2195,7 +2195,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-recommendationservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-recommendationservice
   name: ackstorm-opentelemetry-demo-recommendationservice
   namespace: otel-demo
@@ -2282,7 +2282,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-redis
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-redis
   name: ackstorm-opentelemetry-demo-redis
   namespace: otel-demo
@@ -2359,7 +2359,7 @@ metadata:
     app.kubernetes.io/name: ackstorm-opentelemetry-demo-shippingservice
     app.kubernetes.io/part-of: opentelemetry-demo
     app.kubernetes.io/version: 1.9.0
-    helm.sh/chart: opentelemetry-demo-0.30.2
+    helm.sh/chart: opentelemetry-demo-0.30.3
     opentelemetry.io/name: ackstorm-opentelemetry-demo-shippingservice
   name: ackstorm-opentelemetry-demo-shippingservice
   namespace: otel-demo
