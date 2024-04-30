@@ -1173,7 +1173,13 @@ spec:
         app: vpa-admission-controller
     spec:
       containers:
-      - env:
+      - args:
+        - --client-ca-file=/etc/tls-certs/ca.crt
+        - --tls-cert-file=/etc/tls-certs/tls.crt
+        - --tls-private-key=/etc/tls-certs/tls.key
+        command:
+        - ./admission-controller
+        env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
@@ -1288,6 +1294,26 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: vpa-updater
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vpa-cert-by-certmanager
+  namespace: observability-peer
+spec:
+  dnsNames:
+  - vpa-webhook.observability-peer.svc
+  issuerRef:
+    name: self-signer
+  secretName: vpa-tls-certs
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: self-signer
+  namespace: observability-peer
+spec:
+  selfSigned: {}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
