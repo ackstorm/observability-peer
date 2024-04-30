@@ -3582,7 +3582,7 @@ data:
   trivy.mode: Standalone
   trivy.repository: ghcr.io/aquasecurity/trivy
   trivy.resources.limits.cpu: 250m
-  trivy.resources.limits.memory: 512Mi
+  trivy.resources.limits.memory: 754Mi
   trivy.resources.requests.cpu: 100m
   trivy.resources.requests.memory: 256Mi
   trivy.sbomSources: ""
