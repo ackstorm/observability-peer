@@ -43126,6 +43126,60 @@ data:
           help: VPA container recommendations for memory.
           name: vpa_containerrecommendations_target
         - commonLabels:
+            resource: memory
+            unit: byte
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - lowerBound
+              - memory
+            type: Gauge
+          help: VPA container recommendations for memory.
+          name: vpa_containerrecommendations_lowerbound
+        - commonLabels:
+            resource: memory
+            unit: byte
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - uncappedTarget
+              - memory
+            type: Gauge
+          help: VPA container recommendations for memory.
+          name: vpa_containerrecommendations_uncappedtarget
+        - commonLabels:
+            resource: memory
+            unit: byte
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - upperBound
+              - memory
+            type: Gauge
+          help: VPA container recommendations for memory.
+          name: vpa_containerrecommendations_upperbound
+        - commonLabels:
             resource: cpu
             unit: core
           each:
@@ -43143,6 +43197,60 @@ data:
             type: Gauge
           help: VPA container recommendations for cpu.
           name: vpa_containerrecommendations_target
+        - commonLabels:
+            resource: cpu
+            unit: core
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - lowerBound
+              - cpu
+            type: Gauge
+          help: VPA container recommendations for cpu.
+          name: vpa_containerrecommendations_lowerbound
+        - commonLabels:
+            resource: cpu
+            unit: core
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - uncappedTarget
+              - cpu
+            type: Gauge
+          help: VPA container recommendations for cpu.
+          name: vpa_containerrecommendations_uncappedtarget
+        - commonLabels:
+            resource: cpu
+            unit: core
+          each:
+            gauge:
+              labelsFromPath:
+                container:
+                - containerName
+              path:
+              - status
+              - recommendation
+              - containerRecommendations
+              valueFrom:
+              - upperBound
+              - cpu
+            type: Gauge
+          help: VPA container recommendations for cpu.
+          name: vpa_containerrecommendations_upperbound
 kind: ConfigMap
 metadata:
   labels:
