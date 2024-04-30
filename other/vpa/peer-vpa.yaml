@@ -787,6 +787,74 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen
+  namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-controller
+  namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: recommender
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
+  name: ackstorm-goldilocks-vpa-test
+  namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: updater
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ackstorm-goldilocks
@@ -794,6 +862,18 @@ metadata:
     app.kubernetes.io/name: goldilocks
     helm.sh/chart: goldilocks-8.0.1
   name: goldilocks-peer-controller
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-8.0.1
+  name: goldilocks-peer-dashboard
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -813,6 +893,144 @@ kind: ServiceAccount
 metadata:
   name: vpa-updater
   namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen
+  namespace: observability-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test
+  namespace: observability-peer
+rules:
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalercheckpoints
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resourceNames:
+  - ackstorm-goldilocks-vpa-webhook
+  - ackstorm-goldilocks-vpa-tls-secret
+  resources:
+  - secrets
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test
+rules:
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - nodes
+  verbs:
+  - list
+- apiGroups:
+  - apiextensions.k8s.io
+  resourceNames:
+  - verticalpodautoscalercheckpoints.autoscaling.k8s.io
+  - verticalpodautoscalers.autoscaling.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resourceNames:
+  - ackstorm-goldilocks-vpa-webhook-config
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -869,6 +1087,47 @@ rules:
   - get
   - list
   - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-8.0.1
+  name: goldilocks-peer-dashboard
+rules:
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - argoproj.io
+  resources:
+  - rollouts
+  verbs:
+  - get
+  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -1099,6 +1358,317 @@ rules:
   - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-actor
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - nodes
+  - limitranges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+- apiGroups:
+  - poc.autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-admission-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - configmaps
+  - nodes
+  - limitranges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+- apiGroups:
+  - poc.autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - update
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-checkpoint-actor
+rules:
+- apiGroups:
+  - poc.autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalercheckpoints
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - patch
+  - delete
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalercheckpoints
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-evictioner
+rules:
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - replicasets
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods/eviction
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-metrics-reader
+rules:
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-status-reader
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpa-target-reader
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*/scale'
+  verbs:
+  - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen
+  namespace: observability-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ackstorm-goldilocks-vpa-admission-certgen
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-admission-certgen
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test
+  namespace: observability-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ackstorm-goldilocks-vpa-test
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-test
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ackstorm-goldilocks-vpa-admission-certgen
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-admission-certgen
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ackstorm-goldilocks-vpa-test
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-test
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
@@ -1156,6 +1726,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: goldilocks-peer-controller
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-8.0.1
+  name: goldilocks-peer-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: goldilocks-peer-dashboard
+subjects:
+- kind: ServiceAccount
+  name: goldilocks-peer-dashboard
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1271,6 +1860,384 @@ subjects:
   name: vpa-updater
   namespace: observability-peer
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-actor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-actor
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-admission-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-admission-controller
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-admission-controller
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-checkpoint-actor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-checkpoint-actor
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-evictionter-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-evictioner
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-metrics-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-metrics-reader
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-status-reader-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-status-reader
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-target-reader-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-target-reader
+subjects:
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-admission-controller
+  namespace: observability-peer
+- kind: ServiceAccount
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ackstorm-goldilocks-vpa-webhook
+  namespace: observability-peer
+spec:
+  ports:
+  - port: 443
+    targetPort: 8000
+  selector:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/name: vpa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-8.0.1
+  name: goldilocks-peer-dashboard
+  namespace: observability-peer
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/name: goldilocks
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vpa-webhook
+  namespace: observability-peer
+spec:
+  ports:
+  - port: 443
+    targetPort: 8000
+  selector:
+    app: vpa-admission-controller
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-controller
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: admission-controller
+      app.kubernetes.io/instance: ackstorm-goldilocks
+      app.kubernetes.io/name: vpa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-controller
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/name: vpa
+    spec:
+      containers:
+      - args:
+        - --register-webhook=false
+        - --webhook-service=ackstorm-goldilocks-vpa-webhook
+        - --client-ca-file=/etc/tls-certs/ca
+        - --tls-cert-file=/etc/tls-certs/cert
+        - --tls-private-key=/etc/tls-certs/key
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-admission-controller:0.14.0
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: vpa
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 8944
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /etc/tls-certs
+          name: tls-certs
+          readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: ackstorm-goldilocks-vpa-admission-controller
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: ackstorm-goldilocks-vpa-tls-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: recommender
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-recommender
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: recommender
+      app.kubernetes.io/instance: ackstorm-goldilocks
+      app.kubernetes.io/name: vpa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: recommender
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/name: vpa
+    spec:
+      containers:
+      - args:
+        - --pod-recommendation-min-cpu-millicores=15
+        - --pod-recommendation-min-memory-mb=100
+        - --v=4
+        image: registry.k8s.io/autoscaling/vpa-recommender:0.14.0
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: vpa
+        ports:
+        - containerPort: 8942
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 500Mi
+        securityContext: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: ackstorm-goldilocks-vpa-recommender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: updater
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-updater
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: updater
+      app.kubernetes.io/instance: ackstorm-goldilocks
+      app.kubernetes.io/name: vpa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: updater
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/name: vpa
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-updater:0.14.0
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: vpa
+        ports:
+        - containerPort: 8943
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 500Mi
+        securityContext: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: ackstorm-goldilocks-vpa-updater
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1328,6 +2295,119 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: goldilocks
+    helm.sh/chart: goldilocks-8.0.1
+  name: goldilocks-peer-dashboard
+  namespace: observability-peer
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: dashboard
+      app.kubernetes.io/instance: ackstorm-goldilocks
+      app.kubernetes.io/name: goldilocks
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: dashboard
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/name: goldilocks
+    spec:
+      containers:
+      - command:
+        - /goldilocks
+        - dashboard
+        - --exclude-containers=linkerd-proxy,istio-proxy
+        - -v2
+        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.10.0
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        name: goldilocks
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        resources:
+          limits: {}
+          requests:
+            cpu: 25m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10324
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: goldilocks-peer-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpa-admission-controller
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpa-admission-controller
+  template:
+    metadata:
+      labels:
+        app: vpa-admission-controller
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-admission-controller:1.0.0
+        imagePullPolicy: Always
+        name: admission-controller
+        ports:
+        - containerPort: 8000
+        - containerPort: 8944
+          name: prometheus
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /etc/tls-certs
+          name: tls-certs
+          readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: vpa-admission-controller
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: vpa-tls-certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: vpa-recommender
   namespace: observability-peer
 spec:
@@ -1345,7 +2425,7 @@ spec:
         - --prometheus-address=http://prometheus-prometheus-peer.observability-peer.svc:9090
         - --history-length=4d
         - --storage=prometheus
-        - --target-cpu-percentile=0.95
+        - --target-cpu-percentile=0.90
         - --prometheus-cadvisor-job-name=kubelet
         - --container-pod-name-label=pod
         - --container-name-label=container
@@ -1369,6 +2449,128 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: vpa-recommender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpa-updater
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpa-updater
+  template:
+    metadata:
+      labels:
+        app: vpa-updater
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-updater:1.0.0
+        imagePullPolicy: Always
+        name: updater
+        ports:
+        - containerPort: 8943
+          name: prometheus
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 500Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: vpa-updater
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen-create
+  namespace: observability-peer
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: cadmission-ertgen
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vpa
+        app.kubernetes.io/version: 0.14.0
+        helm.sh/chart: vpa-3.0.2
+      name: ackstorm-goldilocks-vpa-admission-certgen
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=ackstorm-goldilocks-vpa-webhook,ackstorm-goldilocks-vpa-webhook.observability-peer.svc
+        - --namespace=observability-peer
+        - --secret-name=ackstorm-goldilocks-vpa-tls-secret
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794
+        name: create
+        resources: {}
+      restartPolicy: OnFailure
+      serviceAccountName: ackstorm-goldilocks-vpa-admission-certgen
+  ttlSecondsAfterFinished: 300
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-admission-certgen-patch
+  namespace: observability-peer
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-certgen
+        app.kubernetes.io/instance: ackstorm-goldilocks
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vpa
+        app.kubernetes.io/version: 0.14.0
+        helm.sh/chart: vpa-3.0.2
+      name: ackstorm-goldilocks-vpa-admission-certgen-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=ackstorm-goldilocks-vpa-webhook-config
+        - --namespace=observability-peer
+        - --secret-name=ackstorm-goldilocks-vpa-tls-secret
+        - --patch-validating=false
+        - --log-level=debug
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794
+        name: patch
+        resources: {}
+      restartPolicy: OnFailure
+      serviceAccountName: ackstorm-goldilocks-vpa-admission-certgen
+  ttlSecondsAfterFinished: 300
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
@@ -1409,3 +2611,262 @@ spec:
       for: 15m
       labels:
         severity: major
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+    helm.sh/hook-weight: "10"
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test-crds-available
+  namespace: observability-peer
+spec:
+  containers:
+  - args:
+    - get
+    - crd
+    - verticalpodautoscalercheckpoints.autoscaling.k8s.io
+    - verticalpodautoscalers.autoscaling.k8s.io
+    command:
+    - kubectl
+    image: bitnami/kubectl:1.28
+    imagePullPolicy: Always
+    name: test
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10324
+  restartPolicy: Never
+  serviceAccountName: ackstorm-goldilocks-vpa-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "20"
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test-create-vpa
+  namespace: observability-peer
+spec:
+  containers:
+  - args:
+    - -c
+    - |
+      #!/bin/bash
+
+      set -ex
+      cat <<EOF | kubectl -n observability-peer apply -f -
+      apiVersion: autoscaling.k8s.io/v1
+      kind: VerticalPodAutoscaler
+      metadata:
+        name: test-vpa
+      spec:
+        targetRef:
+          apiVersion: "apps/v1"
+          kind:       Deployment
+          name:       my-app
+        updatePolicy:
+          updateMode: "Off"
+      EOF
+
+      kubectl -n observability-peer describe vpa test-vpa
+      kubectl -n observability-peer delete vpa test-vpa
+    command:
+    - bash
+    image: bitnami/kubectl:1.28
+    imagePullPolicy: Always
+    name: test
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10324
+  restartPolicy: Never
+  serviceAccountName: ackstorm-goldilocks-vpa-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "40"
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test-metrics-api-available
+  namespace: observability-peer
+spec:
+  containers:
+  - args:
+    - get
+    - --raw
+    - /apis/metrics.k8s.io/v1beta1/nodes
+    command:
+    - kubectl
+    image: bitnami/kubectl:1.28
+    imagePullPolicy: Always
+    name: test
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10324
+  restartPolicy: Never
+  serviceAccountName: ackstorm-goldilocks-vpa-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "30"
+  labels:
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-test-webhook-configuration
+  namespace: observability-peer
+spec:
+  containers:
+  - args:
+    - -c
+    - |
+      #!/bin/bash
+
+      set -ex
+
+      # Get service FQDN
+      SERVICE=$(kubectl \
+        get service \
+        -n observability-peer \
+        ackstorm-goldilocks-vpa-webhook \
+        -o=jsonpath="{.metadata.name}.{.metadata.namespace}.svc:{.spec.ports[0].port}")
+
+      # Get configured FQDN
+      WEBHOOK_SERVICE=$(kubectl \
+        get mutatingwebhookconfigurations.admissionregistration.k8s.io \
+        ackstorm-goldilocks-vpa-webhook-config \
+        -o=jsonpath="{.webhooks[0].clientConfig.service.name}.{.webhooks[0].clientConfig.service.namespace}.svc:{.webhooks[0].clientConfig.service.port}")
+
+      # Get CA bundle
+      SECRET_CABUNDLE=$(kubectl \
+        get secret \
+        -n observability-peer \
+        ackstorm-goldilocks-vpa-tls-secret \
+        -o=jsonpath="{.data.ca}")
+
+      # Get configured CA bundle
+      WEBHOOK_CABUNDLE=$(kubectl \
+        get mutatingwebhookconfigurations.admissionregistration.k8s.io \
+        ackstorm-goldilocks-vpa-webhook-config \
+        -o=jsonpath="{.webhooks[0].clientConfig.caBundle}")
+
+      # All corresponding values must match
+      if [ $SERVICE = $WEBHOOK_SERVICE ]
+      then
+        echo "$WEBHOOK_SERVICE matches $SERVICE"
+        if [ $WEBHOOK_CABUNDLE = $SECRET_CABUNDLE ]
+        then
+          echo "Webhook CA bundle matches"
+          exit 0;
+        else
+          echo "CA bundle in mutating webhook ackstorm-goldilocks-vpa-webhook-config does not match secret observability-peer/ackstorm-goldilocks-vpa-tls-secret"
+        fi
+      else
+        echo "Service configured in mutating webhook ackstorm-goldilocks-vpa-webhook-config is '$WEBHOOK_SERVICE' not '$SERVICE'"
+      fi
+      exit 1;
+    command:
+    - bash
+    image: bitnami/kubectl:1.28
+    imagePullPolicy: Always
+    name: test
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10324
+  restartPolicy: Never
+  serviceAccountName: ackstorm-goldilocks-vpa-test
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-goldilocks
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 0.14.0
+    helm.sh/chart: vpa-3.0.2
+  name: ackstorm-goldilocks-vpa-webhook-config
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: ackstorm-goldilocks-vpa-webhook
+      namespace: observability-peer
+      port: 443
+  failurePolicy: Ignore
+  matchPolicy: Equivalent
+  name: vpa.k8s.io
+  namespaceSelector: {}
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+    scope: '*'
+  - apiGroups:
+    - autoscaling.k8s.io
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - verticalpodautoscalers
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 30
