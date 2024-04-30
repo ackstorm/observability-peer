@@ -3581,10 +3581,10 @@ data:
   trivy.javaDbRepository: ghcr.io/aquasecurity/trivy-java-db
   trivy.mode: Standalone
   trivy.repository: ghcr.io/aquasecurity/trivy
-  trivy.resources.limits.cpu: 500m
-  trivy.resources.limits.memory: 500M
+  trivy.resources.limits.cpu: 250m
+  trivy.resources.limits.memory: 512Mi
   trivy.resources.requests.cpu: 100m
-  trivy.resources.requests.memory: 100M
+  trivy.resources.requests.memory: 256Mi
   trivy.sbomSources: ""
   trivy.severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
   trivy.skipJavaDBUpdate: "false"
@@ -3722,7 +3722,7 @@ spec:
         resources:
           limits:
             cpu: 250m
-            memory: 300Mi
+            memory: 512Mi
           requests:
             cpu: 100m
             memory: 256Mi
