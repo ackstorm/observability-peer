@@ -11,6 +11,37 @@ metadata:
   namespace: observability-peer
 ---
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+  namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-controller
+  namespace: observability-peer
+---
+apiVersion: v1
 automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
@@ -21,7 +52,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -30,8 +61,47 @@ metadata:
   annotations:
     helm.sh/hook: test
     helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
   namespace: observability-peer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: updater
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-updater
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+  namespace: observability-peer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -45,7 +115,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
   namespace: observability-peer
 rules:
 - apiGroups:
@@ -69,8 +139,8 @@ rules:
 - apiGroups:
   - ""
   resourceNames:
-  - vpa-recommender-peer-webhook
-  - vpa-recommender-peer-tls-secret
+  - vpa-peer-webhook
+  - vpa-peer-tls-secret
   resources:
   - secrets
   - services
@@ -180,6 +250,58 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: vpa-admission-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - configmaps
+  - nodes
+  - limitranges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+- apiGroups:
+  - poc.autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - update
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: vpa-checkpoint-actor
 rules:
 - apiGroups:
@@ -248,6 +370,31 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
     helm.sh/hook: test
     helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
   labels:
@@ -256,7 +403,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
 rules:
 - apiGroups:
   - metrics.k8s.io
@@ -278,7 +425,7 @@ rules:
 - apiGroups:
   - admissionregistration.k8s.io
   resourceNames:
-  - vpa-recommender-peer-webhook-config
+  - vpa-peer-webhook-config
   resources:
   - mutatingwebhookconfigurations
   verbs:
@@ -358,6 +505,31 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+  namespace: observability-peer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vpa-peer-admission-certgen
+subjects:
+- kind: ServiceAccount
+  name: vpa-peer-admission-certgen
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
     helm.sh/hook: test
     helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation,hook-failed
   labels:
@@ -366,15 +538,15 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
   namespace: observability-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -406,7 +578,23 @@ roleRef:
   name: vpa-actor
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
+  namespace: observability-peer
+- kind: ServiceAccount
+  name: vpa-peer-updater
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-admission-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-admission-controller
+subjects:
+- kind: ServiceAccount
+  name: vpa-peer-admission-controller
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -419,7 +607,20 @@ roleRef:
   name: vpa-checkpoint-actor
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-evictionter-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-evictioner
+subjects:
+- kind: ServiceAccount
+  name: vpa-peer-updater
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -432,7 +633,31 @@ roleRef:
   name: vpa-metrics-reader
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-peer-admission-certgen
+subjects:
+- kind: ServiceAccount
+  name: vpa-peer-admission-certgen
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -447,14 +672,14 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-test
+  name: vpa-peer-test
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -467,7 +692,20 @@ roleRef:
   name: vpa-status-actor
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
+  namespace: observability-peer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpa-status-reader-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpa-status-reader
+subjects:
+- kind: ServiceAccount
+  name: vpa-peer-updater
   namespace: observability-peer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -480,8 +718,28 @@ roleRef:
   name: vpa-target-reader
 subjects:
 - kind: ServiceAccount
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
   namespace: observability-peer
+- kind: ServiceAccount
+  name: vpa-peer-admission-controller
+  namespace: observability-peer
+- kind: ServiceAccount
+  name: vpa-peer-updater
+  namespace: observability-peer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vpa-peer-webhook
+  namespace: observability-peer
+spec:
+  ports:
+  - port: 443
+    targetPort: 8000
+  selector:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/name: vpa
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -541,13 +799,107 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-controller
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: admission-controller
+      app.kubernetes.io/instance: ackstorm-vpa
+      app.kubernetes.io/name: vpa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-controller
+        app.kubernetes.io/instance: ackstorm-vpa
+        app.kubernetes.io/name: vpa
+    spec:
+      containers:
+      - args:
+        - --register-webhook=false
+        - --webhook-service=vpa-peer-webhook
+        - --client-ca-file=/etc/tls-certs/ca
+        - --tls-cert-file=/etc/tls-certs/cert
+        - --tls-private-key=/etc/tls-certs/key
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-admission-controller:1.0.0
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: vpa
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 8944
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits: {}
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /etc/tls-certs
+          name: tls-certs
+          readOnly: true
+      hostNetwork: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: vpa-peer-admission-controller
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: vpa-peer-tls-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app.kubernetes.io/component: recommender
     app.kubernetes.io/instance: ackstorm-vpa
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
   namespace: observability-peer
 spec:
   replicas: 1
@@ -623,12 +975,171 @@ spec:
         runAsUser: 65534
         seccompProfile:
           type: RuntimeDefault
-      serviceAccountName: vpa-recommender-peer-recommender
+      serviceAccountName: vpa-peer-recommender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: updater
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-updater
+  namespace: observability-peer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: updater
+      app.kubernetes.io/instance: ackstorm-vpa
+      app.kubernetes.io/name: vpa
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: updater
+        app.kubernetes.io/instance: ackstorm-vpa
+        app.kubernetes.io/name: vpa
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-updater:1.0.0
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: vpa
+        ports:
+        - containerPort: 8943
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /health-check
+            port: metrics
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits: {}
+          requests:
+            cpu: 50m
+            memory: 500Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: vpa-peer-updater
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-110"
+  labels:
+    app.kubernetes.io/component: certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen
+  namespace: observability-peer
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-certgen
+        app.kubernetes.io/instance: ackstorm-vpa
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vpa
+        app.kubernetes.io/version: 1.0.0
+        helm.sh/chart: vpa-4.4.6
+      name: vpa-peer-admission-certgen
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=vpa-peer-webhook,vpa-peer-webhook.observability-peer.svc
+        - --namespace=observability-peer
+        - --secret-name=vpa-peer-tls-secret
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794
+        name: create
+        resources: {}
+      restartPolicy: OnFailure
+      serviceAccountName: vpa-peer-admission-certgen
+  ttlSecondsAfterFinished: 300
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/component: admission-certgen
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-admission-certgen-patch
+  namespace: observability-peer
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-certgen
+        app.kubernetes.io/instance: ackstorm-vpa
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: vpa
+        app.kubernetes.io/version: 1.0.0
+        helm.sh/chart: vpa-4.4.6
+      name: vpa-peer-admission-certgen-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=vpa-peer-webhook-config
+        - --namespace=observability-peer
+        - --secret-name=vpa-peer-tls-secret
+        - --patch-validating=false
+        - --log-level=debug
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794
+        name: patch
+        resources: {}
+      restartPolicy: OnFailure
+      serviceAccountName: vpa-peer-admission-certgen
+  ttlSecondsAfterFinished: 300
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: vpa-recommender-peer-recommender
+  name: vpa-peer-recommender
   namespace: observability-peer
 spec:
   namespaceSelector:
@@ -677,7 +1188,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test-crds-available
+  name: vpa-peer-test-crds-available
   namespace: observability-peer
 spec:
   containers:
@@ -700,7 +1211,7 @@ spec:
       runAsNonRoot: true
       runAsUser: 10324
   restartPolicy: Never
-  serviceAccountName: vpa-recommender-peer-test
+  serviceAccountName: vpa-peer-test
 ---
 apiVersion: v1
 kind: Pod
@@ -715,7 +1226,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test-create-vpa
+  name: vpa-peer-test-create-vpa
   namespace: observability-peer
 spec:
   containers:
@@ -755,7 +1266,7 @@ spec:
       runAsNonRoot: true
       runAsUser: 10324
   restartPolicy: Never
-  serviceAccountName: vpa-recommender-peer-test
+  serviceAccountName: vpa-peer-test
 ---
 apiVersion: v1
 kind: Pod
@@ -770,7 +1281,7 @@ metadata:
     app.kubernetes.io/name: vpa
     app.kubernetes.io/version: 1.0.0
     helm.sh/chart: vpa-4.4.6
-  name: vpa-recommender-peer-test-metrics-api-available
+  name: vpa-peer-test-metrics-api-available
   namespace: observability-peer
 spec:
   containers:
@@ -792,4 +1303,133 @@ spec:
       runAsNonRoot: true
       runAsUser: 10324
   restartPolicy: Never
-  serviceAccountName: vpa-recommender-peer-test
+  serviceAccountName: vpa-peer-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "30"
+  labels:
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-test-webhook-configuration
+  namespace: observability-peer
+spec:
+  containers:
+  - args:
+    - -c
+    - |
+      #!/bin/bash
+
+      set -ex
+
+      # Get service FQDN
+      SERVICE=$(kubectl \
+        get service \
+        -n observability-peer \
+        vpa-peer-webhook \
+        -o=jsonpath="{.metadata.name}.{.metadata.namespace}.svc:{.spec.ports[0].port}")
+
+      # Get configured FQDN
+      WEBHOOK_SERVICE=$(kubectl \
+        get mutatingwebhookconfigurations.admissionregistration.k8s.io \
+        vpa-peer-webhook-config \
+        -o=jsonpath="{.webhooks[0].clientConfig.service.name}.{.webhooks[0].clientConfig.service.namespace}.svc:{.webhooks[0].clientConfig.service.port}")
+
+      # Get CA bundle
+      SECRET_CABUNDLE=$(kubectl \
+        get secret \
+        -n observability-peer \
+        vpa-peer-tls-secret \
+        -o=jsonpath="{.data.ca}")
+
+      # Get configured CA bundle
+      WEBHOOK_CABUNDLE=$(kubectl \
+        get mutatingwebhookconfigurations.admissionregistration.k8s.io \
+        vpa-peer-webhook-config \
+        -o=jsonpath="{.webhooks[0].clientConfig.caBundle}")
+
+      # All corresponding values must match
+      if [ $SERVICE = $WEBHOOK_SERVICE ]
+      then
+        echo "$WEBHOOK_SERVICE matches $SERVICE"
+        if [ $WEBHOOK_CABUNDLE = $SECRET_CABUNDLE ]
+        then
+          echo "Webhook CA bundle matches"
+          exit 0;
+        else
+          echo "CA bundle in mutating webhook vpa-peer-webhook-config does not match secret observability-peer/vpa-peer-tls-secret"
+        fi
+      else
+        echo "Service configured in mutating webhook vpa-peer-webhook-config is '$WEBHOOK_SERVICE' not '$SERVICE'"
+      fi
+      exit 1;
+    command:
+    - bash
+    image: bitnami/kubectl:1.28
+    imagePullPolicy: Always
+    name: test
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10324
+  restartPolicy: Never
+  serviceAccountName: vpa-peer-test
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-controller
+    app.kubernetes.io/instance: ackstorm-vpa
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vpa
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: vpa-4.4.6
+  name: vpa-peer-webhook-config
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: vpa-peer-webhook
+      namespace: observability-peer
+      port: 443
+  failurePolicy: Ignore
+  matchPolicy: Equivalent
+  name: vpa.k8s.io
+  namespaceSelector: {}
+  objectSelector: {}
+  reinvocationPolicy: Never
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+    scope: '*'
+  - apiGroups:
+    - autoscaling.k8s.io
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - verticalpodautoscalers
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 5

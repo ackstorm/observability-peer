@@ -282,9 +282,11 @@ spec:
               resourcePolicy:
                 description: Controls how the autoscaler computes recommended resources.
                   The resource policy may be used to set constraints on the recommendations
-                  for individual containers. If not specified, the autoscaler computes
-                  recommended resources for all containers in the pod, without additional
-                  constraints.
+                  for individual containers. If any individual containers need to
+                  be excluded from getting the VPA recommendations, then it must be
+                  disabled explicitly by setting mode to "Off" under containerPolicies.
+                  If not specified, the autoscaler computes recommended resources
+                  for all containers in the pod, without additional constraints.
                 properties:
                   containerPolicies:
                     description: Per-container resource policies.
@@ -396,7 +398,7 @@ spec:
                           - TargetHigherThanRequests
                           - TargetLowerThanRequests
                           type: string
-                        resource:
+                        resources:
                           description: Resources is a list of one or more resources
                             that the condition applies to. If more than one resource
                             is given, the EvictionRequirement is fulfilled if at least
@@ -408,7 +410,7 @@ spec:
                           type: array
                       required:
                       - changeRequirement
-                      - resource
+                      - resources
                       type: object
                     type: array
                   minReplicas:
@@ -787,30 +789,6 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller
-  namespace: observability-peer
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-dashboard
-  namespace: observability-peer
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
   name: vpa-admission-controller
   namespace: observability-peer
 ---
@@ -825,103 +803,6 @@ kind: ServiceAccount
 metadata:
   name: vpa-updater
   namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller
-rules:
-- apiGroups:
-  - apps
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - pods
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling.k8s.io
-  resources:
-  - verticalpodautoscalers
-  verbs:
-  - get
-  - list
-  - create
-  - delete
-  - update
-- apiGroups:
-  - argoproj.io
-  resources:
-  - rollouts
-  verbs:
-  - get
-  - list
-  - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-dashboard
-rules:
-- apiGroups:
-  - autoscaling.k8s.io
-  resources:
-  - verticalpodautoscalers
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - apps
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - pods
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - argoproj.io
-  resources:
-  - rollouts
-  verbs:
-  - get
-  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -1154,85 +1035,6 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: goldilocks-peer-controller
-subjects:
-- kind: ServiceAccount
-  name: goldilocks-peer-controller
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller-map[apiGroups:[batch] resources:[jobs cronjobs]
-    verbs:[list watch]]
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: map[apiGroups:[batch] resources:[jobs cronjobs] verbs:[list watch]]
-subjects:
-- kind: ServiceAccount
-  name: goldilocks-peer-controller
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller-map[apiGroups:[monitoring.coreos.com] resources:[prometheuses]
-    verbs:[list watch]]
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: map[apiGroups:[monitoring.coreos.com] resources:[prometheuses] verbs:[list
-    watch]]
-subjects:
-- kind: ServiceAccount
-  name: goldilocks-peer-controller
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-dashboard
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: goldilocks-peer-dashboard
-subjects:
-- kind: ServiceAccount
-  name: goldilocks-peer-dashboard
-  namespace: observability-peer
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
   name: system:metrics-reader
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1346,144 +1148,62 @@ subjects:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-dashboard
+  name: vpa-webhook
   namespace: observability-peer
 spec:
   ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
+  - port: 443
+    targetPort: 8000
   selector:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/name: goldilocks
-  type: ClusterIP
+    app: vpa-admission-controller
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-controller
+  name: vpa-admission-controller
   namespace: observability-peer
 spec:
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/component: controller
-      app.kubernetes.io/instance: ackstorm-goldilocks
-      app.kubernetes.io/name: goldilocks
+      app: vpa-admission-controller
   template:
     metadata:
       labels:
-        app.kubernetes.io/component: controller
-        app.kubernetes.io/instance: ackstorm-goldilocks
-        app.kubernetes.io/name: goldilocks
+        app: vpa-admission-controller
     spec:
       containers:
-      - command:
-        - /goldilocks
-        - controller
-        - -v2
-        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.10.0
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-admission-controller:1.1.1
         imagePullPolicy: Always
-        name: goldilocks
+        name: admission-controller
+        ports:
+        - containerPort: 8000
+        - containerPort: 8944
+          name: prometheus
         resources:
           limits:
-            cpu: 25m
-            memory: 256Mi
+            cpu: 200m
+            memory: 500Mi
           requests:
-            cpu: 10m
-            memory: 100Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 10324
+            cpu: 50m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /etc/tls-certs
+          name: tls-certs
+          readOnly: true
       securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: goldilocks-peer-controller
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/component: dashboard
-    app.kubernetes.io/instance: ackstorm-goldilocks
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
-  name: goldilocks-peer-dashboard
-  namespace: observability-peer
-spec:
-  replicas: 2
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: dashboard
-      app.kubernetes.io/instance: ackstorm-goldilocks
-      app.kubernetes.io/name: goldilocks
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: dashboard
-        app.kubernetes.io/instance: ackstorm-goldilocks
-        app.kubernetes.io/name: goldilocks
-    spec:
-      containers:
-      - command:
-        - /goldilocks
-        - dashboard
-        - --exclude-containers=linkerd-proxy,istio-proxy
-        - -v2
-        image: us-docker.pkg.dev/fairwinds-ops/oss/goldilocks:v4.10.0
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-        name: goldilocks
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: http
-        resources:
-          limits: {}
-          requests:
-            cpu: 25m
-            memory: 256Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 10324
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: goldilocks-peer-dashboard
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: vpa-admission-controller
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: vpa-tls-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1505,14 +1225,14 @@ spec:
         - --prometheus-address=http://prometheus-prometheus-peer.observability-peer.svc:9090
         - --history-length=4d
         - --storage=prometheus
-        - --target-cpu-percentile=0.90
+        - --target-cpu-percentile=0.85
         - --prometheus-cadvisor-job-name=kubelet
         - --container-pod-name-label=pod
         - --container-name-label=container
         - --metric-for-pod-labels=kube_pod_labels{job="kube-state-metrics"}[4d]
         - --pod-namespace-label=namespace
         - --pod-name-label=pod
-        image: registry.k8s.io/autoscaling/vpa-recommender:1.0.0
+        image: registry.k8s.io/autoscaling/vpa-recommender:1.1.1
         imagePullPolicy: Always
         name: recommender
         ports:
@@ -1529,6 +1249,45 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: vpa-recommender
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpa-updater
+  namespace: observability-peer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpa-updater
+  template:
+    metadata:
+      labels:
+        app: vpa-updater
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/autoscaling/vpa-updater:1.1.1
+        imagePullPolicy: Always
+        name: updater
+        ports:
+        - containerPort: 8943
+          name: prometheus
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 500Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: vpa-updater
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
