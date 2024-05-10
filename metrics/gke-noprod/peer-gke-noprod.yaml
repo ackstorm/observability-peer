@@ -44132,7 +44132,7 @@ metadata:
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    interval: 30s
+    interval: 1m
     path: /metrics
     port: https
     scheme: https
@@ -44460,7 +44460,7 @@ metadata:
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    interval: 30s
+    interval: 1m
     metricRelabelings:
     - action: drop
       regex: node_(nf_conntrack_stat|netstat_.*6|timex_pps|network_carrie|network_iface|scrape).*
@@ -44530,7 +44530,7 @@ spec:
   endpoints:
   - interval: 30s
     port: web
-  - interval: 30s
+  - interval: 1m
     port: reloader-web
   selector:
     matchLabels:

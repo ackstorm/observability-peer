@@ -254,7 +254,7 @@ spec:
     matchNames:
     - observability-peer
   podMetricsEndpoints:
-  - interval: 30s
+  - interval: 1m
     port: prom-metrics
     relabelings:
     - action: keep
