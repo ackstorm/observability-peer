@@ -930,7 +930,7 @@ spec:
         - --prometheus-address=http://prometheus-prometheus-peer.observability-peer.svc:9090
         - --prometheus-cadvisor-job-name=kubelet
         - --storage=prometheus
-        - --target-cpu-percentile=0.95
+        - --target-cpu-percentile=0.85
         - --v=4
         image: registry.k8s.io/autoscaling/vpa-recommender:1.0.0
         imagePullPolicy: Always

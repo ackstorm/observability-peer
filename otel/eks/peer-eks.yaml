@@ -8867,7 +8867,7 @@ spec:
       value: cert-manager-webhook
     - name: CERT_MANAGER_PORT
       value: "443"
-    image: busybox:latest
+    image: public.ecr.aws/docker/library/busybox:latest
     name: wget
   restartPolicy: Never
 ---
@@ -8901,7 +8901,7 @@ spec:
       value: opentelemetry-operator-peer
     - name: MANAGER_METRICS_SERVICE_PORT
       value: "8443"
-    image: busybox:latest
+    image: public.ecr.aws/docker/library/busybox:latest
     name: wget
   restartPolicy: Never
 ---
@@ -8935,7 +8935,7 @@ spec:
       value: opentelemetry-operator-peer-webhook
     - name: WEBHOOK_SERVICE_PORT
       value: "443"
-    image: busybox:latest
+    image: public.ecr.aws/docker/library/busybox:latest
     name: wget
   restartPolicy: Never
 ---
