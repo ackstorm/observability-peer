@@ -44335,6 +44335,7 @@ metadata:
 spec:
   endpoints:
   - honorLabels: true
+    interval: 1m
     metricRelabelings:
     - regex: (.+)
       sourceLabels:
@@ -44384,6 +44385,7 @@ spec:
       targetLabel: job
     scrapeTimeout: 30s
   - honorLabels: true
+    interval: 1m
     metricRelabelings:
     - regex: (.+)
       sourceLabels:
