@@ -44174,6 +44174,7 @@ spec:
       sourceLabels:
       - job
       targetLabel: job
+    scrapeTimeout: 30s
   - honorLabels: true
     metricRelabelings:
     - regex: (.+)
@@ -44222,11 +44223,13 @@ spec:
       sourceLabels:
       - job
       targetLabel: job
+    scrapeTimeout: 30s
   jobLabel: app.kubernetes.io/name
   selector:
     matchLabels:
       app.kubernetes.io/instance: ackstorm-kube-state-metrics
       app.kubernetes.io/name: kube-state-metrics
+  targetLimit: 1
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
