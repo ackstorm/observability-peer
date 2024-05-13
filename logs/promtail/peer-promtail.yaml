@@ -63,13 +63,12 @@ data:
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
     {}\n      - docker: {}\n      - drop:\n          expression: ^$\n      - multiline:\n
     \         firstline: ^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3}\n          max_wait_time:
-    3s\n      - json:\n          expressions:\n            level: level\n            logger:
-    logger\n            message: message\n            timestamp: timestamp\n      -
-    labels:\n          level: null\n          timestamp: null\n      - match:\n          action:
-    drop\n          drop_counter_reason: debug_line\n          selector: '{app=~\".+\"}
-    |~ \"DEBUG\"'\n      - match:\n          action: drop\n          drop_counter_reason:
-    scan-vulnerabilityreport\n          selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n
-    \     - limit:\n          burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
+    3s\n      - json:\n          expressions:\n            level: level\n      - labels:\n
+    \         level: null\n      - match:\n          action: drop\n          drop_counter_reason:
+    debug_line\n          selector: '{app=~\".+\"} |~ \"DEBUG\"'\n      - match:\n
+    \         action: drop\n          drop_counter_reason: scan-vulnerabilityreport\n
+    \         selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n      - limit:\n
+    \         burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
     app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
     \     - metrics:\n          line_count_total:\n            config:\n              action:
     inc\n              match_all: true\n            description: A running counter
@@ -158,7 +157,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 14efba24983b0e27dbfda7d95c1d6638a73b8feb186fc308457892f90d7b2d46
+        checksum/config: 47d8b3a8086e96d72e1988d26464ff288f50262a2bc6d14680ec453efe4ef284
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
