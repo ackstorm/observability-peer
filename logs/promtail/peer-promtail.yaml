@@ -61,14 +61,13 @@ data:
     \   url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n  filename: /run/promtail/positions.yaml\n\nscrape_configs:\n
     \ # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
-    {}\n      - docker: {}\n      - multiline:\n          firstline: ^\\[\\d{4}-\\d{2}-\\d{2}
-    \\d{1,2}:\\d{2}:\\d{2}\\]\n          max_wait_time: 3s\n      - json:\n          expressions:\n
-    \           level: level\n      - labels:\n          level: null\n      - match:\n
-    \         action: drop\n          drop_counter_reason: debug_line\n          selector:
-    '{app=~\".+\"} |~ \"DEBUG\"'\n      - match:\n          action: drop\n          drop_counter_reason:
-    scan-vulnerabilityreport\n          selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n
-    \     - limit:\n          burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
-    app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
+    {}\n      - docker: {}\n      - drop:\n          expression: ^$\n      - json:\n
+    \         expressions:\n            level: level\n      - labels:\n          level:
+    null\n      - match:\n          action: drop\n          drop_counter_reason: debug_line\n
+    \         selector: '{app=~\".+\"} |~ \"DEBUG\"'\n      - match:\n          action:
+    drop\n          drop_counter_reason: scan-vulnerabilityreport\n          selector:
+    '{pod=~\"scan-vulnerabilityreport.*\"}'\n      - limit:\n          burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
+    \         by_label_name: app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
     \     - metrics:\n          line_count_total:\n            config:\n              action:
     inc\n              match_all: true\n            description: A running counter
     of all lines with their corresponding labels\n            type: Counter\n      -
@@ -156,7 +155,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 39ed78689a927551f28684bbc2b16e4f4e6a69b1eba7c63e9cde504213462767
+        checksum/config: 354033476b1672aad1f22ff42e05789626546c1894f83643a9a77d9f9ec0f840
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
