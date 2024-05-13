@@ -61,13 +61,12 @@ data:
     \   url: ${PEER_OBSERVER_URL}/loki/api/v1/push\n\npositions:\n  filename: /run/promtail/positions.yaml\n\nscrape_configs:\n
     \ # See also https://github.com/grafana/loki/blob/master/production/ksonnet/promtail/scrape_config.libsonnet
     for reference\n  - job_name: kubernetes-pods\n    pipeline_stages:\n      - cri:
-    {}\n      - docker: {}\n      - drop:\n          expression: ^$\n      - json:\n
-    \         expressions:\n            level: level\n      - labels:\n          level:
-    null\n      - labeldrop:\n        - filename\n      - match:\n          action:
-    drop\n          drop_counter_reason: debug_line\n          selector: '{app=~\".+\"}
-    |~ \"DEBUG\"'\n      - match:\n          action: drop\n          drop_counter_reason:
-    scan-vulnerabilityreport\n          selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n
-    \     - limit:\n          burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
+    {}\n      - docker: {}\n      - drop:\n          expression: ^$\n      - labeldrop:\n
+    \       - filename\n      - match:\n          action: drop\n          drop_counter_reason:
+    debug_line\n          selector: '{app=~\".+\"} |~ \"DEBUG\"'\n      - match:\n
+    \         action: drop\n          drop_counter_reason: scan-vulnerabilityreport\n
+    \         selector: '{pod=~\"scan-vulnerabilityreport.*\"}'\n      - limit:\n
+    \         burst: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n          by_label_name:
     app\n          drop: true\n          rate: ${PEER_PROMTAIL_LIMIT_LINES_PER_SECOND}\n
     \     - metrics:\n          line_count_total:\n            config:\n              action:
     inc\n              match_all: true\n            description: A running counter
@@ -156,7 +155,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: e8ed326b7070d5b9192d40e307167714ca1a9d931a23ad635a132b63322b166d
+        checksum/config: 7568dba950cc09fa51c7beca593fc9596f24f980d53dad44b5c65b8c5cd48dd3
       labels:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
