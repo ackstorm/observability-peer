@@ -55,6 +55,25 @@ subjects:
 ---
 apiVersion: v1
 data:
+  rules.yaml: |
+    groups:
+    - name: watchdog
+      rules:
+        - alert: Watchdog
+          expr: vector(1)
+          for: 1m
+          labels:
+            severity: critical
+            service: loki
+kind: ConfigMap
+metadata:
+  labels:
+    loki-rules: "true"
+  name: loki-rule-watchdog
+  namespace: observability-peer
+---
+apiVersion: v1
+data:
   promtail.yaml: "server:\n  log_level: info\n  log_format: logfmt\n  http_listen_port:
     3101\n  \n\nclients:\n  - basic_auth:\n      password: ${PEER_PASSWORD}\n      username:
     ${PEER_ID}\n    external_labels:\n      cluster: ${PEER_ID}\n    tenant_id: ${PEER_ID}\n
@@ -193,7 +212,6 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 200m
             memory: 128Mi
           requests:
             cpu: 50m
