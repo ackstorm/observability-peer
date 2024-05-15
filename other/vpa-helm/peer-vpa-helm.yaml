@@ -777,7 +777,6 @@ spec:
         name: goldilocks
         resources:
           limits:
-            cpu: 25m
             memory: 256Mi
           requests:
             cpu: 10m
@@ -959,7 +958,6 @@ spec:
           timeoutSeconds: 3
         resources:
           limits:
-            cpu: 200m
             memory: 256Mi
           requests:
             cpu: 50m

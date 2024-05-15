@@ -3581,7 +3581,7 @@ data:
   trivy.javaDbRepository: ghcr.io/aquasecurity/trivy-java-db
   trivy.mode: Standalone
   trivy.repository: ghcr.io/aquasecurity/trivy
-  trivy.resources.limits.cpu: 250m
+  trivy.resources.limits.cpu: 500m
   trivy.resources.limits.memory: 754Mi
   trivy.resources.requests.cpu: 100m
   trivy.resources.requests.memory: 256Mi
@@ -3720,8 +3720,6 @@ spec:
           periodSeconds: 10
           successThreshold: 1
         resources:
-          limits:
-            cpu: 250m
           requests:
             cpu: 100m
             memory: 256Mi

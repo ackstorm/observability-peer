@@ -43538,7 +43538,6 @@ spec:
         name: mimir-sync
         resources:
           limits:
-            cpu: 100m
             memory: 200Mi
           requests:
             cpu: 10m

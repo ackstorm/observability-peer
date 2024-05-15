@@ -1309,7 +1309,6 @@ spec:
         name: goldilocks
         resources:
           limits:
-            cpu: 25m
             memory: 256Mi
           requests:
             cpu: 10m
@@ -1362,7 +1361,7 @@ spec:
           name: prometheus
         resources:
           limits:
-            cpu: 100m
+            cpu: 200m
             memory: 256Mi
           requests:
             cpu: 10m

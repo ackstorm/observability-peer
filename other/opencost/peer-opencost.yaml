@@ -240,11 +240,11 @@ spec:
           periodSeconds: 10
         resources:
           limits:
-            cpu: 100m
-            memory: 300Mi
+            cpu: 999m
+            memory: 144Mi
           requests:
-            cpu: 10m
-            memory: 80Mi
+            cpu: 99m
+            memory: 144Mi
       - image: quay.io/kubecost1/opencost-ui:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -267,11 +267,11 @@ spec:
           periodSeconds: 10
         resources:
           limits:
-            cpu: 100m
+            cpu: 999m
             memory: 100Mi
           requests:
             cpu: 10m
-            memory: 55Mi
+            memory: 100Mi
       serviceAccountName: opencost-peer
 ---
 apiVersion: monitoring.coreos.com/v1
