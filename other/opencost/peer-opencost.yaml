@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
   namespace: observability-peer
 ---
@@ -20,8 +20,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
 rules:
 - apiGroups:
@@ -105,8 +105,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -127,8 +127,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
   namespace: observability-peer
 ---
@@ -140,8 +140,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
   namespace: observability-peer
 spec:
@@ -165,8 +165,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
   namespace: observability-peer
 spec:
@@ -189,6 +189,14 @@ spec:
       containers:
       - args: null
         env:
+        - name: LOG_LEVEL
+          value: info
+        - name: CUSTOM_COST_ENABLED
+          value: "false"
+        - name: KUBECOST_NAMESPACE
+          value: observability-peer
+        - name: API_PORT
+          value: "9003"
         - name: PROMETHEUS_SERVER_ENDPOINT
           value: http://prometheus-operated.observability-peer.svc.cluster.local:9090
         - name: CLOUD_PROVIDER_API_KEY
@@ -218,7 +226,7 @@ spec:
           value: info
         - name: PROM_CLUSTER_ID_LABEL
           value: cluster
-        image: quay.io/kubecost1/kubecost-cost-model:latest
+        image: ghcr.io/opencost/opencost:1.110.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 12
@@ -245,7 +253,19 @@ spec:
           requests:
             cpu: 99m
             memory: 144Mi
-      - image: quay.io/kubecost1/opencost-ui:latest
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /healthz
+            port: 9003
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      - env:
+        - name: API_PORT
+          value: "9003"
+        - name: UI_PORT
+          value: "9090"
+        image: ghcr.io/opencost/opencost-ui:1.110.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -302,8 +322,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
-    app.kubernetes.io/version: 1.107.1
-    helm.sh/chart: opencost-1.27.0
+    app.kubernetes.io/version: 1.110.0
+    helm.sh/chart: opencost-1.37.0
   name: opencost-peer
   namespace: observability-peer
 spec:
