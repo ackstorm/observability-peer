@@ -117,6 +117,9 @@ subjects:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/port: "9003"
+    prometheus.io/scrape: "true"
   labels:
     app.kubernetes.io/instance: ackstorm-opencost-exporter
     app.kubernetes.io/managed-by: Helm
