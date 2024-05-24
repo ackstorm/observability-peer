@@ -218,12 +218,6 @@ spec:
           value: "7"
         - name: CLOUD_COST_RUN_WINDOW_DAYS
           value: "3"
-        - name: EMIT_KSM_V1_METRICS
-          value: "false"
-        - name: EMIT_KSM_V1_METRICS_ONLY
-          value: "true"
-        - name: LOG_LEVEL
-          value: info
         - name: PROM_CLUSTER_ID_LABEL
           value: cluster
         image: ghcr.io/opencost/opencost:1.110.0
