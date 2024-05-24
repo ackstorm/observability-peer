@@ -254,6 +254,9 @@ spec:
             port: 9003
           initialDelaySeconds: 10
           periodSeconds: 5
+        volumeMounts:
+        - mountPath: /var/configs
+          name: tmp-configs
       - env:
         - name: API_PORT
           value: "9003"
@@ -287,6 +290,9 @@ spec:
             cpu: 10m
             memory: 100Mi
       serviceAccountName: opencost-peer
+      volumes:
+      - emptyDir: {}
+        name: tmp-configs
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
