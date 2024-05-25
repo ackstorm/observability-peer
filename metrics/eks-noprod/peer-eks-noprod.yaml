@@ -44356,6 +44356,11 @@ spec:
       sourceLabels:
       - job
       targetLabel: job
+    - action: replace
+      regex: container_memory_working_set_bytes;(.*)
+      sourceLabels:
+      - __name__, node
+      targetLabel: instance
     scrapeTimeout: 30s
   - honorLabels: true
     interval: 1m
@@ -44406,6 +44411,11 @@ spec:
       sourceLabels:
       - job
       targetLabel: job
+    - action: replace
+      regex: container_memory_working_set_bytes;(.*)
+      sourceLabels:
+      - __name__, node
+      targetLabel: instance
     scrapeTimeout: 30s
   jobLabel: app.kubernetes.io/name
   selector:
