@@ -43862,26 +43862,6 @@ spec:
           type: RuntimeDefault
       serviceAccountName: prometheus-operator-peer
 ---
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/instance: prometheus-peer
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.48.1
-  name: prometheus-prometheus-peer
-  namespace: observability-peer
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: prometheus
-      app.kubernetes.io/instance: prometheus-peer
-      app.kubernetes.io/name: prometheus
-      app.kubernetes.io/part-of: kube-prometheus
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
