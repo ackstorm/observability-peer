@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
   namespace: observability-peer
 ---
@@ -21,7 +21,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
 rules:
 - apiGroups:
@@ -106,7 +106,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -128,7 +128,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
   namespace: observability-peer
 ---
@@ -141,7 +141,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
   namespace: observability-peer
 spec:
@@ -166,7 +166,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
   namespace: observability-peer
 spec:
@@ -323,7 +323,7 @@ metadata:
     app.kubernetes.io/name: opencost
     app.kubernetes.io/part-of: opencost
     app.kubernetes.io/version: 1.110.0
-    helm.sh/chart: opencost-1.37.0
+    helm.sh/chart: opencost-1.37.1
   name: opencost-peer
   namespace: observability-peer
 spec:

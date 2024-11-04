@@ -194,7 +194,7 @@ spec:
     port: http
   namespaceSelector:
     matchNames:
-    - default
+    - coder
   selector:
     matchLabels:
       app: otel-demo-old-backend
@@ -212,7 +212,7 @@ spec:
     port: http
   namespaceSelector:
     matchNames:
-    - default
+    - coder
   selector:
     matchLabels:
       app: otel-demo-old-frontend

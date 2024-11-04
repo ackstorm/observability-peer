@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
+    helm.sh/chart: goldilocks-8.0.2
   name: goldilocks-peer-controller
   namespace: observability-peer
 ---
@@ -157,7 +157,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
+    helm.sh/chart: goldilocks-8.0.2
   name: goldilocks-peer-controller
 rules:
 - apiGroups:
@@ -557,7 +557,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
+    helm.sh/chart: goldilocks-8.0.2
   name: goldilocks-peer-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -749,7 +749,7 @@ metadata:
     app.kubernetes.io/instance: ackstorm-goldilocks
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: goldilocks
-    helm.sh/chart: goldilocks-8.0.1
+    helm.sh/chart: goldilocks-8.0.2
   name: goldilocks-peer-controller
   namespace: observability-peer
 spec:
@@ -1197,7 +1197,7 @@ spec:
     - verticalpodautoscalers.autoscaling.k8s.io
     command:
     - kubectl
-    image: bitnami/kubectl:1.28
+    image: bitnami/kubectl:1.30
     imagePullPolicy: Always
     name: test
     securityContext:
@@ -1252,7 +1252,7 @@ spec:
       kubectl -n observability-peer delete vpa test-vpa
     command:
     - bash
-    image: bitnami/kubectl:1.28
+    image: bitnami/kubectl:1.30
     imagePullPolicy: Always
     name: test
     securityContext:
@@ -1289,7 +1289,7 @@ spec:
     - /apis/metrics.k8s.io/v1beta1/nodes
     command:
     - kubectl
-    image: bitnami/kubectl:1.28
+    image: bitnami/kubectl:1.30
     imagePullPolicy: Always
     name: test
     securityContext:
@@ -1370,7 +1370,7 @@ spec:
       exit 1;
     command:
     - bash
-    image: bitnami/kubectl:1.28
+    image: bitnami/kubectl:1.30
     imagePullPolicy: Always
     name: test
     securityContext:
