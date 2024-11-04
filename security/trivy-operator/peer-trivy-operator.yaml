@@ -78,6 +78,18 @@ spec:
                             - id
                             type: object
                           type: array
+                        commands:
+                          items:
+                            description: Commands represent the commands to be executed
+                              by the node-collector
+                            properties:
+                              id:
+                                description: id define the commands id
+                                type: string
+                            required:
+                            - id
+                            type: object
+                          type: array
                         defaultStatus:
                           description: define the default value for check status in
                             case resource not found
@@ -112,11 +124,15 @@ spec:
                     type: string
                   id:
                     type: string
+                  platform:
+                    type: string
                   relatedResources:
                     items:
                       type: string
                     type: array
                   title:
+                    type: string
+                  type:
                     type: string
                   version:
                     type: string
@@ -124,8 +140,10 @@ spec:
                 - controls
                 - description
                 - id
+                - platform
                 - relatedResources
                 - title
+                - type
                 - version
                 type: object
               cron:
@@ -2918,8 +2936,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
   namespace: observability-peer
 ---
@@ -2930,8 +2948,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
   namespace: observability-peer
 rules:
@@ -2960,8 +2978,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer-leader-election
   namespace: observability-peer
 rules:
@@ -2987,8 +3005,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -3011,8 +3029,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -3035,8 +3053,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -3426,8 +3444,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
   namespace: observability-peer
 roleRef:
@@ -3446,8 +3464,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer-leader-election
   namespace: observability-peer
 roleRef:
@@ -3466,8 +3484,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -3482,14 +3500,16 @@ apiVersion: v1
 data:
   compliance.failEntriesLimit: "10"
   configAuditReports.scanner: Trivy
-  node.collector.imageRef: ghcr.io/aquasecurity/node-collector:0.1.4
+  node.collector.imageRef: ghcr.io/aquasecurity/node-collector:0.3.1
   node.collector.nodeSelector: "true"
   nodeCollector.volumeMounts: '[{"mountPath":"/var/lib/etcd","name":"var-lib-etcd","readOnly":true},{"mountPath":"/var/lib/kubelet","name":"var-lib-kubelet","readOnly":true},{"mountPath":"/var/lib/kube-scheduler","name":"var-lib-kube-scheduler","readOnly":true},{"mountPath":"/var/lib/kube-controller-manager","name":"var-lib-kube-controller-manager","readOnly":true},{"mountPath":"/etc/systemd","name":"etc-systemd","readOnly":true},{"mountPath":"/lib/systemd/","name":"lib-systemd","readOnly":true},{"mountPath":"/etc/kubernetes","name":"etc-kubernetes","readOnly":true},{"mountPath":"/etc/cni/net.d/","name":"etc-cni-netd","readOnly":true}]'
   nodeCollector.volumes: '[{"hostPath":{"path":"/var/lib/etcd"},"name":"var-lib-etcd"},{"hostPath":{"path":"/var/lib/kubelet"},"name":"var-lib-kubelet"},{"hostPath":{"path":"/var/lib/kube-scheduler"},"name":"var-lib-kube-scheduler"},{"hostPath":{"path":"/var/lib/kube-controller-manager"},"name":"var-lib-kube-controller-manager"},{"hostPath":{"path":"/etc/systemd"},"name":"etc-systemd"},{"hostPath":{"path":"/lib/systemd"},"name":"lib-systemd"},{"hostPath":{"path":"/etc/kubernetes"},"name":"etc-kubernetes"},{"hostPath":{"path":"/etc/cni/net.d/"},"name":"etc-cni-netd"}]'
+  policies.bundle.insecure: "false"
   policies.bundle.oci.ref: ghcr.io/aquasecurity/trivy-checks:0
   report.recordFailedChecksOnly: "true"
   scanJob.compressLogs: "true"
   scanJob.podTemplateContainerSecurityContext: '{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true}'
+  scanJob.useGCRServiceAccount: "true"
   vulnerabilityReports.scanner: Trivy
 kind: ConfigMap
 metadata:
@@ -3497,8 +3517,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator
   namespace: observability-peer
 ---
@@ -3540,6 +3560,7 @@ data:
   OPERATOR_SEND_DELETED_REPORTS: "false"
   OPERATOR_VULNERABILITY_SCANNER_ENABLED: "true"
   OPERATOR_VULNERABILITY_SCANNER_SCAN_ONLY_CURRENT_REVISIONS: "true"
+  OPERATOR_WEBHOOK_BROADCAST_CUSTOM_HEADERS: ""
   OPERATOR_WEBHOOK_BROADCAST_TIMEOUT: 30s
   OPERATOR_WEBHOOK_BROADCAST_URL: ""
   TRIVY_SERVER_HEALTH_CHECK_CACHE_EXPIRATION: 10h
@@ -3549,22 +3570,9 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-config
-  namespace: observability-peer
----
-apiVersion: v1
-data: null
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/instance: ackstorm-trivy-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
-  name: trivy-operator-policies-config
   namespace: observability-peer
 ---
 apiVersion: v1
@@ -3590,17 +3598,18 @@ data:
   trivy.skipJavaDBUpdate: "false"
   trivy.slow: "true"
   trivy.supportedConfigAuditKinds: Workload,Service,Role,ClusterRole,NetworkPolicy,Ingress,LimitRange,ResourceQuota
-  trivy.tag: 0.50.2
+  trivy.tag: 0.53.0
   trivy.timeout: 5m0s
   trivy.useBuiltinRegoPolicies: "true"
+  trivy.useEmbeddedRegoPolicies: "false"
 kind: ConfigMap
 metadata:
   labels:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-trivy-config
   namespace: observability-peer
 ---
@@ -3612,8 +3621,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator
   namespace: observability-peer
 ---
@@ -3625,8 +3634,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-trivy-config
   namespace: observability-peer
 ---
@@ -3637,8 +3646,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
   namespace: observability-peer
 spec:
@@ -3661,8 +3670,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-trivy-operator
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-    helm.sh/chart: trivy-operator-0.22.1
+    app.kubernetes.io/version: 0.22.0
+    helm.sh/chart: trivy-operator-0.24.1
   name: trivy-operator-peer
   namespace: observability-peer
 spec:
@@ -3695,7 +3704,7 @@ spec:
         envFrom:
         - configMapRef:
             name: trivy-operator-config
-        image: ghcr.io/aquasecurity/trivy-operator:0.20.1
+        image: ghcr.io/aquasecurity/trivy-operator:0.22.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -3746,14 +3755,16 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-  name: cis
+    app.kubernetes.io/version: 0.22.0
+  name: k8s-cis-1.23
   namespace: observability-peer
 spec:
   compliance:
     controls:
     - checks:
       - id: AVD-KCV-0048
+      commands:
+      - id: CMD-0001
       description: Ensure that the API server pod specification file has permissions
         of 600 or more restrictive
       id: 1.1.1
@@ -3762,6 +3773,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0049
+      commands:
+      - id: CMD-0002
       description: Ensure that the API server pod specification file ownership is
         set to root:root
       id: 1.1.2
@@ -3770,6 +3783,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0050
+      commands:
+      - id: CMD-0003
       description: Ensure that the controller manager pod specification file has permissions
         of 600 or more restrictive
       id: 1.1.3
@@ -3778,6 +3793,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0051
+      commands:
+      - id: CMD-0004
       description: Ensure that the controller manager pod specification file ownership
         is set to root:root
       id: 1.1.4
@@ -3786,6 +3803,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0052
+      commands:
+      - id: CMD-0005
       description: Ensure that the scheduler pod specification file has permissions
         of 600 or more restrictive
       id: 1.1.5
@@ -3794,6 +3813,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0053
+      commands:
+      - id: CMD-0006
       description: Ensure that the scheduler pod specification file ownership is set
         to root:root
       id: 1.1.6
@@ -3801,6 +3822,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0054
+      commands:
+      - id: CMD-0007
       description: Ensure that the etcd pod specification file has permissions of
         600 or more restrictive
       id: 1.1.7
@@ -3809,6 +3832,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0055
+      commands:
+      - id: CMD-0008
       description: Ensure that the etcd pod specification file ownership is set to
         root:root.
       id: 1.1.8
@@ -3816,6 +3841,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0056
+      commands:
+      - id: CMD-0009
       description: Ensure that the Container Network Interface files have permissions
         of 600 or more restrictive
       id: 1.1.9
@@ -3824,6 +3851,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0057
+      commands:
+      - id: CMD-0010
       description: Ensure that the Container Network Interface files have ownership
         set to root:root
       id: 1.1.10
@@ -3831,6 +3860,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0058
+      commands:
+      - id: CMD-0011
       description: Ensure that the etcd data directory has permissions of 700 or more
         restrictive
       id: 1.1.11
@@ -3839,24 +3870,32 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0059
+      commands:
+      - id: CMD-0012
       description: Ensure that the etcd data directory ownership is set to etcd:etcd
       id: 1.1.12
       name: Ensure that the etcd data directory ownership is set to etcd:etcd
       severity: LOW
     - checks:
       - id: AVD-KCV-0060
+      commands:
+      - id: CMD-0013
       description: Ensure that the admin.conf file has permissions of 600
       id: 1.1.13
       name: Ensure that the admin.conf file permissions are set to 600
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0061
+      commands:
+      - id: CMD-0014
       description: Ensure that the admin.conf file ownership is set to root:root
       id: 1.1.14
       name: Ensure that the admin.conf file ownership is set to root:root
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0062
+      commands:
+      - id: CMD-0015
       description: Ensure that the scheduler.conf file has permissions of 600 or more
         restrictive
       id: 1.1.15
@@ -3865,12 +3904,16 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0063
+      commands:
+      - id: CMD-0016
       description: Ensure that the scheduler.conf file ownership is set to root:root
       id: 1.1.16
       name: Ensure that the scheduler.conf file ownership is set to root:root
       severity: HIGH
     - checks:
       - id: AVD-KCV-0064
+      commands:
+      - id: CMD-0017
       description: Ensure that the controller-manager.conf file has permissions of
         600 or more restrictive
       id: 1.1.17
@@ -3879,6 +3922,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0065
+      commands:
+      - id: CMD-0018
       description: Ensure that the controller-manager.conf file ownership is set to
         root:root.
       id: 1.1.18
@@ -3886,6 +3931,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0066
+      commands:
+      - id: CMD-0019
       description: Ensure that the Kubernetes PKI directory and file ownership is
         set to root:root
       id: 1.1.19
@@ -3894,6 +3941,8 @@ spec:
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0068
+      commands:
+      - id: CMD-0020
       description: Ensure that Kubernetes PKI certificate files have permissions of
         600 or more restrictive
       id: 1.1.20
@@ -3902,6 +3951,8 @@ spec:
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0067
+      commands:
+      - id: CMD-0021
       description: Ensure that Kubernetes PKI key files have permissions of 600
       id: 1.1.21
       name: Ensure that the Kubernetes PKI key file permissions are set to 600
@@ -4201,6 +4252,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0069
+      commands:
+      - id: CMD-0022
       description: Ensure that the kubelet service file has permissions of 600 or
         more restrictive.
       id: 4.1.1
@@ -4209,12 +4262,16 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0070
+      commands:
+      - id: CMD-0023
       description: Ensure that the kubelet service file ownership is set to root:root
       id: 4.1.2
       name: Ensure that the kubelet service file ownership is set to root:root
       severity: HIGH
     - checks:
       - id: AVD-KCV-0071
+      commands:
+      - id: CMD-0024
       description: If kube-proxy is running, and if it is using a file-based kubeconfig
         file, ensure that the proxy kubeconfig file has permissions of 600 or more
         restrictive
@@ -4224,6 +4281,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0072
+      commands:
+      - id: CMD-0025
       description: If kube-proxy is running, ensure that the file ownership of its
         kubeconfig file is set to root:root
       id: 4.1.4
@@ -4231,6 +4290,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0073
+      commands:
+      - id: CMD-0026
       description: Ensure that the kubelet.conf file has permissions of 600 or more
         restrictive
       id: 4.1.5
@@ -4239,12 +4300,16 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0074
+      commands:
+      - id: CMD-0027
       description: Ensure that the kubelet.conf file ownership is set to root:root
       id: 4.1.6
       name: Ensure that the --kubeconfig kubelet.conf file ownership is set to root:root
       severity: HIGH
     - checks:
       - id: AVD-KCV-0075
+      commands:
+      - id: CMD-0028
       description: Ensure that the certificate authorities file has permissions of
         600 or more restrictive
       id: 4.1.7
@@ -4253,6 +4318,8 @@ spec:
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0076
+      commands:
+      - id: CMD-0029
       description: Ensure that the certificate authorities file ownership is set to
         root:root
       id: 4.1.8
@@ -4261,6 +4328,8 @@ spec:
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0077
+      commands:
+      - id: CMD-0030
       description: Ensure that if the kubelet refers to a configuration file with
         the --config argument, that file has permissions of 600 or more restrictive
       id: 4.1.9
@@ -4269,6 +4338,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0078
+      commands:
+      - id: CMD-0031
       description: Ensure that if the kubelet refers to a configuration file with
         the --config argument, that file is owned by root:root
       id: 4.1.10
@@ -4277,30 +4348,40 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0079
+      commands:
+      - id: CMD-0032
       description: Disable anonymous requests to the Kubelet server
       id: 4.2.1
       name: Ensure that the --anonymous-auth argument is set to false
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0080
+      commands:
+      - id: CMD-0033
       description: Do not allow all requests. Enable explicit authorization
       id: 4.2.2
       name: Ensure that the --authorization-mode argument is not set to AlwaysAllow
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0081
+      commands:
+      - id: CMD-0034
       description: Enable Kubelet authentication using certificates
       id: 4.2.3
       name: Ensure that the --client-ca-file argument is set as appropriate
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0082
+      commands:
+      - id: CMD-0035
       description: Disable the read-only port
       id: 4.2.4
       name: Verify that the --read-only-port argument is set to 0
       severity: HIGH
     - checks:
       - id: AVD-KCV-0085
+      commands:
+      - id: CMD-0036
       description: Do not disable timeouts on streaming connections
       id: 4.2.5
       name: Ensure that the --streaming-connection-idle-timeout argument is not set
@@ -4308,6 +4389,8 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0083
+      commands:
+      - id: CMD-0037
       description: Protect tuned kernel parameters from overriding kubelet default
         kernel parameter values
       id: 4.2.6
@@ -4315,18 +4398,24 @@ spec:
       severity: HIGH
     - checks:
       - id: AVD-KCV-0084
+      commands:
+      - id: CMD-0038
       description: Allow Kubelet to manage iptables
       id: 4.2.7
       name: Ensure that the --make-iptables-util-chains argument is set to true
       severity: HIGH
     - checks:
       - id: AVD-KCV-0086
+      commands:
+      - id: CMD-0039
       description: Do not override node hostnames
       id: 4.2.8
       name: Ensure that the --hostname-override argument is not set
       severity: HIGH
     - checks:
       - id: AVD-KCV-0087
+      commands:
+      - id: CMD-0040
       description: Security relevant information should be captured. The --event-qps
         flag on the Kubelet can be used to limit the rate at which events are gathered
       id: 4.2.9
@@ -4336,6 +4425,9 @@ spec:
     - checks:
       - id: AVD-KCV-0088
       - id: AVD-KCV-0089
+      commands:
+      - id: CMD-0041
+      - id: CMD-0042
       description: Setup TLS connection on the Kubelets
       id: 4.2.10
       name: Ensure that the --tls-cert-file and --tls-private-key-file arguments are
@@ -4343,18 +4435,24 @@ spec:
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0090
+      commands:
+      - id: CMD-0043
       description: Enable kubelet client certificate rotation
       id: 4.2.11
       name: Ensure that the --rotate-certificates argument is not set to false
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0091
+      commands:
+      - id: CMD-0044
       description: Enable kubelet server certificate rotation
       id: 4.2.12
       name: Verify that the RotateKubeletServerCertificate argument is set to true
       severity: CRITICAL
     - checks:
       - id: AVD-KCV-0092
+      commands:
+      - id: CMD-0045
       description: Ensure that the Kubelet is configured to only use strong cryptographic
         ciphers
       id: 4.2.13
@@ -4538,11 +4636,13 @@ spec:
       name: The default namespace should not be used
       severity: MEDIUM
     description: CIS Kubernetes Benchmarks
-    id: cis
+    id: k8s-cis-1.23
+    platform: k8s
     relatedResources:
     - https://www.cisecurity.org/benchmark/kubernetes
     title: CIS Kubernetes Benchmarks v1.23
-    version: "1.0"
+    type: cis
+    version: "1.23"
   cron: 0 */6 * * *
   reportType: summary
 ---
@@ -4553,8 +4653,8 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-  name: nsa
+    app.kubernetes.io/version: 0.22.0
+  name: k8s-nsa-1.0
   namespace: observability-peer
 spec:
   compliance:
@@ -4727,10 +4827,12 @@ spec:
       name: Audit log aging
       severity: MEDIUM
     description: National Security Agency - Kubernetes Hardening Guidance
-    id: nsa
+    id: k8s-nsa-1.0
+    platform: k8s
     relatedResources:
     - https://www.nsa.gov/Press-Room/News-Highlights/Article/Article/2716980/nsa-cisa-release-kubernetes-hardening-guidance/
     title: National Security Agency - Kubernetes Hardening Guidance v1.0
+    type: nsa
     version: "1.0"
   cron: 0 */6 * * *
   reportType: summary
@@ -4742,8 +4844,8 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-  name: pss-baseline
+    app.kubernetes.io/version: 0.22.0
+  name: k8s-pss-baseline-0.1
   namespace: observability-peer
 spec:
   compliance:
@@ -4826,10 +4928,12 @@ spec:
       name: Sysctls
       severity: MEDIUM
     description: Kubernetes Pod Security Standards - Baseline
-    id: pss-baseline
+    id: k8s-pss-baseline-0.1
+    platform: eks
     relatedResources:
     - https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline
     title: Kubernetes Pod Security Standards - Baseline
+    type: pss-baseline
     version: "0.1"
   cron: 0 */6 * * *
   reportType: summary
@@ -4841,8 +4945,8 @@ metadata:
     app.kubernetes.io/instance: trivy-operator
     app.kubernetes.io/managed-by: kubectl
     app.kubernetes.io/name: trivy-operator
-    app.kubernetes.io/version: 0.20.1
-  name: pss-restricted
+    app.kubernetes.io/version: 0.22.0
+  name: k8s-pss-restricted-0.1
   namespace: observability-peer
 spec:
   compliance:
@@ -4964,10 +5068,12 @@ spec:
       name: Capabilities
       severity: LOW
     description: Kubernetes Pod Security Standards - Restricted
-    id: pss-restricted
+    id: k8s-pss-restricted-0.1
+    platform: k8s
     relatedResources:
     - https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
     title: Kubernetes Pod Security Standards - Restricted
+    type: pss-restricted
     version: "0.1"
   cron: 0 */6 * * *
   reportType: summary

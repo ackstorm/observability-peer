@@ -1,12 +1,13 @@
 apiVersion: v1
+automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
   namespace: observability-peer
 ---
@@ -17,8 +18,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
 rules:
 - apiGroups:
@@ -41,8 +42,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -126,8 +127,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
   namespace: observability-peer
 ---
@@ -138,8 +139,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer-metrics
   namespace: observability-peer
 spec:
@@ -162,8 +163,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
   namespace: observability-peer
 spec:
@@ -179,6 +180,7 @@ spec:
         app.kubernetes.io/instance: ackstorm-promtail
         app.kubernetes.io/name: promtail
     spec:
+      automountServiceAccountToken: true
       containers:
       - args:
         - -config.file=/etc/promtail/promtail.yaml
@@ -194,7 +196,7 @@ spec:
             secretKeyRef:
               key: password
               name: observability-peer-auth
-        image: docker.io/grafana/promtail:2.9.3
+        image: docker.io/grafana/promtail:3.0.0
         imagePullPolicy: IfNotPresent
         name: promtail
         ports:
@@ -267,8 +269,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
   namespace: observability-peer
 spec:
@@ -341,8 +343,8 @@ metadata:
     app.kubernetes.io/instance: ackstorm-promtail
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: promtail
-    app.kubernetes.io/version: 2.9.3
-    helm.sh/chart: promtail-6.15.5
+    app.kubernetes.io/version: 3.0.0
+    helm.sh/chart: promtail-6.16.6
   name: promtail-peer
   namespace: observability-peer
 spec:
